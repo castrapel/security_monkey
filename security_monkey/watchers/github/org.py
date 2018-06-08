@@ -45,7 +45,12 @@ class GitHubOrg(Watcher):
             "disk_usage",
             "owned_private_repos",
             "public_repos",
-            "disk_usage"
+            "total_private_repos",
+            "private_gists",
+            "public_gists",
+            "followers",
+            "following",
+            "plan$*$filled_seats"
         ]
         self.github_creds = get_github_creds(self.accounts)
 

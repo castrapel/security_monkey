@@ -44,11 +44,7 @@ LOG_CFG = {
     'loggers': {
         'security_monkey': {
             'handlers': ['file', 'console'],
-            'level': 'WARN'
-        },
-        'apscheduler': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO'
+            'level': 'DEBUG'
         }
     }
 }
@@ -62,8 +58,6 @@ AWS_GOVCLOUD = False
 
 SQLALCHEMY_DATABASE_URI = 'postgresql://securitymonkeyuser:securitymonkeypassword@localhost:5432/secmonkey'
 
-SQLALCHEMY_POOL_SIZE = 50
-SQLALCHEMY_MAX_OVERFLOW = 15
 ENVIRONMENT = 'ec2'
 USE_ROUTE53 = False
 FQDN = 'ec2-XX-XXX-XXX-XXX.compute-1.amazonaws.com'
@@ -121,9 +115,6 @@ SECURITYGROUP_INSTANCE_DETAIL = 'FULL'
 # Otherwise, SM will alert on all dataplane write access.
 DEFAULT_SENSITIVE = 'ALL'
 
-# Threads used by the scheduler.
-MAX_THREADS = 30
-
 # SSO SETTINGS:
 ACTIVE_PROVIDERS = []  # "aad", "ping", "google" or "onelogin"
 
@@ -155,6 +146,7 @@ ONELOGIN_APP_ID = '<APP_ID>'  # OneLogin App ID provider by your administrator
 ONELOGIN_EMAIL_FIELD = 'User.email'  # SAML attribute used to provide email address
 ONELOGIN_DEFAULT_ROLE = 'View'  # Default RBAC when user doesn't already exist
 ONELOGIN_HTTPS = True  # If using HTTPS strict mode will check the requests are HTTPS
+ONELOGIN_LOG_SAML_RESPONSE = False # Log SAML response for debugging. Default is False
 ONELOGIN_SETTINGS = {
     # If strict is True, then the Python Toolkit will reject unsigned
     # or unencrypted messages if it expects them to be signed or encrypted.

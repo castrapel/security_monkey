@@ -5,8 +5,9 @@ This document outlines how to configure Security Monkey to:
 
 1. Automatically run the API
 1. Automatically scan for changes in your environment.
+1. Configure Security Monkey to send scanning performance metrics
 
-Each section is important, please read them thoroughly. 
+Each section is important, please read them thoroughly.
 
 Celery and The Supervisor
 ------------
@@ -38,6 +39,9 @@ to make an image of your instance/container and clone new ones to provide the se
 For AWS, you can make an AMI off of your Security Monkey instance, and even create separate launch
 configurations and auto-scaling groups.
 
+Below is a diagram of the components required by Security Monkey (these are not AWS specific):
+![diagram](images/sm_instance_diagram.png)
+
 Autostarting the API and UI
 --------------------
 
@@ -50,7 +54,6 @@ This file needs to be copied over to the supervisor configuration directory at `
 
 To enable NGINX and the supervisor, run the following commands (these also set the proper permissions):
 
-```
     sudo chgrp -R www-data /var/log/security_monkey
     sudo cp /usr/local/src/security_monkey/supervisor/security_monkey_ui.conf /etc/supervisor/conf.d/security_monkey_ui.conf
     sudo systemctl enable nginx
@@ -58,7 +61,6 @@ To enable NGINX and the supervisor, run the following commands (these also set t
     sudo systemctl start nginx
     sudo systemctl start supervisor
     sudo supervisorctl status
-```
 
 The `supervisorctl status` should output details about the loaded supervisor job.
 
@@ -90,8 +92,8 @@ firewall rules to permit worker instances access. This is documented in the abov
 If installing on the `localhost` of the scheduler instance, you will need to install Redis on the instance (this is complete if following the quickstart guide).
 
 ### Celery Configuration
-You will need to modify the `celeryconfig.py` file that is stored in the base Security Monkey location
-at `/usr/local/src/security_monkey/celeryconfig.py`(https://github.com/Netflix/security_monkey/blob/develop/celeryconfig.py).
+You will need to modify the `security_monkey/celeryconfig.py` file that is stored in the base Security Monkey location
+at `/usr/local/src/security_monkey/security_monkey/celeryconfig.py`(https://github.com/Netflix/security_monkey/blob/develop/security_monkey/celeryconfig.py).
 
 This file looks like this:
 ```
@@ -104,6 +106,7 @@ imports = ('security_monkey.task_scheduler.tasks',)
 # How many processes per worker instance?
 worker_concurrency = 10
 
+timezone = "UTC"
 enable_utc = True
 
 ###########################
@@ -123,20 +126,17 @@ With the message broker configured, it's now time to copy over the supervisor co
 A sample is provided at: `security_monkey_scheduler.conf`(https://github.com/Netflix/security_monkey/tree/develop/supervisor/security_monkey_scheduler.conf)
 
 Run the following commands to set this up:
-```
-    sudo touch /var/run/sm-celerybeat-schedule
-    sudo chgrp www-data sm-celerybeat-schedule
+
     sudo chgrp -R www-data /var/log/security_monkey
     sudo cp /usr/local/src/security_monkey/supervisor/security_monkey_scheduler.conf /etc/supervisor/conf.d/security_monkey_scheduler.conf
     sudo systemctl enable supervisor
     sudo systemctl start supervisor
     sudo supervisorctl status
-```
 
 The supervisor configuration will start the Celery `beat` service, which performs all the scheduling logic. 
 The full command that the supervisor runs to launch the the `beat` service is:
  ```
- /usr/local/src/security_monkey/venv/bin/celery -A security_monkey.task_scheduler.beat.CELERY beat -s /var/run/sm-celerybeat-schedule -l debug
+ /usr/local/src/security_monkey/venv/bin/celery -A security_monkey.task_scheduler.beat.CELERY beat -s /tmp/sm-celerybeat-schedule -l debug
  ```
 
 Running this command will first purge out all existing jobs from the message broker and start fresh. This is
@@ -154,7 +154,7 @@ The workers are instances that fetch data from your configured accounts. These a
 
 You are able to deploy as many workers as you like for your environment.  Security Monkey splits up tasks based on the account and technology pair.
 
-Similar to configuring the Scheduler above, the workers need to have the **same** `celeryconfig.py` as the scheduler. In here, you can optionally configure
+Similar to configuring the Scheduler above, the workers need to have the **same** `security_monkey/celeryconfig.py` as the scheduler. In here, you can optionally configure
 the number of processes that exist within each instance (via the `worker_concurrency` configuration). By default 10 is selected. You can adjust this as necessary. In general, if you would like to 
 scale horizontally, you should deploy more worker instances. This will allow for maximum parallelization.
 
@@ -164,13 +164,13 @@ A sample Supervisor configuration is provided at `security_monkey_workers.conf`(
 that will automatically run the Celery worker processes for you.
 
 Run the following commands to set this up:
-```
+
     sudo chgrp -R www-data /var/log/security_monkey
     sudo cp /usr/local/src/security_monkey/supervisor/security_monkey_workers.conf /etc/supervisor/conf.d/security_monkey_workers.conf
     sudo systemctl enable supervisor
     sudo systemctl start supervisor
     sudo supervisorctl status
-```
+
 
 Supervisor will run the Celery `worker` command, which is:
 ```
@@ -179,6 +179,11 @@ Supervisor will run the Celery `worker` command, which is:
 
 **Note:** Please do not run this on the same instance as the scheduler. Exactly one scheduler should exist. There can be many worker instances,
 so keep the supervisor configurations on these instances separate.
+
+
+Configure Security Monkey to send scanning performance metrics
+--------------------------------------------------------------
+Security Monkey can be configured to send metrics when objects are added or removed from the scanning queue.  This allows operators to check Security Monkey performance and ensure that items are being processed from the queue in a timely manner.  To do so set `METRICS_ENABLED` to `True`.  You will need `cloudwatch:PutMetricData` permission.  Metrics will be posted with the namespace `securitymonkey` unless configured using the variable `METRICS_NAMESPACE`.  You will also want to set `METRICS_POST_REGION` with the region you want to post CloudWatch Metrics to (default: `us-east-1`).
 
 
 Deployment Strategies

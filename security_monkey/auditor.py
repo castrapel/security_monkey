@@ -20,11 +20,10 @@
 .. moduleauthor:: Patrick Kelley <pkelley@netflix.com>
 
 """
+from six import string_types, text_type
 
-import datastore
-
-from security_monkey import app, db
-from security_monkey.watcher import ChangeItem
+from security_monkey import app, datastore, db
+from security_monkey.watcher import ChangeItem, ensure_item_has_latest_revision_id
 from security_monkey.common.jinja import get_jinja_env
 from security_monkey.datastore import User, AuditorSettings, Item, ItemAudit, Technology, Account, ItemAuditScore, AccountPatternAuditScore
 from security_monkey.common.utils import send_email
@@ -103,6 +102,7 @@ class Categories:
     # TODO
     # 	INSECURE_CERTIFICATE = 'Insecure Certificate'
 
+
 class Entity:
     """ Entity instances provide a place to map policy elements like s3:my_bucket to the related account. """
     def __init__(self, category, value, account_name=None, account_identifier=None):
@@ -176,7 +176,7 @@ class Auditor(object):
         self.override_scores = None
         self.current_method_name = None
 
-        if type(self.team_emails) in (str, unicode):
+        if type(self.team_emails) in string_types:
             self.emails.append(self.team_emails)
         elif type(self.team_emails) in (list, tuple):
             self.emails.extend(self.team_emails)
@@ -189,18 +189,18 @@ class Auditor(object):
 
     def load_policies(self, item, policy_keys):
         """For a given item, return a list of all resource policies.
-        
-        Most items only have a single resource policy, typically found 
+
+        Most items only have a single resource policy, typically found
         inside the config with the key, "Policy".
-        
+
         Some technologies have multiple resource policies.  A lambda function
         is an example of an item with multiple resource policies.
-        
+
         The lambda function auditor can define a list of `policy_keys`.  Each
         item in this list is the dpath to one of the resource policies.
-        
+
         The `policy_keys` defaults to ['Policy'] unless overriden by a subclass.
-        
+
         Returns:
             list of Policy objects
         """
@@ -356,7 +356,7 @@ class Auditor(object):
             add(cls.OBJECT_STORE['vpc'], item.latest_config.get('id'), item.account.identifier)
             add(cls.OBJECT_STORE['cidr'], item.latest_config.get('cidr_block'), item.account.identifier)
 
-            vpcnat_tags = unicode(item.latest_config.get('tags', {}).get('vpcnat', ''))
+            vpcnat_tags = text_type(item.latest_config.get('tags', {}).get('vpcnat', ''))
             vpcnat_tag_cidrs = vpcnat_tags.split(',')
             for vpcnat_tag_cidr in vpcnat_tag_cidrs:
                 add(cls.OBJECT_STORE['cidr'], vpcnat_tag_cidr.strip(), item.account.identifier)
@@ -399,10 +399,18 @@ class Auditor(object):
         role_results = cls._load_related_items('iamrole')
 
         for item in user_results:
-            add(cls.OBJECT_STORE['userid'], item.latest_config.get('UserId'), item.account.identifier)
+            fixed_item = ensure_item_has_latest_revision_id(item)
+            if not fixed_item:
+                continue
+
+            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get('UserId'), fixed_item.account.identifier)
 
         for item in role_results:
-            add(cls.OBJECT_STORE['userid'], item.latest_config.get('RoleId'), item.account.identifier)
+            fixed_item = ensure_item_has_latest_revision_id(item)
+            if not fixed_item:
+                continue
+
+            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get('RoleId'), fixed_item.account.identifier)
 
     @classmethod
     def _load_accounts(cls):
@@ -443,22 +451,22 @@ class Auditor(object):
         if key == 'aws':
             return dict(name='AWS', identifier='AWS')
         for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS']:
-            if unicode(account.get(key, '')).lower() == value.lower():
+            if text_type(account.get(key, '')).lower() == value.lower():
                 return account
 
     def inspect_entity(self, entity, item):
         """A entity can represent an:
-        
+
         - ARN
         - Account Number
         - UserID
         - CIDR
         - VPC
         - VPCE
-        
+
         Determine if the who is in our current account. Add the associated account
         to the entity.
-        
+
         Return:
             'SAME' - The who is in our same account.
             'FRIENDLY' - The who is in an account Security Monkey knows about.
@@ -741,7 +749,8 @@ class Auditor(object):
         for item in self.items:
             changes = False
             loaded = False
-            if not hasattr(item, 'db_item'):
+
+            if not hasattr(item, 'db_item') or not item.db_item.issues:
                 loaded = True
                 item.db_item = self.datastore._get_item(item.index, item.region, item.account, item.name)
 
@@ -753,22 +762,32 @@ class Auditor(object):
                 cls=issue.auditor_setting.auditor_class,
                 key=issue.key()): issue for issue in list(item.db_item.issues)}
 
-            new_issues = item.audit_issues
+            new_issues = list(item.audit_issues)
             new_issue_keys = [issue.key() for issue in new_issues]
 
             # New/Regressions/Existing Issues
             for new_issue in new_issues:
                 new_issue_key = '{cls} -- {key}'.format(cls=self.__class__.__name__, key=new_issue.key())
 
+                # Make a new issue out of it:
                 if new_issue_key not in existing_issues:
-                    # new issue
+                    # For whatever reason... If we don't make a copy of the SQLAlchemy object, it complains that it
+                    # is already attached to another item >:///
+                    item.audit_issues.remove(new_issue)
+                    new_issue = new_issue.copy_unlinked()
+                    item.audit_issues.append(new_issue)
+
                     changes = True
                     app.logger.debug("Saving NEW issue {}".format(new_issue))
                     item.found_new_issue = True
                     item.confirmed_new_issues.append(new_issue)
+
+                    new_issue.item_id = item.db_item.id
                     item.db_item.issues.append(new_issue)
+                    db.session.add(new_issue)
+
                     continue
-                
+
                 existing_issue = existing_issues[new_issue_key]
                 if existing_issue.fixed:
                     # regression
@@ -794,6 +813,7 @@ class Auditor(object):
                 if old_issue_class is None or (old_issue_class == self.__class__.__name__ and old_issue.key() not in new_issue_keys):
                     changes = True
                     old_issue.fixed = True
+                    db.session.add(old_issue)
                     item.confirmed_fixed_issues.append(old_issue)
                     app.logger.debug("Marking issue as FIXED {}".format(old_issue))
 
@@ -874,6 +894,8 @@ class Auditor(object):
 
         auditor_setting = AuditorSettings.query.filter(
             and_(
+                # TODO: This MUST be modified when switching to new issue logic in future:
+                #       Currently there should be exactly 1 item in the list of sub_items:
                 AuditorSettings.tech_id == issue.item.tech_id,
                 AuditorSettings.account_id == issue.item.account_id,
                 AuditorSettings.issue_text == issue.issue,
@@ -887,6 +909,8 @@ class Auditor(object):
             return auditor_setting
 
         auditor_setting = AuditorSettings(
+            # TODO: This MUST be modified when switching to new issue logic in future:
+            #       Currently there should be exactly 1 item in the list of sub_items:
             tech_id=issue.item.tech_id,
             account_id=issue.item.account_id,
             disabled=False,
@@ -902,6 +926,8 @@ class Auditor(object):
         app.logger.debug("Created AuditorSetting: {} - {} - {}".format(
             issue.issue,
             self.index,
+            # TODO: This MUST be modified when switching to new issue logic in future:
+            #       Currently there should be exactly 1 item in the list of sub_items:
             issue.item.account.name))
 
         return auditor_setting
@@ -942,6 +968,18 @@ class Auditor(object):
 
         raise Exception("Watcher {} is not configured as a data support watcher for {}".format(watcher_index, self.index))
 
+    def _sum_item_score(self, score, issue, matching_issue):
+        if not score:
+            total = issue.score + matching_issue.score
+        else:
+            total = score
+
+        # 999999 is the maximum number a score can be -- this prevents DB integer out of range exceptions
+        if total > 999999:
+            return 999999
+
+        return total
+
     def link_to_support_item_issues(self, item, sub_item, sub_issue_message=None, issue_message=None, issue=None, score=None):
         """
         Creates a new issue that is linked to an issue in a support auditor
@@ -955,7 +993,7 @@ class Auditor(object):
 
         for matching_issue in matching_issues:
             if issue:
-                issue.score = score or issue.score + matching_issue.score
+                issue.score = self._sum_item_score(score, issue, matching_issue)
             else:
                 issue_message = issue_message or sub_issue_message or 'UNDEFINED'
                 link_score = score or matching_issue.score

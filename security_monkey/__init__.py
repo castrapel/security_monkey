@@ -23,7 +23,7 @@ import os
 import stat
 
 ### VERSION ###
-__version__ = '0.9.3'   # TODO update this to 0.9.4!
+__version__ = '1.1.1'
 
 ### FLASK ###
 from flask import Flask
@@ -84,7 +84,6 @@ from flask_mail import Mail
 mail = Mail(app=app)
 from security_monkey.common.utils import send_email as common_send_email
 
-
 ### Flask-WTF CSRF Protection ###
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
@@ -115,7 +114,7 @@ def send_email(msg):
     """
     common_send_email(subject=msg.subject, recipients=msg.recipients, html=msg.html)
 
-from auth.modules import RBAC
+from .auth.modules import RBAC
 rbac = RBAC(app=app)
 
 from flask_security.views import login, logout, register, confirm_email, reset_password, forgot_password, \

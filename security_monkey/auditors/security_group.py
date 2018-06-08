@@ -143,6 +143,9 @@ class SecurityGroupAuditor(Auditor):
     def check_unknown_cross_account_egress(self, item):
         self._check_cross_account(item, 'UNKNOWN', self.record_unknown_access, direction='egress', severity=10)
 
+    def _check_internet_cidr(self, cidr):
+        return str(cidr).endswith('/0')
+
     def _check_internet_accessible(self, item, direction='ingress', severity=10):
         """
         Make sure the SG does not contain any 0.0.0.0/0 or ::/0 rules.
@@ -162,14 +165,14 @@ class SecurityGroupAuditor(Auditor):
                 continue
 
             cidr = rule.get("cidr_ip")
-            if not str(cidr).endswith('/0'):
+            if not self._check_internet_cidr(cidr):
                 continue
 
             actions = self._port_for_rule(rule)
             entity = Entity(category='cidr', value=cidr)
             self.record_internet_access(item, entity, actions, score=score, source='security_group')
 
-    def check_internet_accessible_inress(self, item):
+    def check_internet_accessible_ingress(self, item):
         self._check_internet_accessible(item, direction='ingress')
 
     def check_internet_accessible_egress(self, item):
