@@ -29,7 +29,8 @@ class Technology(Base):
 def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
-    rds_tech = session.query(Technology).filter(Technology.name == 'rds').first()
+    rds_tech = session.query(Technology).filter(
+        Technology.name == 'rds').first()
     if rds_tech:
         rds_tech.name = 'rdssecuritygroup'
     session.commit()
@@ -38,7 +39,8 @@ def upgrade():
 def downgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
-    rds_tech = session.query(Technology).filter(Technology.name == 'rdssecuritygroup').first()
+    rds_tech = session.query(Technology).filter(
+        Technology.name == 'rdssecuritygroup').first()
     if rds_tech:
         rds_tech.name = 'rds'
     session.commit()

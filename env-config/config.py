@@ -20,7 +20,7 @@ LOG_CFG = {
     'formatters': {
         'standard': {
             'format': '%(asctime)s %(levelname)s: %(message)s '
-                '[in %(pathname)s:%(lineno)d]'
+            '[in %(pathname)s:%(lineno)d]'
         }
     },
     'handlers': {
@@ -103,7 +103,8 @@ MAIL_USERNAME = 'username'
 MAIL_PASSWORD = 'password'
 
 WTF_CSRF_ENABLED = True
-WTF_CSRF_SSL_STRICT = True # Checks Referer Header. Set to False for API access.
+# Checks Referer Header. Set to False for API access.
+WTF_CSRF_SSL_STRICT = True
 WTF_CSRF_METHODS = ['DELETE', 'POST', 'PUT', 'PATCH']
 
 # "NONE", "SUMMARY", or "FULL"
@@ -120,8 +121,9 @@ ACTIVE_PROVIDERS = []  # "aad", "ping", "google" or "onelogin"
 
 AAD_NAME = 'AzureAD'  # Use to override the Ping name in the UI.
 AAD_REDIRECT_URI = "{BASE}api/1/auth/aad".format(BASE=BASE_URL)
-AAD_CLIENT_ID = '' # Azure AD application client ID
-AAD_AUTH_ENDPOINT = 'https://login.microsoftonline.com/<tenant>/oauth2/authorize' # Replace <tenant> with the Azure AD tenant ID
+AAD_CLIENT_ID = ''  # Azure AD application client ID
+# Replace <tenant> with the Azure AD tenant ID
+AAD_AUTH_ENDPOINT = 'https://login.microsoftonline.com/<tenant>/oauth2/authorize'
 AAD_JWKS_URL = 'https://login.microsoftonline.com/common/discovery/keys'
 AAD_DEFAULT_ROLE = 'View'
 
@@ -143,10 +145,12 @@ GOOGLE_SECRET = ''
 GOOGLE_DEFAULT_ROLE = 'View'
 
 ONELOGIN_APP_ID = '<APP_ID>'  # OneLogin App ID provider by your administrator
-ONELOGIN_EMAIL_FIELD = 'User.email'  # SAML attribute used to provide email address
+# SAML attribute used to provide email address
+ONELOGIN_EMAIL_FIELD = 'User.email'
 ONELOGIN_DEFAULT_ROLE = 'View'  # Default RBAC when user doesn't already exist
 ONELOGIN_HTTPS = True  # If using HTTPS strict mode will check the requests are HTTPS
-ONELOGIN_LOG_SAML_RESPONSE = False # Log SAML response for debugging. Default is False
+# Log SAML response for debugging. Default is False
+ONELOGIN_LOG_SAML_RESPONSE = False
 ONELOGIN_SETTINGS = {
     # If strict is True, then the Python Toolkit will reject unsigned
     # or unencrypted messages if it expects them to be signed or encrypted.
@@ -174,7 +178,7 @@ ONELOGIN_SETTINGS = {
         # If you need to specify requested attributes, set a
         # attributeConsumingService. nameFormat, attributeValue and
         # friendlyName can be omitted
-        #"attributeConsumingService": {
+        # "attributeConsumingService": {
         #        "ServiceName": "SP test",
         #        "serviceDescription": "Test Service",
         #        "requestedAttributes": [
@@ -186,7 +190,7 @@ ONELOGIN_SETTINGS = {
         #                "attributeValue": ""
         #            }
         #        ]
-        #},
+        # },
         # Specifies info about where and how the <Logout Response> message MUST be
         # returned to the requester, in this case our SP.
         "singleLogoutService": {
@@ -236,32 +240,34 @@ ONELOGIN_SETTINGS = {
 }
 
 from datetime import timedelta
-PERMANENT_SESSION_LIFETIME=timedelta(minutes=60)
-SESSION_REFRESH_EACH_REQUEST=True
-SESSION_COOKIE_SECURE=True
-SESSION_COOKIE_HTTPONLY=True
-PREFERRED_URL_SCHEME='https'
+PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
+SESSION_REFRESH_EACH_REQUEST = True
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+PREFERRED_URL_SCHEME = 'https'
 
-REMEMBER_COOKIE_DURATION=timedelta(minutes=60)  # Can make longer if you want remember_me to be useful.
-REMEMBER_COOKIE_SECURE=True
-REMEMBER_COOKIE_HTTPONLY=True
+# Can make longer if you want remember_me to be useful.
+REMEMBER_COOKIE_DURATION = timedelta(minutes=60)
+REMEMBER_COOKIE_SECURE = True
+REMEMBER_COOKIE_HTTPONLY = True
 
 # Header auth allows you to trust a header set by a reverse proxy to
 # authenticate the current user. This is useful if you have an authn
 # wall in front of your intranet that already knows the identity of
 # the requester and can pass it along to Security Monkey.
-USE_HEADER_AUTH=False
-HEADER_AUTH_USERNAME_HEADER="Remote-User"
-HEADER_AUTH_GROUPS_HEADER=None
+USE_HEADER_AUTH = False
+HEADER_AUTH_USERNAME_HEADER = "Remote-User"
+HEADER_AUTH_GROUPS_HEADER = None
 
 # Apscheduler Configurations
 # Length of time, in seconds, before a scheduled job is cancelled due to thread contention or other issues
-MISFIRE_GRACE_TIME=30
+MISFIRE_GRACE_TIME = 30
 # Delay, in seconds, until reporter starts
-REPORTER_START_DELAY=10
+REPORTER_START_DELAY = 10
 
 # JIRA Settings
 # Verify JIRA SSL certs - useful for testing on JIRA sandbox server
 JIRA_SSL_VERIFY = True
-JIRA_OPEN = 'Open' # Opened ticket JIRA transition name (e.g. 'Open', 'To Do')
-JIRA_CLOSED = 'Closed' # Closed ticket JIRA transition name (e.g. 'Closed', 'Done')
+JIRA_OPEN = 'Open'  # Opened ticket JIRA transition name (e.g. 'Open', 'To Do')
+# Closed ticket JIRA transition name (e.g. 'Closed', 'Done')
+JIRA_CLOSED = 'Closed'

@@ -29,21 +29,24 @@ def backup_config_to_json(account_names, monitor_names, output_folder):
     for account_name in account_names:
         monitors = get_monitors(account_name, monitor_names)
         for monitor in monitors:
-            _backup_items_in_account(account_name, monitor.watcher, output_folder)
+            _backup_items_in_account(
+                account_name, monitor.watcher, output_folder)
 
 
 def _backup_items_in_account(account_name, watcher, output_folder):
     technology_name = watcher.index
     query = Item.query
-    query = query.join((Account, Account.id==Item.account_id))
-    query = query.join((Technology, Technology.id==Item.tech_id))
+    query = query.join((Account, Account.id == Item.account_id))
+    query = query.join((Technology, Technology.id == Item.tech_id))
     query = query.filter(Account.name == account_name)
     query = query.filter(Technology.name == technology_name)
     items_to_backup = query.all()
 
     for item in items_to_backup:
-        latest_revision = ItemRevision.query.filter(ItemRevision.id==item.latest_revision_id).first()
-        _serialize_item_to_file(item, latest_revision, output_folder, account_name, technology_name)
+        latest_revision = ItemRevision.query.filter(
+            ItemRevision.id == item.latest_revision_id).first()
+        _serialize_item_to_file(item, latest_revision,
+                                output_folder, account_name, technology_name)
 
 
 def standardize_name(name):

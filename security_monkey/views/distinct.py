@@ -60,17 +60,27 @@ class Distinct(AuthenticatedService):
             :statuscode 200: no error
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('select2', type=str, default="", location='args')
-        self.reqparse.add_argument('searchconfig', type=str, default="", location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'select2', type=str, default="", location='args')
+        self.reqparse.add_argument(
+            'searchconfig', type=str, default="", location='args')
 
-        self.reqparse.add_argument('regions', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounts', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounttypes', type=str, default=None, location='args')
-        self.reqparse.add_argument('technologies', type=str, default=None, location='args')
-        self.reqparse.add_argument('names', type=str, default=None, location='args')
-        self.reqparse.add_argument('active', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'regions', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounts', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounttypes', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'technologies', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'names', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'active', type=str, default=None, location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
@@ -110,28 +120,32 @@ class Distinct(AuthenticatedService):
             names = args['arns'].split(',')
             query = query.filter(Item.arn.in_(names))
         if 'active' in args:
-            query = query.join((ItemRevision, Item.latest_revision_id == ItemRevision.id))
+            query = query.join(
+                (ItemRevision, Item.latest_revision_id == ItemRevision.id))
             active = args['active'].lower() == "true"
             query = query.filter(ItemRevision.active == active)
 
         if key_id == 'tech':
             query = query.join((Technology, Technology.id == Item.tech_id))
             if select2:
-                query = query.distinct(Technology.name).filter(func.lower(Technology.name).like('%' + q + '%'))
+                query = query.distinct(Technology.name).filter(
+                    func.lower(Technology.name).like('%' + q + '%'))
             else:
                 query = query.distinct(Technology.name)
         elif key_id == 'accounttype':
             query = query.join((Account, Account.id == Item.account_id)).join(
                 (AccountType, AccountType.id == Account.account_type_id))
             if select2:
-                query = query.distinct(AccountType.name).filter(func.lower(AccountType.name).like('%' + q + '%'))
+                query = query.distinct(AccountType.name).filter(
+                    func.lower(AccountType.name).like('%' + q + '%'))
             else:
                 query = query.distinct(AccountType.name)
         elif key_id == 'account':
             query = query.join((Account, Account.id == Item.account_id))
             if select2:
                 query = query.filter(Account.third_party == False)
-                query = query.distinct(Account.name).filter(func.lower(Account.name).like('%' + q + '%'))
+                query = query.distinct(Account.name).filter(
+                    func.lower(Account.name).like('%' + q + '%'))
             else:
                 query = query.distinct(Account.name)
 
@@ -147,7 +161,8 @@ class Distinct(AuthenticatedService):
                 return json.loads('{ "error": "Supply key in type,region,account,name,arn" }')
 
             if select2:
-                query = query.distinct(filter_by).filter(func.lower(filter_by).like('%' + q + '%'))
+                query = query.distinct(filter_by).filter(
+                    func.lower(filter_by).like('%' + q + '%'))
             else:
                 query = query.distinct(filter_by)
 
@@ -174,7 +189,7 @@ class Distinct(AuthenticatedService):
             elif key_id == "arn":
                 text = item.arn
                 item_id = item.id
-            if(select2):
+            if (select2):
                 list_distinct.append({"id": item_id, "text": text})
             else:
                 list_distinct.append(text)

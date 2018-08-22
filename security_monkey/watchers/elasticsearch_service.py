@@ -34,7 +34,8 @@ class ElasticSearchService(Watcher):
     i_am_plural = 'ElasticSearch Service Access Policies'
 
     def __init__(self, accounts=None, debug=False):
-        super(ElasticSearchService, self).__init__(accounts=accounts, debug=debug)
+        super(ElasticSearchService, self).__init__(
+            accounts=accounts, debug=debug)
 
     def slurp(self):
         """
@@ -51,7 +52,8 @@ class ElasticSearchService(Watcher):
             exception_map = {}
             kwargs['exception_map'] = exception_map
 
-            account_db = Account.query.filter(Account.name == kwargs['account_name']).first()
+            account_db = Account.query.filter(
+                Account.name == kwargs['account_name']).first()
             account_num = account_db.identifier
 
             es_info = self.get_all_es_domains_in_region(**kwargs)
@@ -59,27 +61,33 @@ class ElasticSearchService(Watcher):
                 return item_list, exception_map
             (client, domains) = es_info
 
-            app.logger.debug("Found {} {}".format(len(domains), ElasticSearchService.i_am_plural))
+            app.logger.debug("Found {} {}".format(
+                len(domains), ElasticSearchService.i_am_plural))
             for domain in domains:
                 if self.check_ignore_list(domain["DomainName"]):
                     continue
 
                 # Fetch the policy:
-                item = self.build_item(domain["DomainName"], client, account_num, **kwargs)
+                item = self.build_item(
+                    domain["DomainName"], client, account_num, **kwargs)
 
                 if item:
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
     @record_exception(source='{index}-watcher'.format(index=index), pop_exception_fields=False)
     def get_all_es_domains_in_region(self, **kwargs):
         from security_monkey.common.sts_connect import connect
-        client = connect(kwargs['account_name'], "boto3.es.client", region=kwargs['region'])
-        app.logger.debug("Checking {}/{}/{}".format(ElasticSearchService.index, kwargs['account_name'], kwargs['region']))
+        client = connect(kwargs['account_name'],
+                         "boto3.es.client", region=kwargs['region'])
+        app.logger.debug("Checking {}/{}/{}".format(ElasticSearchService.index,
+                                                    kwargs['account_name'], kwargs['region']))
         # No need to paginate according to: client.can_paginate("list_domain_names")
-        domains = self.wrap_aws_rate_limited_call(client.list_domain_names)["DomainNames"]
+        domains = self.wrap_aws_rate_limited_call(
+            client.list_domain_names)["DomainNames"]
 
         return client, domains
 
@@ -100,7 +108,8 @@ class ElasticSearchService(Watcher):
         if domain_config["DomainConfig"]["AccessPolicies"]["Options"] == "":
             config['policy'] = {}
         else:
-            config['policy'] = json.loads(domain_config["DomainConfig"]["AccessPolicies"]["Options"])
+            config['policy'] = json.loads(
+                domain_config["DomainConfig"]["AccessPolicies"]["Options"])
         config['name'] = domain
 
         return ElasticSearchServiceItem(region=kwargs['region'], account=kwargs['account_name'], name=domain, arn=arn,

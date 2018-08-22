@@ -35,7 +35,8 @@ class AccountTestUtils(SecurityMonkeyTestCase):
         from security_monkey.account_manager import account_registry
 
         for name, account_manager in account_registry.items():
-            manager.add_command("add_account_%s" % name.lower(), AddAccount(account_manager()))
+            manager.add_command("add_account_%s" %
+                                name.lower(), AddAccount(account_manager()))
 
         manager.handle("manage.py", ["add_account_aws", "-n", "test", "--active", "--id", "99999999999",
                                      "--canonical_id", "bcaf1ffd86f41161ca5fb16fd081034f",
@@ -63,7 +64,8 @@ class AccountTestUtils(SecurityMonkeyTestCase):
         from security_monkey.account_manager import account_registry
 
         for name, account_manager in account_registry.items():
-            manager.add_command("add_account_%s" % name.lower(), AddAccount(account_manager()))
+            manager.add_command("add_account_%s" %
+                                name.lower(), AddAccount(account_manager()))
 
         # Create the account:
         from security_monkey.account_manager import account_registry
@@ -95,7 +97,8 @@ class AccountTestUtils(SecurityMonkeyTestCase):
                                    custom_fields=dict(canonical_id="bcaf1ffd86f41161ca5fb16fd081034f", s3_id=None))
 
     def test_disable_all_accounts(self):
-        bulk_disable_accounts(['TEST_ACCOUNT1', 'TEST_ACCOUNT2', 'TEST_ACCOUNT3', 'TEST_ACCOUNT4'])
+        bulk_disable_accounts(
+            ['TEST_ACCOUNT1', 'TEST_ACCOUNT2', 'TEST_ACCOUNT3', 'TEST_ACCOUNT4'])
         accounts = Account.query.all()
         for account in accounts:
             self.assertFalse(account.active)
@@ -110,7 +113,8 @@ class AccountTestUtils(SecurityMonkeyTestCase):
                 self.assertFalse(account.active)
 
     def test_enable_all_accounts(self):
-        bulk_enable_accounts(['TEST_ACCOUNT1', 'TEST_ACCOUNT2', 'TEST_ACCOUNT3', 'TEST_ACCOUNT4'])
+        bulk_enable_accounts(
+            ['TEST_ACCOUNT1', 'TEST_ACCOUNT2', 'TEST_ACCOUNT3', 'TEST_ACCOUNT4'])
         accounts = Account.query.all()
         for account in accounts:
             self.assertTrue(account.active)

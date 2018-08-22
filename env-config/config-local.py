@@ -20,7 +20,7 @@ LOG_CFG = {
     'formatters': {
         'standard': {
             'format': '%(asctime)s %(levelname)s: %(message)s '
-                '[in %(pathname)s:%(lineno)d]'
+            '[in %(pathname)s:%(lineno)d]'
         }
     },
     'handlers': {
@@ -95,7 +95,8 @@ MAIL_USERNAME = 'username'
 MAIL_PASSWORD = 'password'
 
 WTF_CSRF_ENABLED = False
-WTF_CSRF_SSL_STRICT = True # Checks Referer Header. Set to False for API access.
+# Checks Referer Header. Set to False for API access.
+WTF_CSRF_SSL_STRICT = True
 WTF_CSRF_METHODS = ['DELETE', 'POST', 'PUT', 'PATCH']
 
 # "NONE", "SUMMARY", or "FULL"
@@ -105,7 +106,8 @@ SECURITYGROUP_INSTANCE_DETAIL = 'FULL'
 ACTIVE_PROVIDERS = []  # "ping", "google" or "onelogin"
 
 PING_NAME = ''  # Use to override the Ping name in the UI.
-PING_REDIRECT_URI = "http://{FQDN}:{PORT}/api/1/auth/ping".format(FQDN=FQDN, PORT=WEB_PORT)
+PING_REDIRECT_URI = "http://{FQDN}:{PORT}/api/1/auth/ping".format(
+    FQDN=FQDN, PORT=WEB_PORT)
 PING_CLIENT_ID = ''  # Provided by your administrator
 PING_AUTH_ENDPOINT = ''  # Often something ending in authorization.oauth2
 PING_ACCESS_TOKEN_URL = ''  # Often something ending in token.oauth2
@@ -119,7 +121,8 @@ GOOGLE_SECRET = ''
 # GOOGLE_HOSTED_DOMAIN = 'example.com' # Verify that token issued by comes from domain
 
 ONELOGIN_APP_ID = '<APP_ID>'  # OneLogin App ID provider by your administrator
-ONELOGIN_EMAIL_FIELD = 'User.email'  # SAML attribute used to provide email address
+# SAML attribute used to provide email address
+ONELOGIN_EMAIL_FIELD = 'User.email'
 ONELOGIN_DEFAULT_ROLE = 'View'  # Default RBAC when user doesn't already exist
 ONELOGIN_HTTPS = True  # If using HTTPS strict mode will check the requests are HTTPS
 ONELOGIN_SETTINGS = {
@@ -149,7 +152,7 @@ ONELOGIN_SETTINGS = {
         # If you need to specify requested attributes, set a
         # attributeConsumingService. nameFormat, attributeValue and
         # friendlyName can be omitted
-        #"attributeConsumingService": {
+        # "attributeConsumingService": {
         #        "ServiceName": "SP test",
         #        "serviceDescription": "Test Service",
         #        "requestedAttributes": [
@@ -161,7 +164,7 @@ ONELOGIN_SETTINGS = {
         #                "attributeValue": ""
         #            }
         #        ]
-        #},
+        # },
         # Specifies info about where and how the <Logout Response> message MUST be
         # returned to the requester, in this case our SP.
         "singleLogoutService": {
@@ -214,9 +217,9 @@ ONELOGIN_SETTINGS = {
 # authenticate the current user. This is useful if you have an authn
 # wall in front of your intranet that already knows the identity of
 # the requester and can pass it along to Security Monkey.
-USE_HEADER_AUTH=False
-HEADER_AUTH_USERNAME_HEADER="Remote-User"
-HEADER_AUTH_GROUPS_HEADER=None
+USE_HEADER_AUTH = False
+HEADER_AUTH_USERNAME_HEADER = "Remote-User"
+HEADER_AUTH_GROUPS_HEADER = None
 
 # Log SSL Cert SubjectAltName errors
 LOG_SSL_SUBJ_ALT_NAME_ERRORS = True

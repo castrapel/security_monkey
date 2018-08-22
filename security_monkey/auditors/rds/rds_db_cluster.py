@@ -31,7 +31,8 @@ class RDSDBClusterAuditor(Auditor):
     support_auditor_indexes = [SecurityGroup.index]
 
     def __init__(self, accounts=None, debug=False):
-        super(RDSDBClusterAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(RDSDBClusterAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     def _get_listener_ports_and_protocols(self, item):
         """
@@ -42,12 +43,15 @@ class RDSDBClusterAuditor(Auditor):
 
     def check_internet_accessible(self, item):
         security_groups = item.config.get('vpc_security_groups', [])
-        security_group_ids = {sg['VpcSecurityGroupId'] for sg in security_groups}
-        sg_auditor_items = self.get_auditor_support_items(SecurityGroup.index, item.account)
-        security_auditor_groups = [sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
+        security_group_ids = {sg['VpcSecurityGroupId']
+                              for sg in security_groups}
+        sg_auditor_items = self.get_auditor_support_items(
+            SecurityGroup.index, item.account)
+        security_auditor_groups = [
+            sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
 
         for sg in security_auditor_groups:
             for issue in sg.db_item.issues:
                 if self._issue_matches_listeners(item, issue):
                     self.link_to_support_item_issues(item, sg.db_item,
-                        sub_issue_message=issue.issue, score=issue.score)
+                                                     sub_issue_message=issue.issue, score=issue.score)

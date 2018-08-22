@@ -15,6 +15,7 @@ from security_monkey import app
 
 class Monitor(object):
     """Collects a watcher with the associated auditors"""
+
     def __init__(self, watcher_class, account, debug=False):
         self.watcher = watcher_class(accounts=[account.name], debug=debug)
         self.auditors = []
@@ -80,9 +81,11 @@ def all_monitors(account_name, debug=False):
     for mon in monitor_dict.values():
         if len(mon.auditors) > 0:
             path = [mon.watcher.index]
-            _set_dependency_hierarchies(monitor_dict, mon, path, mon.audit_tier + 1)
+            _set_dependency_hierarchies(
+                monitor_dict, mon, path, mon.audit_tier + 1)
 
-    monitors = sorted(monitor_dict.values(), key=lambda item: item.audit_tier, reverse=True)
+    monitors = sorted(monitor_dict.values(),
+                      key=lambda item: item.audit_tier, reverse=True)
     return monitors
 
 
@@ -93,22 +96,25 @@ def _set_dependency_hierarchies(monitor_dict, monitor, path, level):
         declared_support_indexes |= set(auditor.support_auditor_indexes)
 
     for support_index in declared_support_indexes:
-        current_path = path + [ support_index ]
+        current_path = path + [support_index]
         if support_index in path:
             auditor_flow = ''
             for index in current_path:
                 auditor_flow = auditor_flow + '->' + index
-            raise Exception('Detected circular dependency in support auditor', auditor_flow)
+            raise Exception(
+                'Detected circular dependency in support auditor', auditor_flow)
 
         support_mon = monitor_dict.get(support_index)
         if support_mon == None:
             app.logger.warn("Monitor {0} depends on monitor {1}, but {1} is unavailable"
-                                    .format(monitor.watcher.index, support_index))
+                            .format(monitor.watcher.index, support_index))
         else:
             if support_mon.audit_tier < level:
                 support_mon.audit_tier = level
 
-            _set_dependency_hierarchies(monitor_dict, support_mon, current_path, level + 1)
+            _set_dependency_hierarchies(
+                monitor_dict, support_mon, current_path, level + 1)
+
 
 def _find_dependent_monitors(monitors, monitor_names):
     """

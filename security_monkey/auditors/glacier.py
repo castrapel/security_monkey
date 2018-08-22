@@ -27,5 +27,6 @@ class GlacierVaultAuditor(ResourcePolicyAuditor):
     i_am_plural = GlacierVault.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(GlacierVaultAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(GlacierVaultAuditor, self).__init__(
+            accounts=accounts, debug=debug)
         self.policy_keys = ['Policy']

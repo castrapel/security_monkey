@@ -76,7 +76,8 @@ class JustifyPostDelete(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('justification', required=False, type=str, help='Must provide justification', location='json')
+        self.reqparse.add_argument('justification', required=False,
+                                   type=str, help='Must provide justification', location='json')
         args = self.reqparse.parse_args()
 
         item = ItemAudit.query.filter(ItemAudit.id == audit_id).first()

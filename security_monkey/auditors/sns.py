@@ -67,7 +67,8 @@ class SNSAuditor(ResourcePolicyAuditor):
 
             account = self._get_account('identifier', src_account_number)
             if not account:
-                self.record_unknown_access(item, entity, actions=['subscription'])
+                self.record_unknown_access(
+                    item, entity, actions=['subscription'])
                 continue
 
             if account['name'] == item.account:
@@ -76,6 +77,8 @@ class SNSAuditor(ResourcePolicyAuditor):
 
             entity.account_name = account['name']
             if account['label'] == 'friendly':
-                self.record_friendly_access(item, entity, actions=['subscription'])
+                self.record_friendly_access(
+                    item, entity, actions=['subscription'])
             elif account['label'] == 'thirdparty':
-                self.record_thirdparty_access(item, entity, actions=['subscription'])
+                self.record_thirdparty_access(
+                    item, entity, actions=['subscription'])

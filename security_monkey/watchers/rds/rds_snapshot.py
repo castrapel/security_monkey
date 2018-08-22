@@ -89,8 +89,10 @@ class RDSSnapshot(Watcher):
                         continue
 
                     config = dict(snapshot)
-                    config['InstanceCreateTime'] = str(config.get('InstanceCreateTime'))
-                    config['SnapshotCreateTime'] = str(config.get('SnapshotCreateTime'))
+                    config['InstanceCreateTime'] = str(
+                        config.get('InstanceCreateTime'))
+                    config['SnapshotCreateTime'] = str(
+                        config.get('SnapshotCreateTime'))
                     config['Arn'] = str(config.get('DBSnapshotArn'))
                     config['Attributes'] = dict()
 
@@ -100,12 +102,15 @@ class RDSSnapshot(Watcher):
                             DBSnapshotIdentifier=snapshot.get('DBSnapshotIdentifier'))
 
                         for attribute in attributes['DBSnapshotAttributesResult']['DBSnapshotAttributes']:
-                            config['Attributes'][attribute['AttributeName']] = attribute['AttributeValues']
+                            config['Attributes'][attribute['AttributeName']
+                                                 ] = attribute['AttributeValues']
 
                     except Exception as e:
                         if region.name not in TROUBLE_REGIONS:
-                            exc = BotoConnectionIssue(str(e), self.index, account, region.name)
-                            self.slurp_exception((self.index, account, region.name, name), exc, exception_map)
+                            exc = BotoConnectionIssue(
+                                str(e), self.index, account, region.name)
+                            self.slurp_exception(
+                                (self.index, account, region.name, name), exc, exception_map)
 
                     item = RDSSnapshotItem(
                         region=region.name, account=account, name=name,

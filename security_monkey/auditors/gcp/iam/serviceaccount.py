@@ -26,6 +26,7 @@ from security_monkey.common.gcp.config import AuditorConfig
 from security_monkey.common.gcp.error import AuditIssue
 from security_monkey.watchers.gcp.iam.serviceaccount import IAMServiceAccount
 
+
 # NOTE: issue scores and messages are defined in
 # security_monkey/common/gcp/config.py
 

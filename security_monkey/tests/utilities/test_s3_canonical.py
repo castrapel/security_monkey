@@ -53,7 +53,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         for account in accounts:
             assert len(account.custom_fields) == 1
             assert account.custom_fields[0].name == "canonical_id"
-            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"  # Default from moto.
+            # Default from moto.
+            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"
 
             # Make it something else to test overrides:
             account.custom_fields[0].value = "replaceme"
@@ -73,7 +74,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         for account in accounts:
             assert len(account.custom_fields) == 1
             assert account.custom_fields[0].name == "canonical_id"
-            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"  # Default from moto.
+            # Default from moto.
+            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"
 
         mock_sts().stop()
         mock_s3().stop()
@@ -85,7 +87,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         for account in accounts:
             assert len(account.custom_fields) == 1
             assert account.custom_fields[0].name == "canonical_id"
-            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"  # Default from moto.
+            # Default from moto.
+            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"
 
             # Make it something else to test overrides:
             account.custom_fields[0].value = "replaceme"
@@ -105,7 +108,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         for account in accounts:
             assert len(account.custom_fields) == 1
             assert account.custom_fields[0].name == "canonical_id"
-            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"  # Default from moto.
+            # Default from moto.
+            assert account.custom_fields[0].value == "bcaf1ffd86f41161ca5fb16fd081034f"
 
         # Create an inactive account:
         inactive = Account(name="inactive", account_type_id=self.account_type.id,
@@ -129,7 +133,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         from security_monkey.account_manager import account_registry
 
         for name, account_manager in account_registry.items():
-            manager.add_command("add_account_%s" % name.lower(), AddAccount(account_manager()))
+            manager.add_command("add_account_%s" %
+                                name.lower(), AddAccount(account_manager()))
 
         manager.handle("manage.py", ["add_account_aws", "-n", "test", "--active", "--id", "99999999999",
                                      "--canonical_id", "bcaf1ffd86f41161ca5fb16fd081034f", "--s3_name", "test",
@@ -156,7 +161,8 @@ class S3CanonicalTestCase(SecurityMonkeyTestCase):
         from security_monkey.account_manager import account_registry
 
         for name, account_manager in account_registry.items():
-            manager.add_command("add_account_%s" % name.lower(), AddAccount(account_manager()))
+            manager.add_command("add_account_%s" %
+                                name.lower(), AddAccount(account_manager()))
 
         # Update:
         manager.handle("manage.py", ["add_account_aws", "-n", "account0", "--active", "--id", "012345678910",

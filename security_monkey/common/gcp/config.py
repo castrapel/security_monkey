@@ -20,6 +20,7 @@
 
 """
 
+
 class ApplicationConfig(object):
 
     @staticmethod
@@ -27,12 +28,14 @@ class ApplicationConfig(object):
         from security_monkey.common.utils import get_version
         return get_version()
 
+
 class AuditorConfig(object):
     """
     Each Auditor has it's own configuration class defined. They are all guaranteed to contain
     an ISSUE_MAP member, containing issue scores and messages. Auditor-specific configuration
     variables can be defined/modified here as well.
     """
+
     class GCSBucket():
         MAX_OWNERS_PER_BUCKET = 1
 
@@ -49,9 +52,12 @@ class AuditorConfig(object):
             'CORS_OPTIONS_METHOD': {'score': 7, 'msg': "CORS method OPTIONS allowed in bucket config"},
             'CORS_POST_METHOD': {'score': 9, 'msg': "CORS method POST allowed in bucket config"},
             'CORS_PUT_METHOD': {'score': 9, 'msg': "CORS method PUT allowed in bucket config"},
-            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_READER': {'score': 7, 'msg': "allUsers with Role READER set in Default Object ACL."},
-            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_WRITER': {'score': 8, 'msg': "allUsers with Role WRITER set in Default Object ACL."},
-            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_OWNER': {'score': 10, 'msg': "allUsers with Role OWNER set in Default Object ACL."},
+            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_READER': {'score': 7,
+                                                        'msg': "allUsers with Role READER set in Default Object ACL."},
+            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_WRITER': {'score': 8,
+                                                        'msg': "allUsers with Role WRITER set in Default Object ACL."},
+            'DEFAULT_OBJECT_ACL_ALLUSERS_ROLE_OWNER': {'score': 10,
+                                                       'msg': "allUsers with Role OWNER set in Default Object ACL."},
             'DEFAULT_OBJECT_ACL_OWNER_MAX': {'score': 7, 'msg': "OWNERS max exceeded  in Default Object ACL"},
             'DEFAULT_OBJECT_ACL_NOT_FOUND': {'score': 10, 'msg': "Default Object ACL not found in bucket config."},
         }

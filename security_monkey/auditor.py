@@ -25,7 +25,8 @@ from six import string_types, text_type
 from security_monkey import app, datastore, db
 from security_monkey.watcher import ChangeItem, ensure_item_has_latest_revision_id
 from security_monkey.common.jinja import get_jinja_env
-from security_monkey.datastore import User, AuditorSettings, Item, ItemAudit, Technology, Account, ItemAuditScore, AccountPatternAuditScore
+from security_monkey.datastore import User, AuditorSettings, Item, ItemAudit, Technology, Account, ItemAuditScore, \
+    AccountPatternAuditScore
 from security_monkey.common.utils import send_email
 from security_monkey.account_manager import get_account_by_name
 from security_monkey.alerters.custom_alerter import report_auditor_changes
@@ -38,7 +39,6 @@ import json
 import netaddr
 import ipaddr
 import re
-
 
 auditor_registry = defaultdict(list)
 
@@ -105,6 +105,7 @@ class Categories:
 
 class Entity:
     """ Entity instances provide a place to map policy elements like s3:my_bucket to the related account. """
+
     def __init__(self, category, value, account_name=None, account_identifier=None):
         self.category = category
         self.value = value
@@ -118,12 +119,15 @@ class Entity:
     def __str__(self):
         strval = ''
         if self.account_name or self.account_identifier:
-            strval = 'Account: [{identifier}/{account_name}] '.format(identifier=self.account_identifier, account_name=self.account_name)
-        strval += 'Entity: [{category}:{value}]'.format(category=self.category, value=self.value)
+            strval = 'Account: [{identifier}/{account_name}] '.format(
+                identifier=self.account_identifier, account_name=self.account_name)
+        strval += 'Entity: [{category}:{value}]'.format(
+            category=self.category, value=self.value)
         return strval
 
     def __repr__(self):
         return self.__str__()
+
 
 class AuditorType(type):
     def __init__(cls, name, bases, attrs):
@@ -137,7 +141,8 @@ class AuditorType(type):
                         found = True
                         break
                 if not found:
-                    app.logger.debug("Registering auditor {} {}.{}".format(cls.index, cls.__module__, cls.__name__))
+                    app.logger.debug("Registering auditor {} {}.{}".format(
+                        cls.index, cls.__module__, cls.__name__))
                     auditor_registry[cls.index].append(cls)
 
 
@@ -156,9 +161,9 @@ class Auditor(object):
     and look for any violations.  These violations are saved with the object and a report
     is made available via the Web UI and through email.
     """
-    index = None          # Should be overridden
+    index = None  # Should be overridden
     i_am_singular = None  # Should be overridden
-    i_am_plural = None    # Should be overridden
+    i_am_plural = None  # Should be overridden
     __metaclass__ = AuditorType
     support_auditor_indexes = []
     support_watcher_indexes = []
@@ -176,15 +181,17 @@ class Auditor(object):
         self.override_scores = None
         self.current_method_name = None
 
-        if isinstance(self.team_emails,  string_types):
+        if isinstance(self.team_emails, string_types):
             self.emails.append(self.team_emails)
         elif isinstance(self.team_emails, (list, tuple)):
             self.emails.extend(self.team_emails)
         else:
-            app.logger.info("Auditor: SECURITY_TEAM_EMAIL contains an invalid type")
+            app.logger.info(
+                "Auditor: SECURITY_TEAM_EMAIL contains an invalid type")
 
         for account in self.accounts:
-            users = User.query.filter(User.daily_audit_email==True).filter(User.accounts.any(name=account)).all()
+            users = User.query.filter(User.daily_audit_email == True).filter(
+                User.accounts.any(name=account)).all()
             self.emails.extend([user.email for user in users])
 
     def load_policies(self, item, policy_keys):
@@ -284,7 +291,6 @@ class Auditor(object):
                 cls._load_network_whitelist()
                 cls._merge_cidrs()
 
-
     @classmethod
     def _merge_cidrs(cls):
         """
@@ -353,28 +359,35 @@ class Auditor(object):
         """Store the VPC IDs. Also, extract & store network/NAT ranges."""
         results = cls._load_related_items('vpc')
         for item in results:
-            add(cls.OBJECT_STORE['vpc'], item.latest_config.get('id'), item.account.identifier)
-            add(cls.OBJECT_STORE['cidr'], item.latest_config.get('cidr_block'), item.account.identifier)
+            add(cls.OBJECT_STORE['vpc'], item.latest_config.get(
+                'id'), item.account.identifier)
+            add(cls.OBJECT_STORE['cidr'], item.latest_config.get(
+                'cidr_block'), item.account.identifier)
 
-            vpcnat_tags = text_type(item.latest_config.get('tags', {}).get('vpcnat', ''))
+            vpcnat_tags = text_type(
+                item.latest_config.get('tags', {}).get('vpcnat', ''))
             vpcnat_tag_cidrs = vpcnat_tags.split(',')
             for vpcnat_tag_cidr in vpcnat_tag_cidrs:
-                add(cls.OBJECT_STORE['cidr'], vpcnat_tag_cidr.strip(), item.account.identifier)
+                add(cls.OBJECT_STORE['cidr'], vpcnat_tag_cidr.strip(
+                ), item.account.identifier)
 
     @classmethod
     def _load_vpces(cls):
         """Store the VPC Endpoint IDs."""
         results = cls._load_related_items('endpoint')
         for item in results:
-            add(cls.OBJECT_STORE['vpce'], item.latest_config.get('id'), item.account.identifier)
+            add(cls.OBJECT_STORE['vpce'], item.latest_config.get(
+                'id'), item.account.identifier)
 
     @classmethod
     def _load_elasticips(cls):
         """Store the Elastic IPs."""
         results = cls._load_related_items('elasticip')
         for item in results:
-            add(cls.OBJECT_STORE['cidr'], item.latest_config.get('public_ip'), item.account.identifier)
-            add(cls.OBJECT_STORE['cidr'], item.latest_config.get('private_ip_address'), item.account.identifier)
+            add(cls.OBJECT_STORE['cidr'], item.latest_config.get(
+                'public_ip'), item.account.identifier)
+            add(cls.OBJECT_STORE['cidr'], item.latest_config.get(
+                'private_ip_address'), item.account.identifier)
 
     @classmethod
     def _load_natgateways(cls):
@@ -382,8 +395,10 @@ class Auditor(object):
         results = cls._load_related_items('natgateway')
         for gateway in results:
             for address in gateway.latest_config.get('nat_gateway_addresses', []):
-                add(cls.OBJECT_STORE['cidr'], address['public_ip'], gateway.account.identifier)
-                add(cls.OBJECT_STORE['cidr'], address['private_ip'], gateway.account.identifier)
+                add(cls.OBJECT_STORE['cidr'],
+                    address['public_ip'], gateway.account.identifier)
+                add(cls.OBJECT_STORE['cidr'],
+                    address['private_ip'], gateway.account.identifier)
 
     @classmethod
     def _load_network_whitelist(cls):
@@ -403,19 +418,22 @@ class Auditor(object):
             if not fixed_item:
                 continue
 
-            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get('UserId'), fixed_item.account.identifier)
+            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get(
+                'UserId'), fixed_item.account.identifier)
 
         for item in role_results:
             fixed_item = ensure_item_has_latest_revision_id(item)
             if not fixed_item:
                 continue
 
-            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get('RoleId'), fixed_item.account.identifier)
+            add(cls.OBJECT_STORE['userid'], fixed_item.latest_config.get(
+                'RoleId'), fixed_item.account.identifier)
 
     @classmethod
     def _load_accounts(cls):
         """Store the account IDs of all friendly/thirdparty accounts."""
-        friendly_accounts = Account.query.filter(Account.third_party == False).all()
+        friendly_accounts = Account.query.filter(
+            Account.third_party == False).all()
         third_party = Account.query.filter(Account.third_party == True).all()
 
         cls.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] = list()
@@ -443,7 +461,7 @@ class Auditor(object):
     @staticmethod
     def _load_related_items(technology_name):
         query = Item.query.join((Technology, Technology.id == Item.tech_id))
-        query = query.filter(Technology.name==technology_name)
+        query = query.filter(Technology.name == technology_name)
         return query.all()
 
     def _get_account(self, key, value):
@@ -481,7 +499,8 @@ class Auditor(object):
         if entity.category == 'security_group':
             account_identifier = entity.value.split('/')[0]
             entity.value = entity.value.split('/')[1]
-            result_set = set([self.inspect_entity_account(entity, account_identifier, same)])
+            result_set = set([self.inspect_entity_account(
+                entity, account_identifier, same)])
             return result_set
         if entity.category == 'userid':
             return self.inspect_entity_userid(entity, same)
@@ -544,7 +563,8 @@ class Auditor(object):
         for str_cidr in self.OBJECT_STORE.get('cidr', []):
             if ipaddr.IPNetwork(entity.value) in ipaddr.IPNetwork(str_cidr):
                 for account in self.OBJECT_STORE['cidr'].get(str_cidr, []):
-                    values.add(self.inspect_entity_account(entity, account, same))
+                    values.add(self.inspect_entity_account(
+                        entity, account, same))
         if not values:
             return set(['UNKNOWN'])
         return values
@@ -568,9 +588,11 @@ class Auditor(object):
 
         action_instructions = None
         if source == 'resource_policy':
-            action_instructions = "An {singular} ".format(singular=self.i_am_singular)
+            action_instructions = "An {singular} ".format(
+                singular=self.i_am_singular)
             action_instructions += "with { 'Principal': { 'AWS': '*' } } must also have a strong condition block or it is Internet Accessible. "
-        self.add_issue(score, tag, item, notes=notes, action_instructions=action_instructions)
+        self.add_issue(score, tag, item, notes=notes,
+                       action_instructions=action_instructions)
 
     def record_friendly_access(self, item, entity, actions, score=0, source=None):
         tag = Categories.FRIENDLY_CROSS_ACCOUNT
@@ -613,7 +635,8 @@ class Auditor(object):
 
     def record_arn_parse_issue(self, item, arn):
         tag = Categories.PARSE_ERROR
-        notes = Categories.PARSE_ERROR_NOTES.format(input_type='ARN', input=arn)
+        notes = Categories.PARSE_ERROR_NOTES.format(
+            input_type='ARN', input=arn)
         self.add_issue(3, tag, item, notes=notes)
 
     def add_issue(self, score, issue, item, notes=None, action_instructions=None):
@@ -626,7 +649,8 @@ class Auditor(object):
             notes = notes[0:1024]
 
         if not self.override_scores:
-            query = ItemAuditScore.query.filter(ItemAuditScore.technology == self.index)
+            query = ItemAuditScore.query.filter(
+                ItemAuditScore.technology == self.index)
             self.override_scores = query.all()
 
         # Check for override scores to apply
@@ -668,10 +692,12 @@ class Auditor(object):
         app.logger.debug("Asked to audit {} Objects".format(len(self.items)))
         self.prep_for_audit()
         self.current_support_items = {}
-        query = ItemAuditScore.query.filter(ItemAuditScore.technology == self.index)
+        query = ItemAuditScore.query.filter(
+            ItemAuditScore.technology == self.index)
         self.override_scores = query.all()
 
-        methods = [getattr(self, method_name) for method_name in dir(self) if method_name.find("check_") == 0]
+        methods = [getattr(self, method_name) for method_name in dir(
+            self) if method_name.find("check_") == 0]
         app.logger.debug("methods: {}".format(methods))
         for item in self.items:
             for method in methods:
@@ -701,7 +727,8 @@ class Auditor(object):
         """
         prev_list = []
         for account in self.accounts:
-            prev = self.datastore.get_all_ctype_filtered(tech=self.index, account=account, include_inactive=False)
+            prev = self.datastore.get_all_ctype_filtered(
+                tech=self.index, account=account, include_inactive=False)
             # Returns a map of {Item: ItemRevision}
             for item in prev:
                 item_revision = prev[item]
@@ -722,7 +749,8 @@ class Auditor(object):
         :return: List of all items for the given technology and the given account.
         """
         prev_list = []
-        prev = self.datastore.get_all_ctype_filtered(tech=index, account=account, include_inactive=False)
+        prev = self.datastore.get_all_ctype_filtered(
+            tech=index, account=account, include_inactive=False)
         # Returns a map of {Item: ItemRevision}
         for item in prev:
             item_revision = prev[item]
@@ -752,7 +780,8 @@ class Auditor(object):
 
             if not hasattr(item, 'db_item') or not item.db_item.issues:
                 loaded = True
-                item.db_item = self.datastore._get_item(item.index, item.region, item.account, item.name)
+                item.db_item = self.datastore._get_item(
+                    item.index, item.region, item.account, item.name)
 
             for issue in item.db_item.issues:
                 if not issue.auditor_setting:
@@ -767,7 +796,8 @@ class Auditor(object):
 
             # New/Regressions/Existing Issues
             for new_issue in new_issues:
-                new_issue_key = '{cls} -- {key}'.format(cls=self.__class__.__name__, key=new_issue.key())
+                new_issue_key = '{cls} -- {key}'.format(
+                    cls=self.__class__.__name__, key=new_issue.key())
 
                 # Make a new issue out of it:
                 if new_issue_key not in existing_issues:
@@ -793,16 +823,18 @@ class Auditor(object):
                     # regression
                     changes = True
                     existing_issue.fixed = False
-                    app.logger.debug("Previous Issue has Regressed {}".format(existing_issue))
+                    app.logger.debug(
+                        "Previous Issue has Regressed {}".format(existing_issue))
 
                 else:
                     # existing issue
                     item.confirmed_existing_issues.append(existing_issue)
 
-                    item_key = "{}/{}/{}/{}".format(item.index, item.region, item.account, item.name)
+                    item_key = "{}/{}/{}/{}".format(item.index,
+                                                    item.region, item.account, item.name)
                     app.logger.debug("Issue was previously found. Not overwriting."
-                        "\n\t{item_key}\n\t{issue}".format(
-                        item_key=item_key, issue=new_issue))
+                                     "\n\t{item_key}\n\t{issue}".format(
+                                         item_key=item_key, issue=new_issue))
 
             # Fixed Issues
             for _, old_issue in existing_issues.items():
@@ -810,12 +842,14 @@ class Auditor(object):
                 if old_issue.fixed:
                     continue
 
-                if old_issue_class is None or (old_issue_class == self.__class__.__name__ and old_issue.key() not in new_issue_keys):
+                if old_issue_class is None or (
+                        old_issue_class == self.__class__.__name__ and old_issue.key() not in new_issue_keys):
                     changes = True
                     old_issue.fixed = True
                     db.session.add(old_issue)
                     item.confirmed_fixed_issues.append(old_issue)
-                    app.logger.debug("Marking issue as FIXED {}".format(old_issue))
+                    app.logger.debug(
+                        "Marking issue as FIXED {}".format(old_issue))
 
             if changes:
                 db.session.add(item.db_item)
@@ -835,7 +869,8 @@ class Auditor(object):
             app.logger.info("No Audit issues.  Not sending audit email.")
             return
 
-        subject = "Security Monkey {} Auditor Report".format(self.i_am_singular)
+        subject = "Security Monkey {} Auditor Report".format(
+            self.i_am_singular)
         send_email(subject=subject, recipients=self.emails, html=report)
 
     def create_report(self):
@@ -857,7 +892,8 @@ class Auditor(object):
                 item.reportable_issues.append(issue)
                 item.score += issue.score
 
-        sorted_list = sorted(self.items, key=lambda item: item.score, reverse=True)
+        sorted_list = sorted(
+            self.items, key=lambda item: item.score, reverse=True)
         report_list = [item for item in sorted_list if item.score > 0]
 
         if report_list:
@@ -876,7 +912,8 @@ class Auditor(object):
         Checks to see if an AuditorSettings entry exists for each issue.
         If it does not, one will be created with disabled set to false.
         """
-        app.logger.debug("Creating/Assigning Auditor Settings in account {} and tech {}".format(self.accounts, self.index))
+        app.logger.debug(
+            "Creating/Assigning Auditor Settings in account {} and tech {}".format(self.accounts, self.index))
 
         query = ItemAudit.query
         query = query.join((Item, Item.id == ItemAudit.item_id))
@@ -888,7 +925,8 @@ class Auditor(object):
             self._set_auditor_setting_for_issue(issue)
 
         db.session.commit()
-        app.logger.debug("Done Creating/Assigning Auditor Settings in account {} and tech {}".format(self.accounts, self.index))
+        app.logger.debug(
+            "Done Creating/Assigning Auditor Settings in account {} and tech {}".format(self.accounts, self.index))
 
     def _set_auditor_setting_for_issue(self, issue):
 
@@ -935,24 +973,31 @@ class Auditor(object):
     def get_auditor_support_items(self, auditor_index, account):
         for index in self.support_auditor_indexes:
             if index == auditor_index:
-                audited_items = self.current_support_items.get(account + auditor_index)
+                audited_items = self.current_support_items.get(
+                    account + auditor_index)
                 if audited_items is None:
-                    audited_items = self.read_previous_items_for_account(auditor_index, account)
+                    audited_items = self.read_previous_items_for_account(
+                        auditor_index, account)
                     if not audited_items:
-                        app.logger.info("{} Could not load audited items for {}/{}".format(self.index, auditor_index, account))
-                        self.current_support_items[account+auditor_index] = []
+                        app.logger.info(
+                            "{} Could not load audited items for {}/{}".format(self.index, auditor_index, account))
+                        self.current_support_items[account +
+                                                   auditor_index] = []
                     else:
-                        self.current_support_items[account+auditor_index] = audited_items
+                        self.current_support_items[account +
+                                                   auditor_index] = audited_items
                 return audited_items
 
-        raise Exception("Auditor {} is not configured as an audit support auditor for {}".format(auditor_index, self.index))
+        raise Exception("Auditor {} is not configured as an audit support auditor for {}".format(
+            auditor_index, self.index))
 
     def get_watcher_support_items(self, watcher_index, account):
         for index in self.support_watcher_indexes:
             if index == watcher_index:
                 items = self.current_support_items.get(account + watcher_index)
                 if items is None:
-                    items = self.read_previous_items_for_account(watcher_index, account)
+                    items = self.read_previous_items_for_account(
+                        watcher_index, account)
                     # Only the item contents should be used for watcher support
                     # config. This prevents potentially stale issues from being
                     # used by the auditor
@@ -960,13 +1005,17 @@ class Auditor(object):
                         item.db_item.issues = []
 
                     if not items:
-                        app.logger.info("{} Could not load support items for {}/{}".format(self.index, watcher_index, account))
-                        self.current_support_items[account+watcher_index] = []
+                        app.logger.info(
+                            "{} Could not load support items for {}/{}".format(self.index, watcher_index, account))
+                        self.current_support_items[account +
+                                                   watcher_index] = []
                     else:
-                        self.current_support_items[account+watcher_index] = items
+                        self.current_support_items[account +
+                                                   watcher_index] = items
                 return items
 
-        raise Exception("Watcher {} is not configured as a data support watcher for {}".format(watcher_index, self.index))
+        raise Exception("Watcher {} is not configured as a data support watcher for {}".format(
+            watcher_index, self.index))
 
     def _sum_item_score(self, score, issue, matching_issue):
         if not score:
@@ -980,7 +1029,8 @@ class Auditor(object):
 
         return total
 
-    def link_to_support_item_issues(self, item, sub_item, sub_issue_message=None, issue_message=None, issue=None, score=None):
+    def link_to_support_item_issues(self, item, sub_item, sub_issue_message=None, issue_message=None, issue=None,
+                                    score=None):
         """
         Creates a new issue that is linked to an issue in a support auditor
         """
@@ -993,7 +1043,8 @@ class Auditor(object):
 
         for matching_issue in matching_issues:
             if issue:
-                issue.score = self._sum_item_score(score, issue, matching_issue)
+                issue.score = self._sum_item_score(
+                    score, issue, matching_issue)
             else:
                 issue_message = issue_message or sub_issue_message or 'UNDEFINED'
                 link_score = score or matching_issue.score
@@ -1032,20 +1083,28 @@ class Auditor(object):
                 for account_pattern_score in override_score.account_pattern_scores:
                     if getattr(account, account_pattern_score.account_field, None):
                         # Standard account field, such as identifier or notes
-                        account_pattern_value = getattr(account, account_pattern_score.account_field)
+                        account_pattern_value = getattr(
+                            account, account_pattern_score.account_field)
                     else:
                         # If there is no attribute, this is an account custom field
-                        account_pattern_value = account.getCustom(account_pattern_score.account_field)
+                        account_pattern_value = account.getCustom(
+                            account_pattern_score.account_field)
 
                     if account_pattern_value is not None:
                         # Override the score based on the matching pattern
                         if account_pattern_value == account_pattern_score.account_pattern:
-                            app.logger.debug("Overriding score based on config {}:{} {}/{}".format(self.index, self.current_method_name + '(' + self.__class__.__name__ + ')', score, account_pattern_score.score))
+                            app.logger.debug("Overriding score based on config {}:{} {}/{}".format(
+                                self.index, self.current_method_name +
+                                '(' + self.__class__.__name__ + ')', score,
+                                account_pattern_score.score))
                             score = account_pattern_score.score
                             break
                 else:
                     # No specific override pattern fund. use the generic override score
-                    app.logger.debug("Overriding score based on config {}:{} {}/{}".format(self.index, self.current_method_name + '(' + self.__class__.__name__ + ')', score, override_score.score))
+                    app.logger.debug("Overriding score based on config {}:{} {}/{}".format(
+                        self.index, self.current_method_name +
+                        '(' + self.__class__.__name__ + ')', score,
+                        override_score.score))
                     score = override_score.score
 
         return score

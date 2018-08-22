@@ -16,13 +16,13 @@ import sqlalchemy as sa
 
 def upgrade():
     op.alter_column('account', 'name',
-        existing_type=sa.VARCHAR(length=32),
-        type_=sa.String(length=50),
-        existing_nullable=True)
+                    existing_type=sa.VARCHAR(length=32),
+                    type_=sa.String(length=50),
+                    existing_nullable=True)
 
 
 def downgrade():
     op.alter_column('account', 'name',
-        existing_type=sa.VARCHAR(length=50),
-        type_=sa.String(length=32),
-        existing_nullable=True)
+                    existing_type=sa.VARCHAR(length=50),
+                    type_=sa.String(length=32),
+                    existing_nullable=True)

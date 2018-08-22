@@ -39,8 +39,10 @@ class Account(Base):
     third_party = sa.Column(sa.Boolean())
     name = sa.Column(sa.String(50), index=True, unique=True)
     notes = sa.Column(sa.String(256))
-    identifier = sa.Column(sa.String(256), unique=True)  # Unique id of the account, the number for AWS.
-    account_type_id = sa.Column(sa.Integer, sa.ForeignKey("account_type.id"), nullable=False)
+    # Unique id of the account, the number for AWS.
+    identifier = sa.Column(sa.String(256), unique=True)
+    account_type_id = sa.Column(sa.Integer, sa.ForeignKey(
+        "account_type.id"), nullable=False)
 
 
 class AccountTypeCustomValues(Base):
@@ -51,7 +53,8 @@ class AccountTypeCustomValues(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(64))
     value = sa.Column(sa.String(256))
-    account_id = sa.Column(sa.Integer, sa.ForeignKey("account.id"), nullable=False)
+    account_id = sa.Column(sa.Integer, sa.ForeignKey(
+        "account.id"), nullable=False)
 
 
 def upgrade():
@@ -75,16 +78,19 @@ def upgrade():
                 print("[+] Replacing OLD duplicate account custom field for account with ID: {},"
                       " field name: {}, old field Value: {}, "
                       "with new field value: {}".format(result.account_id, result.name,
-                                                        seen["{}-{}".format(result.account_id, result.name)].value,
+                                                        seen["{}-{}".format(
+                                                            result.account_id, result.name)].value,
                                                         result.value))
-                delete_list.append(seen["{}-{}".format(result.account_id, result.name)])
+                delete_list.append(
+                    seen["{}-{}".format(result.account_id, result.name)])
                 seen["{}-{}".format(result.account_id, result.name)] = result
 
         else:
             seen["{}-{}".format(result.account_id, result.name)] = result
 
     if delete_list:
-        print("[-->] Deleting duplicate account custom fields... This may take a while...")
+        print(
+            "[-->] Deleting duplicate account custom fields... This may take a while...")
         for d in delete_list:
             session.delete(d)
 
@@ -95,7 +101,8 @@ def upgrade():
         print("[@] No duplicates found so nothing to delete!")
 
     print("[-->] Adding proper unique constraint to the `account_type_values` table...")
-    op.create_unique_constraint("uq_account_id_name", "account_type_values", ["account_id", "name"])
+    op.create_unique_constraint(
+        "uq_account_id_name", "account_type_values", ["account_id", "name"])
     print("[@] Completed adding proper unique constraint to the `account_type_values` table.")
 
 

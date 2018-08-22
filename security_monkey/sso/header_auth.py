@@ -35,6 +35,7 @@ class HeaderAuthExtension(object):
     """
     Extension for handling login via authn headers set by a trusted reverse proxy
     """
+
     def __init__(self, app=None):
         if app:
             self.init_app(app)
@@ -47,7 +48,8 @@ class HeaderAuthExtension(object):
         def _wrapped_login_view():
             if app.config.get("USE_HEADER_AUTH"):
                 username_header_name = app.config["HEADER_AUTH_USERNAME_HEADER"]
-                groups_header_name = app.config.get("HEADER_AUTH_GROUPS_HEADER")
+                groups_header_name = app.config.get(
+                    "HEADER_AUTH_GROUPS_HEADER")
 
                 authed_user = request.headers.get(username_header_name)
                 # Don't have a valid session but have a trusted authn header
@@ -58,7 +60,8 @@ class HeaderAuthExtension(object):
                     user = setup_user(
                         authed_user,
                         groups=groups,
-                        default_role=app.config.get('HEADER_AUTH_DEFAULT_ROLE', 'View')
+                        default_role=app.config.get(
+                            'HEADER_AUTH_DEFAULT_ROLE', 'View')
                     )
                     # Tell Flask-Principal the identity changed
                     identity_changed.send(app, identity=Identity(user.id))

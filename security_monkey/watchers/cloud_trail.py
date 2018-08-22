@@ -85,7 +85,8 @@ class CloudTrail(Watcher):
                                                                            Name=trail['TrailARN'])
                         trail_enabled = get_trail_status["IsLogging"]
                     except Exception as e:
-                        app.logger.debug("Issues getting the status of cloudtrail")
+                        app.logger.debug(
+                            "Issues getting the status of cloudtrail")
                         # Store it to the database:
                         location = (self.index, account, region.name, name)
                         store_exception("cloudtrail", location, e)

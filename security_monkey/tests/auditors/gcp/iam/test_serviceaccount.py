@@ -30,7 +30,6 @@ POLICY_WITH_ACTOR_LIST = [
     }
 ]
 
-
 POLICY_NO_ACTOR_LIST = [
     {
         "Members": [

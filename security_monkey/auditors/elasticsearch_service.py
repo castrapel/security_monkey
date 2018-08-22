@@ -31,5 +31,6 @@ class ElasticSearchServiceAuditor(ResourcePolicyAuditor):
     i_am_plural = ElasticSearchService.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(ElasticSearchServiceAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(ElasticSearchServiceAuditor, self).__init__(
+            accounts=accounts, debug=debug)
         self.policy_keys = ['policy']

@@ -50,18 +50,21 @@ class Keypair(Watcher):
         from security_monkey.common.sts_connect import connect
         for account in self.accounts:
             try:
-                account_db = Account.query.filter(Account.name == account).first()
+                account_db = Account.query.filter(
+                    Account.name == account).first()
                 account_number = account_db.identifier
                 ec2 = connect(account, 'ec2')
                 regions = ec2.get_all_regions()
             except Exception as e:  # EC2ResponseError
                 # Some Accounts don't subscribe to EC2 and will throw an exception here.
                 exc = BotoConnectionIssue(str(e), 'keypair', account, None)
-                self.slurp_exception((self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
+                self.slurp_exception(
+                    (self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
                 continue
 
             for region in regions:
-                app.logger.debug("Checking {}/{}/{}".format(Keypair.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(Keypair.index, account, region.name))
 
                 try:
                     rec2 = connect(account, 'boto3.ec2.client', region=region)
@@ -70,12 +73,14 @@ class Keypair(Watcher):
                     )
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), 'keypair', account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), 'keypair', account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
 
-                app.logger.debug("Found {} {}".format(len(kps), Keypair.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(kps), Keypair.i_am_plural))
                 for kp in kps['KeyPairs']:
                     if self.check_ignore_list(kp['KeyName']):
                         continue
@@ -90,7 +95,7 @@ class Keypair(Watcher):
                                                      'fingerprint': kp["KeyFingerprint"],
                                                      'arn': arn,
                                                      'name': kp["KeyName"]
-                                                 }, source_watcher=self))
+                    }, source_watcher=self))
         return item_list, exception_map
 
 

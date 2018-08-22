@@ -58,7 +58,8 @@ class Alerter(object):
         self.delete = []
         self.changed = []
         self.watchers_auditors = watchers_auditors if watchers_auditors else []
-        users = User.query.filter(User.accounts.any(name=account)).filter(User.change_reports == 'ALL').all()
+        users = User.query.filter(User.accounts.any(name=account)).filter(
+            User.change_reports == 'ALL').all()
         self.emails = [user.email for user in users]
         self.team_emails = app.config.get('SECURITY_TEAM_EMAIL', [])
 
@@ -67,7 +68,8 @@ class Alerter(object):
         elif isinstance(self.team_emails, (list, tuple)):
             self.emails.extend(self.team_emails)
         else:
-            app.logger.info("Alerter: SECURITY_TEAM_EMAIL contains an invalid type")
+            app.logger.info(
+                "Alerter: SECURITY_TEAM_EMAIL contains an invalid type")
 
     def report(self):
         """
@@ -91,8 +93,10 @@ class Alerter(object):
             app.logger.info("Alerter: no changes found")
             return
 
-        app.logger.info("Alerter: Found some changes in {}: {}".format(self.account, watcher_str))
+        app.logger.info("Alerter: Found some changes in {}: {}".format(
+            self.account, watcher_str))
         content = {u'watchers': changed_watchers}
         body = report_content(content)
-        subject = get_subject(has_issues, has_new_issue, has_unjustified_issue, self.account, watcher_str)
+        subject = get_subject(has_issues, has_new_issue,
+                              has_unjustified_issue, self.account, watcher_str)
         return send_email(subject=subject, recipients=self.emails, html=body)

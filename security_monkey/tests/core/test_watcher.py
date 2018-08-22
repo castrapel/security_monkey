@@ -30,7 +30,6 @@ from security_monkey import db, ARN_PREFIX
 
 from security_monkey.tests import SecurityMonkeyTestCase
 
-
 CONFIG_1 = {
     'key1': 'value1',
     'key2': 'value2',
@@ -110,14 +109,16 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         issue.justification = 'test justification'
 
         old_item_w_issues = ChangeItem(index='testtech', region='us-west-2', account='testaccount',
-                                      new_config=CONFIG_1, active=True, audit_issues=[issue])
+                                       new_config=CONFIG_1, active=True, audit_issues=[issue])
         old_item_wo_issues = ChangeItem(index='testtech', region='us-west-2', account='testaccount',
                                         new_config=CONFIG_1, active=True)
         new_item = ChangeItem(index='testtech', region='us-west-2', account='testaccount', new_config=CONFIG_2,
                               active=True)
 
-        merged_item_w_issues = ChangeItem.from_items(old_item=old_item_w_issues, new_item=new_item)
-        merged_item_wo_issues = ChangeItem.from_items(old_item=old_item_wo_issues, new_item=new_item)
+        merged_item_w_issues = ChangeItem.from_items(
+            old_item=old_item_w_issues, new_item=new_item)
+        merged_item_wo_issues = ChangeItem.from_items(
+            old_item=old_item_wo_issues, new_item=new_item)
 
         assert len(merged_item_w_issues.audit_issues) == 1
         assert len(merged_item_wo_issues.audit_issues) == 0
@@ -283,38 +284,40 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         datastore = Datastore()
 
         old_item = ChangeItem(
-                index='test_index',
-                account='test_account',
-                name='item_name',
-                active=True,
-                new_config={
-                    'config': 'test1'
-                }
-            )
+            index='test_index',
+            account='test_account',
+            name='item_name',
+            active=True,
+            new_config={
+                'config': 'test1'
+            }
+        )
 
         old_item.save(datastore)
 
-        query = Item.query.filter(Technology.name == 'test_index').filter(Account.name == 'test_account')
+        query = Item.query.filter(Technology.name == 'test_index').filter(
+            Account.name == 'test_account')
         items = query.all()
         self.assertEquals(len(items), 1)
         revisions = items[0].revisions.all()
         self.assertEquals(len(revisions), 1)
 
         new_item = ChangeItem(
-                index='test_index',
-                account='test_account',
-                name='item_name',
-                active=True,
-                new_config={
-                    'config': 'test2'
-                }
-            )
+            index='test_index',
+            account='test_account',
+            name='item_name',
+            active=True,
+            new_config={
+                'config': 'test2'
+            }
+        )
         watcher = Watcher(accounts=['test_account'])
         watcher.index = 'test_index'
         watcher.find_changes(current=[new_item])
         watcher.save()
 
-        query = Item.query.filter(Technology.name == 'test_index').filter(Account.name == 'test_account')
+        query = Item.query.filter(Technology.name == 'test_index').filter(
+            Account.name == 'test_account')
         items = query.all()
         self.assertEquals(len(items), 1)
         revisions = items[0].revisions.all()
@@ -326,32 +329,33 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         datastore = Datastore()
 
         old_item = ChangeItem(
-                index='test_index',
-                account='test_account',
-                name='item_name',
-                active=True,
-                new_config={
-                    'config': 'test1'
-                }
-            )
+            index='test_index',
+            account='test_account',
+            name='item_name',
+            active=True,
+            new_config={
+                'config': 'test1'
+            }
+        )
 
         old_item.save(datastore)
 
-        query = Item.query.filter(Technology.name == 'test_index').filter(Account.name == 'test_account')
+        query = Item.query.filter(Technology.name == 'test_index').filter(
+            Account.name == 'test_account')
         items = query.all()
         self.assertEquals(len(items), 1)
         revisions = items[0].revisions.all()
         self.assertEquals(len(revisions), 1)
 
         new_item = ChangeItem(
-                index='test_index',
-                account='test_account',
-                name='item_name',
-                active=True,
-                new_config={
-                    'config': 'test2'
-                }
-            )
+            index='test_index',
+            account='test_account',
+            name='item_name',
+            active=True,
+            new_config={
+                'config': 'test2'
+            }
+        )
         watcher = Watcher(accounts=['test_account'])
         watcher.index = 'test_index'
         watcher.honor_ephemerals = True
@@ -360,7 +364,8 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         watcher.find_changes(current=[new_item])
         watcher.save()
 
-        query = Item.query.filter(Technology.name == 'test_index').filter(Account.name == 'test_account')
+        query = Item.query.filter(Technology.name == 'test_index').filter(
+            Account.name == 'test_account')
         items = query.all()
         self.assertEquals(len(items), 1)
         revisions = items[0].revisions.all()
@@ -397,9 +402,11 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         for x in range(0, 5):
             mod_conf = dict(ACTIVE_CONF)
             mod_conf["name"] = "SomeRole{}".format(x)
-            mod_conf["Arn"] = "arn:aws:iam::012345678910:role/SomeRole{}".format(x)
+            mod_conf["Arn"] = "arn:aws:iam::012345678910:role/SomeRole{}".format(
+                x)
 
-            items.append(SomeTestItem().from_slurp(mod_conf, account_name=self.account.name))
+            items.append(SomeTestItem().from_slurp(
+                mod_conf, account_name=self.account.name))
 
         assert len(watcher.find_changes(items)) == 5
         assert len(watcher.deleted_items) == 0
@@ -434,11 +441,14 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         for x in range(0, 5):
             mod_conf = dict(ACTIVE_CONF)
             mod_conf["name"] = "SomeRole{}".format(x)
-            mod_conf["Arn"] = ARN_PREFIX + ":iam::012345678910:role/SomeRole{}".format(x)
-            items.append(SomeTestItem().from_slurp(mod_conf, account_name=self.account.name))
+            mod_conf["Arn"] = ARN_PREFIX + \
+                ":iam::012345678910:role/SomeRole{}".format(x)
+            items.append(SomeTestItem().from_slurp(
+                mod_conf, account_name=self.account.name))
 
             mod_aspd = dict(ASPD)
-            mod_aspd["Arn"] = ARN_PREFIX + ":iam::012345678910:role/SomeRole{}".format(x)
+            mod_aspd["Arn"] = ARN_PREFIX + \
+                ":iam::012345678910:role/SomeRole{}".format(x)
             mod_aspd["RoleName"] = "SomeRole{}".format(x)
             watcher.total_list.append(mod_aspd)
 
@@ -451,7 +461,8 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         # Check that nothing was deleted:
         for x in range(0, 5):
             item_revision = ItemRevision.query.join((Item, ItemRevision.id == Item.latest_revision_id)).filter(
-                Item.arn == ARN_PREFIX + ":iam::012345678910:role/SomeRole{}".format(x),
+                Item.arn == ARN_PREFIX +
+                ":iam::012345678910:role/SomeRole{}".format(x),
             ).one()
 
             assert item_revision.active
@@ -461,7 +472,8 @@ class WatcherTestCase(SecurityMonkeyTestCase):
                                      issue="IAM Role has full admin permissions.",
                                      notes=json.dumps(item_revision.config),
                                      item_id=item_revision.item_id))
-            db.session.add(ItemAudit(score=9001, issue="Some test issue", notes="{}", item_id=item_revision.item_id))
+            db.session.add(ItemAudit(score=9001, issue="Some test issue",
+                                     notes="{}", item_id=item_revision.item_id))
 
         db.session.commit()
         assert len(ItemAudit.query.all()) == len(items) * 2
@@ -490,7 +502,8 @@ class WatcherTestCase(SecurityMonkeyTestCase):
             ).one()
 
             assert item_revision.active
-            assert len(ItemAudit.query.filter(ItemAudit.item_id == item_revision.item_id).all()) == 2
+            assert len(ItemAudit.query.filter(
+                ItemAudit.item_id == item_revision.item_id).all()) == 2
 
     def test_ensure_item_has_latest_revision_id(self):
         """
@@ -518,12 +531,14 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         db.session.add(no_revision_item)
         db.session.commit()
 
-        assert db.session.query(Item).filter(Item.name == no_revision_item.name).one()
+        assert db.session.query(Item).filter(
+            Item.name == no_revision_item.name).one()
 
         # Should delete the item from the DB:
         result = ensure_item_has_latest_revision_id(no_revision_item)
         assert not result
-        assert not db.session.query(Item).filter(Item.name == no_revision_item.name).first()
+        assert not db.session.query(Item).filter(
+            Item.name == no_revision_item.name).first()
 
         # Test case #2: Create two item revisions for the given item, but don't attach them to the item.
         #               After the fixer runs, it should return the item with proper hashes and a proper
@@ -537,19 +552,23 @@ class WatcherTestCase(SecurityMonkeyTestCase):
         ir_one = ItemRevision(config=ACTIVE_CONF, date_created=datetime.datetime.utcnow(),
                               item_id=no_revision_item.id)
         ir_two = ItemRevision(config=ACTIVE_CONF,
-                              date_created=(datetime.datetime.utcnow() - timedelta(days=1)),
+                              date_created=(
+                                  datetime.datetime.utcnow() - timedelta(days=1)),
                               item_id=no_revision_item.id)
 
         db.session.add(ir_one)
         db.session.add(ir_two)
         db.session.commit()
 
-        assert len(db.session.query(ItemRevision).filter(ItemRevision.item_id == no_revision_item.id).all()) == 2
+        assert len(db.session.query(ItemRevision).filter(
+            ItemRevision.item_id == no_revision_item.id).all()) == 2
         result = ensure_item_has_latest_revision_id(no_revision_item)
         assert result
         assert result.latest_revision_id == ir_one.id
-        assert ds.hash_config(ACTIVE_CONF) == no_revision_item.latest_revision_complete_hash
-        assert ds.durable_hash(ACTIVE_CONF, watcher.ephemeral_paths) == no_revision_item.latest_revision_durable_hash
+        assert ds.hash_config(
+            ACTIVE_CONF) == no_revision_item.latest_revision_complete_hash
+        assert ds.durable_hash(
+            ACTIVE_CONF, watcher.ephemeral_paths) == no_revision_item.latest_revision_durable_hash
 
         # Undo the mock:
         security_monkey.watcher.watcher_registry = old_watcher_registry

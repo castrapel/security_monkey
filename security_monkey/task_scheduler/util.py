@@ -75,7 +75,8 @@ def get_sm_celery_config_value(celery_config, variable_name, variable_type):
             return
 
         if not isinstance(value, variable_type):
-            raise InvalidCeleryConfigurationType(variable_name, variable_type, type(value))
+            raise InvalidCeleryConfigurationType(
+                variable_name, variable_type, type(value))
 
     except KeyError as _:
         return

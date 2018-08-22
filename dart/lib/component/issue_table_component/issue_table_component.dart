@@ -115,7 +115,7 @@ class IssueTableComponent extends PaginatedTable implements ScopeAware {
     void export(){
       window.location.assign(getExportLink());
     }
-    
+
     String getExportLink(){
       String link = "/api/1/export/issues?";
       List<String> params = new List();

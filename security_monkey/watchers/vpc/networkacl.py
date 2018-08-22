@@ -87,6 +87,7 @@ class NetworkACL(Watcher):
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

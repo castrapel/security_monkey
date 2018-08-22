@@ -37,7 +37,6 @@ def get_rsa_public_key(n, e):
     )
 
 
-
 def fetch_token_header_payload(token):
     """
     Fetch the header and payload out of the JWT token.
@@ -52,13 +51,15 @@ def fetch_token_header_payload(token):
         raise jwt.DecodeError('Not enough segments')
 
     try:
-        header = json.loads(jwt.utils.base64url_decode(header_segment).decode('utf-8'))
+        header = json.loads(jwt.utils.base64url_decode(
+            header_segment).decode('utf-8'))
     except TypeError as e:
         current_app.logger.exception(e)
         raise jwt.DecodeError('Invalid header padding')
 
     try:
-        payload = json.loads(jwt.utils.base64url_decode(payload_segment).decode('utf-8'))
+        payload = json.loads(jwt.utils.base64url_decode(
+            payload_segment).decode('utf-8'))
     except TypeError as e:
         current_app.logger.exception(e)
         raise jwt.DecodeError('Invalid payload padding')
@@ -75,7 +76,7 @@ def on_identity_loaded(sender, identity):
     :param identity:
     """
     # load the user
-    user = User.query.filter(User.id==identity.id).first()
+    user = User.query.filter(User.id == identity.id).first()
 
     # add the UserNeed to the identity
     identity.provides.add(UserNeed(identity.id))

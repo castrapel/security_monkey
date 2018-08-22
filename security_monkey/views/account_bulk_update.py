@@ -23,7 +23,6 @@
 
 """
 
-
 from security_monkey.views import AuthenticatedService
 from security_monkey.datastore import Account
 from security_monkey import app, db, rbac
@@ -46,7 +45,8 @@ class AccountListPut(AuthenticatedService):
         values = json.loads(request.json)
         app.logger.debug("Account bulk update {}".format(values))
         for account_name in values.keys():
-            account = Account.query.filter(Account.name == account_name).first()
+            account = Account.query.filter(
+                Account.name == account_name).first()
             if account:
                 account.active = values[account_name]
                 db.session.add(account)

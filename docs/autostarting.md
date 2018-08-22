@@ -133,7 +133,7 @@ Run the following commands to set this up:
     sudo systemctl start supervisor
     sudo supervisorctl status
 
-The supervisor configuration will start the Celery `beat` service, which performs all the scheduling logic. 
+The supervisor configuration will start the Celery `beat` service, which performs all the scheduling logic.
 The full command that the supervisor runs to launch the the `beat` service is:
  ```
  /usr/local/src/security_monkey/venv/bin/celery -A security_monkey.task_scheduler.beat.CELERY beat -s /tmp/sm-celerybeat-schedule -l debug
@@ -142,7 +142,7 @@ The full command that the supervisor runs to launch the the `beat` service is:
 Running this command will first purge out all existing jobs from the message broker and start fresh. This is
 necessary when editing watcher frequency and enablement.
 
-*Note*: There should be exactly ONE instance that runs `beat`. Running more than one will cause issues. 
+*Note*: There should be exactly ONE instance that runs `beat`. Running more than one will cause issues.
 See deployment strategy below for additional details.
 
 The Workers
@@ -155,7 +155,7 @@ The workers are instances that fetch data from your configured accounts. These a
 You are able to deploy as many workers as you like for your environment.  Security Monkey splits up tasks based on the account and technology pair.
 
 Similar to configuring the Scheduler above, the workers need to have the **same** `security_monkey/celeryconfig.py` as the scheduler. In here, you can optionally configure
-the number of processes that exist within each instance (via the `worker_concurrency` configuration). By default 10 is selected. You can adjust this as necessary. In general, if you would like to 
+the number of processes that exist within each instance (via the `worker_concurrency` configuration). By default 10 is selected. You can adjust this as necessary. In general, if you would like to
 scale horizontally, you should deploy more worker instances. This will allow for maximum parallelization.
 
 ### Supervisor

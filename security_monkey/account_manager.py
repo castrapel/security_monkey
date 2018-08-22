@@ -37,6 +37,7 @@ class AccountManagerType(type):
     Generates a global account registry as AccountManager derived classes
     are loaded
     """
+
     def __init__(cls, name, bases, attrs):
         super(AccountManagerType, cls).__init__(name, bases, attrs)
         if cls.account_type:
@@ -94,14 +95,16 @@ class AccountManager(object):
         """
         account_type_result = _get_or_create_account_type(account_type)
 
-        account = Account.query.filter(Account.identifier == identifier).first()
+        account = Account.query.filter(
+            Account.identifier == identifier).first()
 
         if not account:
             account = Account()
 
         account = self._populate_account(account, account_type_result.id, self.sanitize_account_name(name),
                                          active, third_party, notes,
-                                         self.sanitize_account_identifier(identifier),
+                                         self.sanitize_account_identifier(
+                                             identifier),
                                          custom_fields)
 
         db.session.add(account)
@@ -122,14 +125,16 @@ class AccountManager(object):
             account = Account.query.filter(Account.id == account_id).first()
 
             if not account:
-                app.logger.error("Account with ID {} does not exist.".format(account_id))
+                app.logger.error(
+                    "Account with ID {} does not exist.".format(account_id))
                 return None
 
             # Are we changing the account name?
             if account.name != name:
                 # Check if the account with that name exists:
                 if Account.query.filter(Account.name == name).first():
-                    app.logger.error("Account with name: {} already exists.".format(name))
+                    app.logger.error(
+                        "Account with name: {} already exists.".format(name))
                     raise AccountNameExists(name)
 
                 account.name = self.sanitize_account_name(name)
@@ -137,7 +142,8 @@ class AccountManager(object):
         else:
             account = Account.query.filter(Account.name == name).first()
             if not account:
-                app.logger.error("Account with name {} does not exist.".format(name))
+                app.logger.error(
+                    "Account with name {} does not exist.".format(name))
                 return None
 
         account.active = active
@@ -173,7 +179,8 @@ class AccountManager(object):
         account = Account()
         account = self._populate_account(account, account_type_result.id, self.sanitize_account_name(name),
                                          active, third_party, notes,
-                                         self.sanitize_account_identifier(identifier),
+                                         self.sanitize_account_identifier(
+                                             identifier),
                                          custom_fields)
 
         db.session.add(account)
@@ -246,7 +253,8 @@ class AccountManager(object):
 
                 except KeyError:
                     # The field does not exist, so add it with the correct value:
-                    new_custom_value = AccountTypeCustomValues(name=custom_config.name, value=new_value)
+                    new_custom_value = AccountTypeCustomValues(
+                        name=custom_config.name, value=new_value)
                     account.custom_fields.append(new_custom_value)
                     db.session.add(account)
 
@@ -298,7 +306,6 @@ def get_account_by_name(account_name):
 
 
 def delete_account_by_id(account_id):
-
     # Need to unsubscribe any users first:
     users = User.query.filter(
         User.accounts.any(Account.id == account_id)).all()
@@ -318,26 +325,26 @@ def delete_account_by_id(account_id):
         conn = psycopg2.connect(app.config.get('SQLALCHEMY_DATABASE_URI'))
         cur = conn.cursor()
         cur.execute('DELETE from issue_item_association '
-                      'WHERE super_issue_id IN '
-                        '(SELECT itemaudit.id from itemaudit, item '
-                          'WHERE itemaudit.item_id = item.id AND item.account_id = %s);', [account_id])
+                    'WHERE super_issue_id IN '
+                    '(SELECT itemaudit.id from itemaudit, item '
+                    'WHERE itemaudit.item_id = item.id AND item.account_id = %s);', [account_id])
 
         cur.execute('DELETE from itemaudit WHERE item_id IN '
-                      '(SELECT id from item WHERE account_id = %s);', [account_id])
+                    '(SELECT id from item WHERE account_id = %s);', [account_id])
 
         cur.execute('DELETE from itemrevisioncomment WHERE revision_id IN '
-                      '(SELECT itemrevision.id from itemrevision, item WHERE '
-                        'itemrevision.item_id = item.id AND item.account_id = %s);', [account_id])
+                    '(SELECT itemrevision.id from itemrevision, item WHERE '
+                    'itemrevision.item_id = item.id AND item.account_id = %s);', [account_id])
 
         cur.execute('DELETE from cloudtrail WHERE revision_id IN '
                     '(SELECT itemrevision.id from itemrevision, item WHERE '
                     'itemrevision.item_id = item.id AND item.account_id = %s);', [account_id])
 
         cur.execute('DELETE from itemrevision WHERE item_id IN '
-                      '(SELECT id from item WHERE account_id = %s);', [account_id])
+                    '(SELECT id from item WHERE account_id = %s);', [account_id])
 
         cur.execute('DELETE from itemcomment WHERE item_id IN '
-                      '(SELECT id from item WHERE account_id = %s);', [account_id])
+                    '(SELECT id from item WHERE account_id = %s);', [account_id])
 
         cur.execute('DELETE from exceptions WHERE item_id IN '
                     '(SELECT id from item WHERE account_id = %s);', [account_id])
@@ -347,11 +354,14 @@ def delete_account_by_id(account_id):
 
         cur.execute('DELETE from item WHERE account_id = %s;', [account_id])
 
-        cur.execute('DELETE from exceptions WHERE account_id = %s;', [account_id])
+        cur.execute(
+            'DELETE from exceptions WHERE account_id = %s;', [account_id])
 
-        cur.execute('DELETE from auditorsettings WHERE account_id = %s;', [account_id])
+        cur.execute(
+            'DELETE from auditorsettings WHERE account_id = %s;', [account_id])
 
-        cur.execute('DELETE from account_type_values WHERE account_id = %s;', [account_id])
+        cur.execute(
+            'DELETE from account_type_values WHERE account_id = %s;', [account_id])
 
         cur.execute('DELETE from account WHERE id = %s;', [account_id])
 

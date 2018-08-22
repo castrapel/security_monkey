@@ -16,6 +16,7 @@ from security_monkey.tests import SecurityMonkeyTestCase
 from security_monkey.datastore import Account, AccountType
 from security_monkey import db
 
+
 class SecurityMonkeyWatcherTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
         account_type_result = AccountType(name='AWS')
@@ -23,8 +24,8 @@ class SecurityMonkeyWatcherTestCase(SecurityMonkeyTestCase):
         db.session.commit()
 
         self.account = Account(identifier="012345678910", name="TEST_ACCOUNT",
-                          account_type_id=account_type_result.id, notes="TEST_ACCOUNT",
-                          third_party=False, active=True)
+                               account_type_id=account_type_result.id, notes="TEST_ACCOUNT",
+                               third_party=False, active=True)
 
         db.session.add(self.account)
         db.session.commit()

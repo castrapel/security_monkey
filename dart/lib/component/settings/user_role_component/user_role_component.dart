@@ -38,7 +38,7 @@ class UserRoleComponent extends PaginatedTable {
                 super.is_loaded = true;
             }
         });
-            
+
         store.list(Role).then((roles_response) {
             this.roles = roles_response;
             roles_loaded = true;
@@ -53,12 +53,12 @@ class UserRoleComponent extends PaginatedTable {
         user.active = true;
         store.update(user);
     }
-    
+
     void disableUser(User user){
         user.active = false;
         store.update(user);
     }
-    
+
     void changeRole(User user){
         var elements = document.getElementsByClassName("changeRole");
         for(Node element in elements){
@@ -76,7 +76,7 @@ class UserRoleComponent extends PaginatedTable {
             }
         }
     }
-    
+
     //TODO (Olly) add "Are you sure" dialog
     void deleteUser(User user){
         Future f = store.delete(user);

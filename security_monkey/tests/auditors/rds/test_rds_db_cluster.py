@@ -41,7 +41,7 @@ class RDSDBClusterTestCase(SecurityMonkeyTestCase):
         from security_monkey.watchers.rds.rds_db_cluster import RDSClusterItem
         item = RDSClusterItem(
             account='TEST_ACCOUNT',
-            name='MyRDSDbCluster', 
+            name='MyRDSDbCluster',
             arn=ARN_PREFIX + ":rds:" + AWS_DEFAULT_REGION + ":012345678910:db/MyDBCluster",
             config=rds_instance)
 
@@ -76,7 +76,8 @@ class RDSDBClusterTestCase(SecurityMonkeyTestCase):
             return [sg_item]
 
         def mock_link_to_support_item_issues(item, sg, sub_issue_message, score):
-            auditor.add_issue(score, sub_issue_message, item, notes='Related to: INTERNETSG (sg-12345678 in vpc-49999999)')
+            auditor.add_issue(score, sub_issue_message, item,
+                              notes='Related to: INTERNETSG (sg-12345678 in vpc-49999999)')
 
         auditor.get_auditor_support_items = mock_get_auditor_support_items
         auditor.link_to_support_item_issues = mock_link_to_support_item_issues
@@ -85,4 +86,5 @@ class RDSDBClusterTestCase(SecurityMonkeyTestCase):
         self.assertEqual(len(item.audit_issues), 1)
         issue = item.audit_issues[0]
         self.assertEqual(issue.issue, 'Internet Accessible')
-        self.assertEqual(issue.notes, 'Related to: INTERNETSG (sg-12345678 in vpc-49999999)')
+        self.assertEqual(
+            issue.notes, 'Related to: INTERNETSG (sg-12345678 in vpc-49999999)')

@@ -1,12 +1,12 @@
 ADVANCED: Tuning the Watchers / Prioritizing
 =================
-By default, Security Monkey watchers as configured in the [Autostarting Doc](autostarting.md) will grab tasks when they are scheduled. If you have many accounts, 
-you will need many watchers in order to fetch data in a timely manner. If there are technologies that you are more sensitive about (such as IAM) that you want to 
+By default, Security Monkey watchers as configured in the [Autostarting Doc](autostarting.md) will grab tasks when they are scheduled. If you have many accounts,
+you will need many watchers in order to fetch data in a timely manner. If there are technologies that you are more sensitive about (such as IAM) that you want to
 prioritize, you can do so by spinning up a separate scheduler and watching stack. This section outlines how to do that.
 
-This will require a separate set of scheduler/watchers. This doc outlines a strategy that you can take to accomplish this. 
+This will require a separate set of scheduler/watchers. This doc outlines a strategy that you can take to accomplish this.
 
-In this example, we are going to assume that you want to prioritize IAM Roles (called the `iam` stack) vs. all other technologies. 
+In this example, we are going to assume that you want to prioritize IAM Roles (called the `iam` stack) vs. all other technologies.
 You will still have a general stack for everything else (called the `main` stack). In this example, the following are required:
 1. Dedicated Redis cache for each stack
 1. Dedicated scheduler and set of workers for each stack
@@ -90,7 +90,7 @@ You will need to place the scheduler `supervisor` config on the scheduler instan
 your `main` stack. We'll create another stack for the IAM watchers (per our example).
 
 ### Dedicated Stack
-With the `main` stack above set to watch everything except for IAM roles, we are now going to make a prioritized stack for IAM roles. Like above, you need to: 
+With the `main` stack above set to watch everything except for IAM roles, we are now going to make a prioritized stack for IAM roles. Like above, you need to:
 1. Make a copy of `celeryconfig.py`, and call it `iamceleryconfig.py`
 1. Since a dedicated Redis cache was created for this stack (if you didn't do this, re read the section above about creating a dedicated Redis cache), you will need to update the
    `broker_url` to point to this new Redis cache. **Failure to do this will result in schedulers looping over and over again, because they will step on each other. That is why

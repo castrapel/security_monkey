@@ -97,8 +97,10 @@ CONFIG_TWO = {
 class GitHubOrgAuditorTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
         self.gh_items = [
-            GitHubOrgItem(account="Netflix", name="Netflix", arn="Netflix", config=CONFIG_ONE),
-            GitHubOrgItem(account="Netflix-PRIVATE", name="Netflix-PRIVATE", arn="Netflix-PRIVATE", config=CONFIG_TWO),
+            GitHubOrgItem(account="Netflix", name="Netflix",
+                          arn="Netflix", config=CONFIG_ONE),
+            GitHubOrgItem(account="Netflix-PRIVATE", name="Netflix-PRIVATE",
+                          arn="Netflix-PRIVATE", config=CONFIG_TWO),
         ]
 
         self.account_type = AccountType(name="GitHub")

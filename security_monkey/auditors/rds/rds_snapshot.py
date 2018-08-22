@@ -29,12 +29,16 @@ class RDSSnapshotAuditor(Auditor):
     i_am_plural = RDSSnapshot.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(RDSSnapshotAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(RDSSnapshotAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     def prep_for_audit(self):
         super(RDSSnapshotAuditor, self).prep_for_audit()
-        self.FRIENDLY = { account['identifier']: account['name'] for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly'}
-        self.THIRDPARTY = { account['identifier']: account['name'] for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'thirdparty'}
+        self.FRIENDLY = {account['identifier']: account['name']
+                         for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly'}
+        self.THIRDPARTY = {account['identifier']: account['name']
+                           for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if
+                           account['label'] == 'thirdparty'}
 
     def check_internet_accessible(self, item):
         if 'all' in item.config.get('Attributes', {}).get('restore', []):
@@ -67,7 +71,8 @@ class RDSSnapshotAuditor(Auditor):
                     value=account,
                     account_name=self.THIRDPARTY[account],
                     account_identifier=account)
-                self.record_thirdparty_access(item, entity, actions=['restore'])
+                self.record_thirdparty_access(
+                    item, entity, actions=['restore'])
 
     def check_unknown_cross_account(self, item):
         accounts = item.config.get('Attributes', {}).get('restore', [])

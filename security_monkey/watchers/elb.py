@@ -29,5 +29,6 @@ class ELB(CloudAuxWatcher):
         if self.detail == 'NONE' or self.detail == None:
             result.pop('Instances', None)
         elif self.detail == 'SUMMARY':
-            result['Instances'] = '{len} Instance(s)'.format(len=len(result.get('Instances', [])))
+            result['Instances'] = '{len} Instance(s)'.format(
+                len=len(result.get('Instances', [])))
         return result

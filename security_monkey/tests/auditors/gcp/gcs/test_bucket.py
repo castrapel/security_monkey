@@ -48,7 +48,7 @@ class BucketTestCase(SecurityMonkeyTestCase):
         self.assertFalse(actual)
         actual = auditor._acl_allusers_exists(ACL_LIST_ALLUSERS)
         self.assertTrue(actual)
-        
+
     def test__acl_max_owners(self):
         from security_monkey.auditors.gcp.gcs.bucket import GCSBucketAuditor
         auditor = GCSBucketAuditor(accounts=['unittest'])

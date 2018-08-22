@@ -56,11 +56,13 @@ class Subnet(Watcher):
             item_list = []
             exception_map = {}
             kwargs['exception_map'] = exception_map
-            app.logger.debug("Checking {}/{}/{}".format(self.index, kwargs['account_name'], kwargs['region']))
+            app.logger.debug("Checking {}/{}/{}".format(self.index,
+                                                        kwargs['account_name'], kwargs['region']))
             all_subnets = self.get_all_subnets(**kwargs)
 
             if all_subnets:
-                app.logger.debug("Found {} {}".format(len(all_subnets), self.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(all_subnets), self.i_am_plural))
 
                 for subnet in all_subnets:
 
@@ -70,7 +72,8 @@ class Subnet(Watcher):
                             subnet_name = tag.get('Value')
                     subnet_id = subnet.get('SubnetId')
                     if subnet_name:
-                        subnet_name = "{0} ({1})".format(subnet_name, subnet_id)
+                        subnet_name = "{0} ({1})".format(
+                            subnet_name, subnet_id)
                     else:
                         subnet_name = subnet_id
 
@@ -106,6 +109,7 @@ class Subnet(Watcher):
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

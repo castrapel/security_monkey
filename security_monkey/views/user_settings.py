@@ -29,7 +29,8 @@ from marshmallow import Schema, fields, ValidationError
 class SaveSettingsSchema(Schema):
     accounts = fields.List(fields.Integer())
     daily_audit_email = fields.Boolean(allow_none=True, required=True)
-    change_report_setting = fields.String(allow_none=True, required=True, validate=OneOf(["ISSUES", "ALL", "NONE"]))
+    change_report_setting = fields.String(
+        allow_none=True, required=True, validate=OneOf(["ISSUES", "ALL", "NONE"]))
 
 
 class UserSettings(AuthenticatedService):
@@ -175,7 +176,7 @@ class UserSettings(AuthenticatedService):
             account = Account.query.filter(Account.id == account_id).first()
             if account:
                 account_list.append(account)
-                #current_user.accounts.append(account)
+                # current_user.accounts.append(account)
         current_user.accounts = account_list
 
         db.session.add(current_user)

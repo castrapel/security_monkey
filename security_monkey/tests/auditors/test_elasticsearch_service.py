@@ -29,7 +29,6 @@ from security_monkey import db
 from security_monkey.watchers.elasticsearch_service import ElasticSearchServiceItem
 from security_monkey.auditors.elasticsearch_service import ElasticSearchServiceAuditor
 
-
 CONFIG_ONE = {
     "name": "es_test",
     "policy": json.loads(b"""{
@@ -283,21 +282,29 @@ CONFIG_NINE = {
 }
 
 
-
-
 class ElasticSearchServiceTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        ElasticSearchServiceAuditor(accounts=['TEST_ACCOUNT']).OBJECT_STORE.clear()
+        ElasticSearchServiceAuditor(
+            accounts=['TEST_ACCOUNT']).OBJECT_STORE.clear()
         self.es_items = [
-            ElasticSearchServiceItem(region="us-east-1", account="TEST_ACCOUNT", name="es_test", config=CONFIG_ONE),
-            ElasticSearchServiceItem(region="us-west-2", account="TEST_ACCOUNT", name="es_test_2", config=CONFIG_TWO),
-            ElasticSearchServiceItem(region="eu-west-1", account="TEST_ACCOUNT", name="es_test_3", config=CONFIG_THREE),
-            ElasticSearchServiceItem(region="us-east-1", account="TEST_ACCOUNT", name="es_test_4", config=CONFIG_FOUR),
-            ElasticSearchServiceItem(region="us-east-1", account="TEST_ACCOUNT", name="es_test_5", config=CONFIG_FIVE),
-            ElasticSearchServiceItem(region="eu-west-1", account="TEST_ACCOUNT", name="es_test_6", config=CONFIG_SIX),
-            ElasticSearchServiceItem(region="eu-west-1", account="TEST_ACCOUNT", name="es_test_7", config=CONFIG_SEVEN),
-            ElasticSearchServiceItem(region="eu-west-1", account="TEST_ACCOUNT", name="es_test_8", config=CONFIG_EIGHT),
-            ElasticSearchServiceItem(region="us-east-1", account="TEST_ACCOUNT", name="es_test_9", config=CONFIG_NINE),
+            ElasticSearchServiceItem(
+                region="us-east-1", account="TEST_ACCOUNT", name="es_test", config=CONFIG_ONE),
+            ElasticSearchServiceItem(
+                region="us-west-2", account="TEST_ACCOUNT", name="es_test_2", config=CONFIG_TWO),
+            ElasticSearchServiceItem(
+                region="eu-west-1", account="TEST_ACCOUNT", name="es_test_3", config=CONFIG_THREE),
+            ElasticSearchServiceItem(
+                region="us-east-1", account="TEST_ACCOUNT", name="es_test_4", config=CONFIG_FOUR),
+            ElasticSearchServiceItem(
+                region="us-east-1", account="TEST_ACCOUNT", name="es_test_5", config=CONFIG_FIVE),
+            ElasticSearchServiceItem(
+                region="eu-west-1", account="TEST_ACCOUNT", name="es_test_6", config=CONFIG_SIX),
+            ElasticSearchServiceItem(
+                region="eu-west-1", account="TEST_ACCOUNT", name="es_test_7", config=CONFIG_SEVEN),
+            ElasticSearchServiceItem(
+                region="eu-west-1", account="TEST_ACCOUNT", name="es_test_8", config=CONFIG_EIGHT),
+            ElasticSearchServiceItem(
+                region="us-east-1", account="TEST_ACCOUNT", name="es_test_9", config=CONFIG_NINE),
         ]
 
         account_type_result = AccountType(name='AWS')

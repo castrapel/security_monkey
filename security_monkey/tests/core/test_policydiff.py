@@ -21,7 +21,6 @@
 """
 from security_monkey.common.PolicyDiff import PolicyDiff
 
-
 TEST_CASES = [
     dict(
         old="{}",
@@ -68,7 +67,7 @@ TEST_CASES = [
             "user_name": "test"
         },
         new={
-            "thelist": [{"rule": "asdf"},{"rule": "defg"}],
+            "thelist": [{"rule": "asdf"}, {"rule": "defg"}],
             "must_change_password": "false",
             "user_name": "test"
         },
@@ -179,7 +178,7 @@ def test_get_brackets():
     values = [
         ("str", dict(open="\"", close="\"")),
         (u"uni", dict(open="\"", close="\"")),
-        ([1,2,3], dict(open="[", close="]")),
+        ([1, 2, 3], dict(open="[", close="]")),
         ({"a": 123}, dict(open="{", close="}")),
         (True, dict(open="", close="")),
         (123, dict(open="", close="")),
@@ -289,9 +288,12 @@ def test_print_list():
 <font color='{color}'></font><br/>
 """
 
-    assert print_list(values, 'same', 0) == expected.format(color='black').replace('[[', '{').replace(']]', '}')
-    assert print_list(values, 'deleted', 0) == expected.format(color='red').replace('[[', '{').replace(']]', '}')
-    assert print_list(values, 'added', 0) == expected.format(color='green').replace('[[', '{').replace(']]', '}')
+    assert print_list(values, 'same', 0) == expected.format(
+        color='black').replace('[[', '{').replace(']]', '}')
+    assert print_list(values, 'deleted', 0) == expected.format(
+        color='red').replace('[[', '{').replace(']]', '}')
+    assert print_list(values, 'added', 0) == expected.format(
+        color='green').replace('[[', '{').replace(']]', '}')
 
 
 def test_print_dict():
@@ -322,9 +324,12 @@ def test_print_dict():
 <font color='{color}'>"f": </font><br/>
 """
 
-    assert print_dict(values, 'same', 0) == expected.format(color='black').replace('[[', '{').replace(']]', '}')
-    assert print_dict(values, 'deleted', 0) == expected.format(color='red').replace('[[', '{').replace(']]', '}')
-    assert print_dict(values, 'added', 0) == expected.format(color='green').replace('[[', '{').replace(']]', '}')
+    assert print_dict(values, 'same', 0) == expected.format(
+        color='black').replace('[[', '{').replace(']]', '}')
+    assert print_dict(values, 'deleted', 0) == expected.format(
+        color='red').replace('[[', '{').replace(']]', '}')
+    assert print_dict(values, 'added', 0) == expected.format(
+        color='green').replace('[[', '{').replace(']]', '}')
 
 
 def test_sub_dict():
@@ -406,7 +411,7 @@ def test_sub_dict():
     for value in values:
         result = process_sub_dict("somekey", value["a"], value["b"], 0)
         if result != value['x']:
-            print("RE",result)
+            print("RE", result)
             print("EX", value['x'])
         assert result == value['x']
 
@@ -447,8 +452,10 @@ def test_diff_list():
 
     values = [
         dict(
-            a=["1", u"2", 3, 3.0, True, False, None, dict(a="123"), ["list"], set([1,2,3])],
-            b=["1", u"2", 3, 3.0, True, False, None, dict(a="123"), ["list"], set([1,2,3])],
+            a=["1", u"2", 3, 3.0, True, False, None,
+               dict(a="123"), ["list"], set([1, 2, 3])],
+            b=["1", u"2", 3, 3.0, True, False, None,
+               dict(a="123"), ["list"], set([1, 2, 3])],
             x="""<font color='black'>"1",</font><br/>
 <font color='black'>"2",</font><br/>
 <font color='black'>3,</font><br/>
@@ -520,7 +527,8 @@ def test_diff_list():
         ),
         dict(
             a=[],
-            b=["<script>", u"<script>", 1234, 1234.0, True, None, [1, 2, 3], {"a": 1}, set([1])],
+            b=["<script>", u"<script>", 1234, 1234.0,
+               True, None, [1, 2, 3], {"a": 1}, set([1])],
             x="""<font color='red'>"&lt;script&gt;",</font><br/>
 <font color='red'>"&lt;script&gt;",</font><br/>
 <font color='red'>1234,</font><br/>

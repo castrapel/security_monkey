@@ -23,6 +23,7 @@
 from security_monkey.auditors.security_group import SecurityGroupAuditor
 from security_monkey.watchers.openstack.network.openstack_security_group import OpenStackSecurityGroup
 
+
 class OpenStackSecurityGroupAuditor(SecurityGroupAuditor):
     index = OpenStackSecurityGroup.index
     i_am_singular = OpenStackSecurityGroup.i_am_singular
@@ -30,7 +31,8 @@ class OpenStackSecurityGroupAuditor(SecurityGroupAuditor):
     network_whitelist = []
 
     def __init__(self, accounts=None, debug=False):
-        super(OpenStackSecurityGroupAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(OpenStackSecurityGroupAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     def check_securitygroup_ec2_rfc1918(self, sg_item):
         pass

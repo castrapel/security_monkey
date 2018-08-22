@@ -62,11 +62,13 @@ class ElasticIP(Watcher):
             except Exception as e:  # EC2ResponseError
                 # Some Accounts don't subscribe to EC2 and will throw an exception here.
                 exc = BotoConnectionIssue(str(e), self.index, account, None)
-                self.slurp_exception((self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
+                self.slurp_exception(
+                    (self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
                 continue
 
             for region in regions:
-                app.logger.debug("Checking {}/{}/{}".format(self.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(self.index, account, region.name))
 
                 try:
                     rec2 = connect(account, 'boto3.ec2.client', region=region)
@@ -79,12 +81,14 @@ class ElasticIP(Watcher):
                     )
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), self.index, account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), self.index, account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
 
-                app.logger.debug("Found {} {}".format(len(el_ips), self.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(el_ips), self.i_am_plural))
                 for ip in el_ips['Addresses']:
 
                     if self.check_ignore_list(str(ip['PublicIp'])):

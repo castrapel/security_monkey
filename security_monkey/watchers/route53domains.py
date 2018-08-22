@@ -117,6 +117,7 @@ class Route53Domains(Watcher):
                 item_list.append(item)
 
             return item_list, kwargs['exception_map']
+
         return slurp_items()
 
 

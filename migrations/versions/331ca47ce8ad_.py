@@ -15,9 +15,10 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.alter_column('item', 'name', type_=sa.String(285), existing_type=sa.String(length=128), nullable=True)
+    op.alter_column('item', 'name', type_=sa.String(
+        285), existing_type=sa.String(length=128), nullable=True)
 
 
 def downgrade():
-    op.alter_column('item', 'name', type_=sa.String(128), existing_type=sa.String(length=285), nullable=True)
-
+    op.alter_column('item', 'name', type_=sa.String(
+        128), existing_type=sa.String(length=285), nullable=True)

@@ -55,14 +55,14 @@ def cert_get_issuer(cert):
     """
     delchars = ''.join(c for c in map(chr, range(256)) if not c.isalnum())
     try:
-        issuer = str(cert.issuer.get_attributes_for_oid(x509.OID_ORGANIZATION_NAME)[0].value)
+        issuer = str(cert.issuer.get_attributes_for_oid(
+            x509.OID_ORGANIZATION_NAME)[0].value)
         for c in delchars:
             issuer = issuer.replace(c, "")
         return issuer
     except Exception as e:
         app.logger.error("Unable to get issuer! {0}".format(e))
         return 'ERROR_EXTRACTING_ISSUER'
-
 
 
 def cert_get_serial(cert):
@@ -110,13 +110,15 @@ def cert_get_domains(cert):
     """
     domains = []
     try:
-        ext = cert.extensions.get_extension_for_oid(x509.OID_SUBJECT_ALTERNATIVE_NAME)
+        ext = cert.extensions.get_extension_for_oid(
+            x509.OID_SUBJECT_ALTERNATIVE_NAME)
         entries = ext.value.get_values_for_type(x509.DNSName)
         for entry in entries:
             domains.append(entry)
     except Exception as e:
         if app.config.get("LOG_SSL_SUBJ_ALT_NAME_ERRORS", True):
-            app.logger.warning("Failed to get SubjectAltName: {0}".format(e), exc_info=True)
+            app.logger.warning(
+                "Failed to get SubjectAltName: {0}".format(e), exc_info=True)
 
     return domains
 
@@ -198,7 +200,8 @@ class IAMSSL(Watcher):
         for account in self.accounts:
             for region in ['universal']:
                 # Purposely sending default region instead of universal.
-                all_certs = self.get_all_certs_in_region(account, AWS_DEFAULT_REGION, exception_map)
+                all_certs = self.get_all_certs_in_region(
+                    account, AWS_DEFAULT_REGION, exception_map)
                 for cert in all_certs:
                     name = cert['server_certificate_name']
                     # Purposely saving as 'universal'.
@@ -212,7 +215,8 @@ class IAMSSL(Watcher):
         from security_monkey.common.sts_connect import connect
         import traceback
         all_certs = []
-        app.logger.debug("Checking {}/{}/{}".format(self.index, account, region))
+        app.logger.debug(
+            "Checking {}/{}/{}".format(self.index, account, region))
         try:
             iamconn = connect(account, 'iam', region=region)
             marker = None
@@ -244,18 +248,22 @@ class IAMSSL(Watcher):
 
                 except Exception as e:
                     app.logger.warn(traceback.format_exc())
-                    app.logger.error("Invalid certificate {}!".format(cert.server_certificate_id))
+                    app.logger.error("Invalid certificate {}!".format(
+                        cert.server_certificate_id))
                     self.slurp_exception(
-                        (self.index, account, 'universal', cert.server_certificate_name),
+                        (self.index, account, 'universal',
+                         cert.server_certificate_name),
                         e, exception_map, source="{}-watcher".format(self.index))
 
         except Exception as e:
             app.logger.warn(traceback.format_exc())
             if region not in TROUBLE_REGIONS:
-                exc = BotoConnectionIssue(str(e), self.index, account, 'universal')
+                exc = BotoConnectionIssue(
+                    str(e), self.index, account, 'universal')
                 self.slurp_exception((self.index, account, 'universal'), exc, exception_map,
                                      source="{}-watcher".format(self.index))
-        app.logger.info("Found {} {} from {}/{}".format(len(all_certs), self.i_am_plural, account, 'universal'))
+        app.logger.info("Found {} {} from {}/{}".format(len(all_certs),
+                                                        self.i_am_plural, account, 'universal'))
         return all_certs
 
 

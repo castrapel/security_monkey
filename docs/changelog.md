@@ -106,7 +106,7 @@ Important Notes:
     - "iam:listsamlproviders",
 - New Watcher: ALB (elbv2)
 - ELB (v1) Watcher re-written with boto3 in CloudAux.  Now respects the config value `SECURITYGROUP_INSTANCE_DETAIL` when determining whether to add the instance id's to the ELB definition.
- 
+
 Contributors:
 - @LukeKennedy
 - @rodriguezsergio
@@ -163,7 +163,7 @@ v0.9.0 (2017-04-13)
 - PR #519 - @selmanj - Minor reformatting/style changes to Docker docs
 - PR #512 / #521 - @kalpatel01 - Organize tests into directories
 - PR #524 - @kalpatel01 - Remove DB mock class
-- PR #522 - @kalpatel01 - Optimize SQL for account delete 
+- PR #522 - @kalpatel01 - Optimize SQL for account delete
 - PR #525 - @kalpatel01 - Handle known kms boto exceptions
 - PR #529 - @mariusgrigaitis - Usage of `GOOGLE_HOSTED_DOMAIN` in sample configs
 - PR #532 - @kalpatel01 - Add sorting to account tables (UI)
@@ -262,7 +262,7 @@ Contributors:
 - @shrikant0013
 - @mikegrima
 - @monkeysecurity
- 
+
 
 v0.8.0 (2016-12-02-delayed-\>2017-01-13)
 ----------------------------------------

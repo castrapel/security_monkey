@@ -55,11 +55,13 @@ def upgrade():
         # If the password isn't bcrypted, then delete it -- Also output that it was deleted!
         if user.password:
             if not re.match("^\$2[ayb]\$.{56}$", user.password):
-                print("[!] User: {} has a plaintext password! Deleting the password!".format(user.email))
+                print("[!] User: {} has a plaintext password! Deleting the password!".format(
+                    user.email))
                 user.password = ""
                 session.add(user)
                 session.commit()
-                print("[-] Deleted plaintext password from user: {}'s account".format(user.email))
+                print(
+                    "[-] Deleted plaintext password from user: {}'s account".format(user.email))
 
     print("[@] Completed plaintext password check.")
 

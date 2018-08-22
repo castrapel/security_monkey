@@ -46,10 +46,12 @@ class KMS(Watcher):
         all_results = []
         while True:
             if marker is None:
-                response = self.wrap_aws_rate_limited_call(func, *args, **nargs)
+                response = self.wrap_aws_rate_limited_call(
+                    func, *args, **nargs)
             else:
                 nargs["Marker"] = marker
-                response = self.wrap_aws_rate_limited_call(func, *args, **nargs)
+                response = self.wrap_aws_rate_limited_call(
+                    func, *args, **nargs)
             all_results.extend(response.get(type))
             marker = response.get("NextMarker")
             if marker is None:
@@ -93,16 +95,16 @@ class KMS(Watcher):
                 raise
 
             arn = ARN_PREFIX + ":kms:{}:{}:key/{}".format(kwargs['region'],
-                                                    kwargs['account_name'],
-                                                    key_id)
+                                                          kwargs['account_name'],
+                                                          key_id)
 
             return {
-                       'Error': 'Unauthorized',
-                       'Arn': arn,
-                       "AWSAccountId": kwargs['account_name'],
-                       'Policies': [],
-                       'Grants': []
-                   }
+                'Error': 'Unauthorized',
+                'Arn': arn,
+                "AWSAccountId": kwargs['account_name'],
+                'Policies': [],
+                'Grants': []
+            }
 
         return response.get("KeyMetadata")
 
@@ -111,15 +113,16 @@ class KMS(Watcher):
         policy_names = []
         if alias.startswith('alias/aws/'):
             # AWS-owned KMS keys don't have a policy we can see. Setting a default here saves an API request.
-            app.logger.debug("{} {}({}) is an AWS supplied KMS key, overriding to [default] for policy".format(self.i_am_singular, alias, key_id))
+            app.logger.debug("{} {}({}) is an AWS supplied KMS key, overriding to [default] for policy".format(
+                self.i_am_singular, alias, key_id))
             policy_names = ['default']
         else:
             try:
                 policy_names = self.paged_wrap_aws_rate_limited_call(
-                        "PolicyNames",
-                        kms.list_key_policies,
-                        KeyId=key_id
-                    )
+                    "PolicyNames",
+                    kms.list_key_policies,
+                    KeyId=key_id
+                )
             except ClientError as e:
                 raise
 
@@ -140,7 +143,8 @@ class KMS(Watcher):
         rotation_status = None
         if alias.startswith('alias/aws/'):
             # AWS-owned KMS keys don't have a rotation status we can see. Setting a default here saves an API request.
-            app.logger.debug("{} {}({}) is an AWS supplied KMS key, overriding to True for rotation state".format(self.i_am_singular, alias, key_id))
+            app.logger.debug("{} {}({}) is an AWS supplied KMS key, overriding to True for rotation state".format(
+                self.i_am_singular, alias, key_id))
             rotation_status = True
         else:
             rotation_status = self.wrap_aws_rate_limited_call(
@@ -179,10 +183,12 @@ class KMS(Watcher):
                 keys = self.list_keys(kms, **kwargs)
                 # If we don't have any keys, don't bother getting aliases
                 if keys:
-                    app.logger.debug("Found {} {}.".format(len(keys), self.i_am_plural))
+                    app.logger.debug("Found {} {}.".format(
+                        len(keys), self.i_am_plural))
                     aliases = self.list_aliases(kms, **kwargs)
 
-                    app.logger.debug("Found {} {} and {} Aliases.".format(len(keys), self.i_am_plural, len(aliases)))
+                    app.logger.debug("Found {} {} and {} Aliases.".format(
+                        len(keys), self.i_am_plural, len(aliases)))
                     # Then, we'll get info about each key
                     for key in keys:
                         policies = []
@@ -191,36 +197,46 @@ class KMS(Watcher):
                         config = self.describe_key(kms, key_id, **kwargs)
                         if config:
                             # filter the list of all aliases and save them with the key they're for
-                            config[u"Aliases"] = [a.get("AliasName") for a in aliases if a.get("TargetKeyId") == key_id]
+                            config[u"Aliases"] = [
+                                a.get("AliasName") for a in aliases if a.get("TargetKeyId") == key_id]
 
                             if config[u"Aliases"]:
                                 alias = config[u"Aliases"][0]
-                                alias = alias[len('alias/'):]  # Turn alias/name into just name
+                                # Turn alias/name into just name
+                                alias = alias[len('alias/'):]
                             else:
                                 alias = "[No Aliases]"
 
-                            name = "{alias} ({key_id})".format(alias=alias, key_id=key_id)
+                            name = "{alias} ({key_id})".format(
+                                alias=alias, key_id=key_id)
 
                             if config.get('Error') is None:
-                                grants = self.list_grants(kms, key_id, **kwargs)
-                                policy_names = self.list_key_policies(kms, key_id, alias, **kwargs)
-                                rotation_status = self.get_key_rotation_status(kms, key_id, alias, **kwargs)
+                                grants = self.list_grants(
+                                    kms, key_id, **kwargs)
+                                policy_names = self.list_key_policies(
+                                    kms, key_id, alias, **kwargs)
+                                rotation_status = self.get_key_rotation_status(
+                                    kms, key_id, alias, **kwargs)
 
                                 if policy_names:
                                     for policy_name in policy_names:
-                                        policy = self.get_key_policy(kms, key_id, policy_name, alias, **kwargs)
+                                        policy = self.get_key_policy(
+                                            kms, key_id, policy_name, alias, **kwargs)
                                         policies.append(policy)
 
                                 # Convert the datetime objects into ISO formatted strings in UTC
                                 if config.get('CreationDate'):
-                                    config.update({ 'CreationDate': config.get('CreationDate').astimezone(tzutc()).isoformat() })
+                                    config.update({'CreationDate': config.get(
+                                        'CreationDate').astimezone(tzutc()).isoformat()})
                                 if config.get('DeletionDate'):
-                                    config.update({ 'DeletionDate': config.get('DeletionDate').astimezone(tzutc()).isoformat() })
+                                    config.update({'DeletionDate': config.get(
+                                        'DeletionDate').astimezone(tzutc()).isoformat()})
 
                                 if grants:
                                     for grant in grants:
                                         if grant.get("CreationDate"):
-                                            grant.update({ 'CreationDate': grant.get('CreationDate').astimezone(tzutc()).isoformat() })
+                                            grant.update({'CreationDate': grant.get(
+                                                'CreationDate').astimezone(tzutc()).isoformat()})
 
                                 config[u"Policies"] = policies
                                 config[u"Grants"] = grants
@@ -231,6 +247,7 @@ class KMS(Watcher):
                             item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

@@ -39,13 +39,16 @@ class EC2ImageWatcherTestCase(SecurityMonkeyWatcherTestCase):
             if kwargs['region'] == 'us-east-1':
                 return {'Arn': 'somearn', 'ImageId': 'ami-1234abcd'}
             return {}
+
         def list_method(*args, **kwargs):
             if kwargs['region'] == 'us-east-1':
                 return [{'Arn': 'somearn', 'ImageId': 'ami-1234abcd'}]
             return []
 
-        EC2Image.get_method = lambda *args, **kwargs: get_method(*args, **kwargs)
-        EC2Image.list_method = lambda *args, **kwargs: list_method(*args, **kwargs)
+        EC2Image.get_method = lambda *args, **kwargs: get_method(
+            *args, **kwargs)
+        EC2Image.list_method = lambda *args, **kwargs: list_method(
+            *args, **kwargs)
 
         watcher = EC2Image(accounts=[self.account.name])
         item_list, exception_map = watcher.slurp()

@@ -75,6 +75,7 @@ def crossdomain(allowed_origins=None, methods=None, headers=None,
 
         f.provide_automatic_options = False
         return update_wrapper(wrapped_function, f)
+
     return decorator
 
 
@@ -99,7 +100,8 @@ def record_exception(source="boto", pop_exception_fields=False):
                 index = exception_values['index']
                 account = exception_values['account']
                 # Allow the recording region to be overridden for universal tech like IAM
-                region = exception_values['exception_record_region'] or kwargs.get('region')
+                region = exception_values['exception_record_region'] or kwargs.get(
+                    'region')
                 name = exception_values['name']
                 exception_map = exception_values['exception_map']
                 exc = BotoConnectionIssue(str(e), index, account, name)
@@ -110,7 +112,7 @@ def record_exception(source="boto", pop_exception_fields=False):
                 elif account:
                     location = (index, account)
                 else:
-                    location = (index, )
+                    location = (index,)
 
                 exception_map[location] = exc
 
@@ -129,15 +131,18 @@ def iter_account_region(index=None, accounts=None, service_name=None, exception_
             item_list = []
             exception_map = {}
             for account_name in accounts:
-                account = Account.query.filter(Account.name == account_name).first()
+                account = Account.query.filter(
+                    Account.name == account_name).first()
                 if not account:
-                    app.logger.error("Couldn't find account with name {}".format(account_name))
+                    app.logger.error(
+                        "Couldn't find account with name {}".format(account_name))
                     return
 
                 try:
                     (role, regions) = get_regions(account, service_name)
                 except Exception as e:
-                    exc = BotoConnectionIssue(str(e), index, account.name, None)
+                    exc = BotoConnectionIssue(
+                        str(e), index, account.name, None)
                     exception_map[(index, account)] = exc
                     return item_list, exception_map
 
@@ -146,7 +151,8 @@ def iter_account_region(index=None, accounts=None, service_name=None, exception_
                     kwargs['account_name'] = account.name
                     kwargs['account_number'] = account.identifier
                     kwargs['region'] = region
-                    kwargs['assume_role'] = account.getCustom("role_name") or 'SecurityMonkey'
+                    kwargs['assume_role'] = account.getCustom(
+                        "role_name") or 'SecurityMonkey'
                     if role:
                         kwargs['assumed_role'] = role or 'SecurityMonkey'
                     kwargs['exception_map'] = {}
@@ -156,7 +162,9 @@ def iter_account_region(index=None, accounts=None, service_name=None, exception_
                     item_list.extend(itm)
                     exception_map.update(exc)
             return item_list, exception_map
+
         return decorated_function
+
     return decorator
 
 

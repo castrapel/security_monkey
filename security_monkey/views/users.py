@@ -73,10 +73,14 @@ class UserList(AuthenticatedService):
             :statuscode 401: Authentication Error. Please ensure you have administrator rights.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('order_by', type=str, default=None, location='args')
-        self.reqparse.add_argument('order_dir', type=str, default='desc', location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'order_by', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'order_dir', type=str, default='desc', location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
@@ -142,7 +146,7 @@ class UserDetail(AuthenticatedService):
         """
 
         if user_id == current_user.id:
-            return {"status": "Cannot modify own user account."},  403
+            return {"status": "Cannot modify own user account."}, 403
 
         user = User.query.filter(User.id == user_id).first()
 
@@ -205,17 +209,21 @@ class UserDetail(AuthenticatedService):
             :statuscode 404: User entry with the given ID not found.
         """
 
-        self.reqparse.add_argument('id', required=True, location='json', type=int)
-        self.reqparse.add_argument('email', required=True, location='json', type=text_type)
-        self.reqparse.add_argument('active', required=True, location='json', type=bool)
-        self.reqparse.add_argument('role_id', required=True, location='json', type=str)
+        self.reqparse.add_argument(
+            'id', required=True, location='json', type=int)
+        self.reqparse.add_argument(
+            'email', required=True, location='json', type=text_type)
+        self.reqparse.add_argument(
+            'active', required=True, location='json', type=bool)
+        self.reqparse.add_argument(
+            'role_id', required=True, location='json', type=str)
         args = self.reqparse.parse_args()
 
         if user_id != args['id']:
-            return {"status": "User ID cannot be modified."},  403
+            return {"status": "User ID cannot be modified."}, 403
 
         if user_id == current_user.id:
-            return {"status": "Cannot modify own user account."},  403
+            return {"status": "Cannot modify own user account."}, 403
 
         email = args.get('email')
         active = args.get('active')

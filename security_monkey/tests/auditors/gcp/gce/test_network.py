@@ -41,7 +41,7 @@ AUTO_NETWORK_DICT = {
             "Region": "https://www.googleapis.com/compute/v1/projects/my-project-one/regions/asia-northeast1",
             "SelfLink": "https://www.googleapis.com/compute/v1/projects/my-project-one/regions/asia-northeast1/subnetworks/default"
         }
-        
+
     ]
 }
 

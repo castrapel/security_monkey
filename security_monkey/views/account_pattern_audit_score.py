@@ -166,10 +166,12 @@ class AccountPatternAuditScorePost(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('account_type', required=False, type=text_type, location='json')
+        self.reqparse.add_argument(
+            'account_type', required=False, type=text_type, location='json')
         self.reqparse.add_argument('account_field', required=True, type=text_type, help='Must provide account field',
                                    location='json')
-        self.reqparse.add_argument('account_pattern', required=True, type=text_type, help='Must provide account pattern',
+        self.reqparse.add_argument('account_pattern', required=True, type=text_type,
+                                   help='Must provide account pattern',
                                    location='json')
         self.reqparse.add_argument('score', required=True, type=text_type, help='Override score required',
                                    location='json')
@@ -191,7 +193,6 @@ class AccountPatternAuditScorePost(AuthenticatedService):
         accountpatternauditscore = result.get_account_pattern_audit_score(args['account_type'],
                                                                           args['account_field'],
                                                                           args['account_pattern'])
-
 
         accountpatternauditscore_marshaled = marshal(accountpatternauditscore.__dict__,
                                                      ACCOUNT_PATTERN_AUDIT_SCORE_FIELDS)

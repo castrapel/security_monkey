@@ -17,7 +17,7 @@ class IAMRole(CloudAuxBatchedWatcher):
 
     def _get_regions(self):
         return [AWS_DEFAULT_REGION]
-    
+
     def get_name_from_list_output(self, item):
         return item['RoleName']
 

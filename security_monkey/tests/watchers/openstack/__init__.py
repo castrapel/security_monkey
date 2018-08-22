@@ -32,9 +32,12 @@ from cloudaux.openstack.utils import list_items
 
 """ Patch all of the CloudAux decorators. Must do this before importing watchers """
 
-mock.patch('cloudaux.openstack.decorators.openstack_conn', mock_openstack_conn).start()
-mock.patch('cloudaux.openstack.decorators.iter_account_region', mock_iter_account_region).start()
-mock.patch('cloudaux.openstack.decorators.get_regions', mock_get_regions).start()
+mock.patch('cloudaux.openstack.decorators.openstack_conn',
+           mock_openstack_conn).start()
+mock.patch('cloudaux.openstack.decorators.iter_account_region',
+           mock_iter_account_region).start()
+mock.patch('cloudaux.openstack.decorators.get_regions',
+           mock_get_regions).start()
 mock.patch('cloudaux.openstack.utils.list_items', mock_list_items).start()
 
 
@@ -55,7 +58,8 @@ class OpenStackWatcherTestCase(SecurityMonkeyWatcherTestCase):
         self.watcher = None
 
     def test_slurp(self):
-        if not self.watcher: return
+        if not self.watcher:
+            return
 
         item_list, exception_map = self.watcher.slurp()
 

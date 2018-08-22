@@ -35,14 +35,11 @@ class MockAuditor(Auditor):
     def __init__(self, accounts=None, debug=False):
         super(MockAuditor, self).__init__(accounts=accounts, debug=debug)
 
-
-
     def applies_to_account(self, account):
         return self.applies
 
 
 test_auditor_registry = defaultdict(list)
-
 
 auditor_configs = [
     {
@@ -59,11 +56,11 @@ auditor_configs = [
 
 for config in auditor_configs:
     auditor = type(
-                config['type'], (MockAuditor,),
-                {
-                    'applies': config['applies']
-                }
-            )
+        config['type'], (MockAuditor,),
+        {
+            'applies': config['applies']
+        }
+    )
     app.logger.debug(auditor.__name__)
 
     test_auditor_registry[config['index']].append(auditor)
@@ -71,7 +68,8 @@ for config in auditor_configs:
 
 class AuditIssueCleanupTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)

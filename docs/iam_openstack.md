@@ -1,7 +1,7 @@
 IAM Role Setup on OpenStack
 ===========================
 
-Security Monkey currently only supports the Keystone [password](https://docs.openstack.org/keystoneauth/latest/authentication-plugins.html) identity plugin. 
+Security Monkey currently only supports the Keystone [password](https://docs.openstack.org/keystoneauth/latest/authentication-plugins.html) identity plugin.
 This allows for support for both V2/V3 identity services. It is anticipated that additional identity plugins will be added.
 
 
@@ -48,11 +48,11 @@ Example commands below are using the unified openstack client. User creation req
 Role Setup
 ----------
 
-OpenStack's support for IAM [roles](https://docs.openstack.org/keystone/latest/admin/cli-manage-projects-users-and-roles.html) continues to evolve. 
+OpenStack's support for IAM [roles](https://docs.openstack.org/keystone/latest/admin/cli-manage-projects-users-and-roles.html) continues to evolve.
 
 Currently, role configuration is an involved/manual process. It requires admin account access to create and assign roles and also the ability to directly edit the OpenStack service policy files (or the ability to set via automated workflow). In addition, roles are managed per service (/etc/PROJECT/policy.json). Modify the user/project names below as appropriate.
 
-We will create a dedicated read-only role and modify service policy to restrict to get APIs. 
+We will create a dedicated read-only role and modify service policy to restrict to get APIs.
 
     $ openstack role create read-only
     +-----------+----------------------------------+
@@ -69,7 +69,7 @@ Add the secmonkey user (created above) to the read-only role (this command has n
 
 Verify the user was added to the role
 
-    $ openstack role assignment list --user secmonkey --project demo --names 
+    $ openstack role assignment list --user secmonkey --project demo --names
     +-----------+--------------------+-------+--------------+--------+-----------+
     | Role      | User               | Group | Project      | Domain | Inherited |
     +-----------+--------------------+-------+--------------+--------+-----------+
@@ -77,7 +77,7 @@ Verify the user was added to the role
     +-----------+--------------------+-------+--------------+--------+-----------+
 
 
-These instructions were written based on the Pike release, syntax may look different depending on the release. Let's start where most of our watchers reference, the neutron (networking service) policy file (by default in /etc/neutron/policy.json). There are many ways we could setup the policies to restrict our role to only get APIs. 
+These instructions were written based on the Pike release, syntax may look different depending on the release. Let's start where most of our watchers reference, the neutron (networking service) policy file (by default in /etc/neutron/policy.json). There are many ways we could setup the policies to restrict our role to only get APIs.
 One of the least intrusive is to exclude the read_only role from the owner rule and create a read_only rule that we can apply to the get APIs. Then we update each get with an or clause for our read_only rule.
 
     {

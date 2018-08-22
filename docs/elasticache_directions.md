@@ -29,7 +29,7 @@ Go to the AWS console to create an AWS ElastiCache Cluster.  We are going to cre
 Cache URL
 ----------
 You will now need to grab the URL to the ElastiCache cluster. Once AWS has completed provisioning your cluster, you will
-need find the `Primary Endpont` (visible by selecting the cluster in the console), and paste that into 
+need find the `Primary Endpont` (visible by selecting the cluster in the console), and paste that into
 your `celeryconfig.py` file. This is the path to the ElastiCache cluster that Celery will use for scheduling and worker management.
 
 For Redis, the path needs to be set for the `broker_url` variable in the `celeryconfig.py` file needs to be in the format of:

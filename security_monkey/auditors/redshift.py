@@ -38,4 +38,3 @@ class RedshiftAuditor(Auditor):
         if not redshift_cluster.config.get('VpcId'):
             message = "POLICY - Redshift cluster not in VPC."
             self.add_issue(10, message, redshift_cluster)
-

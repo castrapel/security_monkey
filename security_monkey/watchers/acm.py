@@ -66,43 +66,55 @@ class ACM(Watcher):
                 continue
 
             for region in regions:
-                app.logger.debug("Checking {}/{}/{}".format(ACM.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(ACM.index, account, region.name))
                 try:
-                    acm = connect(account, 'boto3.acm.client', region=region, debug=1000)
+                    acm = connect(account, 'boto3.acm.client',
+                                  region=region, debug=1000)
                     response = self.wrap_aws_rate_limited_call(
                         acm.list_certificates
                     )
                     cert_list = response.get('CertificateSummaryList')
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), 'acm', account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), 'acm', account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
-                app.logger.debug("Found {} {}".format(len(cert_list), ACM.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(cert_list), ACM.i_am_plural))
 
                 for cert in cert_list:
-                    app.logger.debug("Getting {} details for {}".format(ACM.i_am_singular, cert.get('DomainName')))
+                    app.logger.debug("Getting {} details for {}".format(
+                        ACM.i_am_singular, cert.get('DomainName')))
                     try:
-                        config = self.describe_certificate(acm, cert.get('CertificateArn')).get('Certificate')
+                        config = self.describe_certificate(
+                            acm, cert.get('CertificateArn')).get('Certificate')
 
                         # Convert the datetime objects into ISO formatted strings in UTC
                         if config.get('NotBefore'):
-                            config.update({ 'NotBefore': config.get('NotBefore').astimezone(tzutc()).isoformat() })
+                            config.update({'NotBefore': config.get(
+                                'NotBefore').astimezone(tzutc()).isoformat()})
                         if config.get('NotAfter'):
-                            config.update({ 'NotAfter': config.get('NotAfter').astimezone(tzutc()).isoformat() })
+                            config.update({'NotAfter': config.get(
+                                'NotAfter').astimezone(tzutc()).isoformat()})
                         if config.get('CreatedAt'):
-                            config.update({ 'CreatedAt': config.get('CreatedAt').astimezone(tzutc()).isoformat() })
+                            config.update({'CreatedAt': config.get(
+                                'CreatedAt').astimezone(tzutc()).isoformat()})
                         if config.get('IssuedAt'):
-                            config.update({ 'IssuedAt': config.get('IssuedAt').astimezone(tzutc()).isoformat() })
+                            config.update({'IssuedAt': config.get(
+                                'IssuedAt').astimezone(tzutc()).isoformat()})
                         if config.get('ImportedAt'):
-                            config.update({ 'ImportedAt': config.get('ImportedAt').astimezone(tzutc()).isoformat()})
+                            config.update({'ImportedAt': config.get(
+                                'ImportedAt').astimezone(tzutc()).isoformat()})
 
                         item = ACMCertificate(region=region.name, account=account, name=cert.get('DomainName'),
                                               arn=cert.get('CertificateArn'), config=dict(config), source_watcher=self)
                         item_list.append(item)
                     except Exception as e:
-                        exc = BotoConnectionIssue(str(e), 'acm', account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), 'acm', account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
 

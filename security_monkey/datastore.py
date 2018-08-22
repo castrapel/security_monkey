@@ -48,7 +48,6 @@ import json
 import hashlib
 import traceback
 
-
 association_table = db.Table(
     'association',
     Column('user_id', Integer, ForeignKey('user.id'), primary_key=True),
@@ -76,16 +75,22 @@ class Account(db.Model):
     third_party = Column(Boolean())
     name = Column(String(50), index=True, unique=True)
     notes = Column(String(256))
-    identifier = Column(String(256), unique=True)  # Unique id of the account, the number for AWS.
-    items = relationship("Item", backref="account", cascade="all, delete, delete-orphan")
+    # Unique id of the account, the number for AWS.
+    identifier = Column(String(256), unique=True)
+    items = relationship("Item", backref="account",
+                         cascade="all, delete, delete-orphan")
     issue_categories = relationship("AuditorSettings", backref="account")
-    account_type_id = Column(Integer, ForeignKey("account_type.id"), nullable=False)
-    custom_fields = relationship("AccountTypeCustomValues", lazy="immediate", cascade="all, delete, delete-orphan")
+    account_type_id = Column(Integer, ForeignKey(
+        "account_type.id"), nullable=False)
+    custom_fields = relationship(
+        "AccountTypeCustomValues", lazy="immediate", cascade="all, delete, delete-orphan")
     unique_const = UniqueConstraint('account_type_id', 'identifier')
 
     # 'lazy' is required for the Celery scheduler to reference the type:
-    type = relationship("AccountType", backref="account_type", lazy="immediate")
-    exceptions = relationship("ExceptionLogs", backref="account", cascade="all, delete, delete-orphan")
+    type = relationship(
+        "AccountType", backref="account_type", lazy="immediate")
+    exceptions = relationship(
+        "ExceptionLogs", backref="account", cascade="all, delete, delete-orphan")
 
     def getCustom(self, name):
         for field in self.custom_fields:
@@ -112,18 +117,22 @@ class Technology(db.Model):
     """
     __tablename__ = 'technology'
     id = Column(Integer, primary_key=True)
-    name = Column(String(32), index=True, unique=True)  # elb, s3, iamuser, iamgroup, etc.
+    # elb, s3, iamuser, iamgroup, etc.
+    name = Column(String(32), index=True, unique=True)
     items = relationship("Item", backref="technology")
     issue_categories = relationship("AuditorSettings", backref="technology")
     ignore_items = relationship("IgnoreListEntry", backref="technology")
 
-    exceptions = relationship("ExceptionLogs", backref="technology", cascade="all, delete, delete-orphan")
+    exceptions = relationship(
+        "ExceptionLogs", backref="technology", cascade="all, delete, delete-orphan")
 
 
 roles_users = db.Table(
     'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id'), primary_key=True),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'), primary_key=True)
+    db.Column('user_id', db.Integer(), db.ForeignKey(
+        'user.id'), primary_key=True),
+    db.Column('role_id', db.Integer(), db.ForeignKey(
+        'role.id'), primary_key=True)
 )
 
 
@@ -171,9 +180,11 @@ class User(UserMixin, db.Model, RBACUserMixin):
 
 
 issue_item_association = db.Table('issue_item_association',
-    Column('super_issue_id', Integer, ForeignKey('itemaudit.id'), primary_key=True),
-    Column('sub_item_id', Integer, ForeignKey('item.id'), primary_key=True)
-)
+                                  Column('super_issue_id', Integer, ForeignKey(
+                                      'itemaudit.id'), primary_key=True),
+                                  Column('sub_item_id', Integer, ForeignKey(
+                                      'item.id'), primary_key=True)
+                                  )
 
 
 class ItemAudit(db.Model):
@@ -192,13 +203,19 @@ class ItemAudit(db.Model):
     class_uuid = Column(String(32), nullable=True)
     fixed = Column(Boolean, default=False, nullable=False)
     justified = Column(Boolean)
-    justified_user_id = Column(Integer, ForeignKey("user.id"), nullable=True, index=True)
+    justified_user_id = Column(Integer, ForeignKey(
+        "user.id"), nullable=True, index=True)
     justification = Column(String(512))
-    justified_date = Column(DateTime(), default=datetime.datetime.utcnow, nullable=True)
-    item_id = Column(Integer, ForeignKey("item.id"), nullable=False, index=True)
-    auditor_setting_id = Column(Integer, ForeignKey("auditorsettings.id"), nullable=True, index=True)
-    sub_items = relationship("Item", secondary=issue_item_association, back_populates="issues")
-    item = relationship("Item")  # TODO: Remove this when the issue system is refactored.
+    justified_date = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=True)
+    item_id = Column(Integer, ForeignKey("item.id"),
+                     nullable=False, index=True)
+    auditor_setting_id = Column(Integer, ForeignKey(
+        "auditorsettings.id"), nullable=True, index=True)
+    sub_items = relationship(
+        "Item", secondary=issue_item_association, back_populates="issues")
+    # TODO: Remove this when the issue system is refactored.
+    item = relationship("Item")
 
     def __str__(self):
         return "Issue: [{issue}] Score: {score} Fixed: {fixed} Justified: {justified}\nNotes: {notes}\n".format(
@@ -247,7 +264,8 @@ class AuditorSettings(db.Model):
     disabled = Column(Boolean(), nullable=False)
     issue_text = Column(String(512), nullable=True)
     auditor_class = Column(String(128))
-    issues = relationship("ItemAudit", backref="auditor_setting", cascade="all, delete, delete-orphan")
+    issues = relationship("ItemAudit", backref="auditor_setting",
+                          cascade="all, delete, delete-orphan")
     tech_id = Column(Integer, ForeignKey("technology.id"), index=True)
     account_id = Column(Integer, ForeignKey("account.id"), index=True)
     unique_const = UniqueConstraint('account_id', 'issue_text', 'tech_id')
@@ -265,8 +283,10 @@ class Item(db.Model):
     arn = Column(Text(), nullable=True, index=True, unique=True)
     latest_revision_complete_hash = Column(String(32), index=True)
     latest_revision_durable_hash = Column(String(32), index=True)
-    tech_id = Column(Integer, ForeignKey("technology.id"), nullable=False, index=True)
-    account_id = Column(Integer, ForeignKey("account.id"), nullable=False, index=True)
+    tech_id = Column(Integer, ForeignKey("technology.id"),
+                     nullable=False, index=True)
+    account_id = Column(Integer, ForeignKey(
+        "account.id"), nullable=False, index=True)
     latest_revision_id = Column(Integer, nullable=True)
     comments = relationship("ItemComment", backref="revision", cascade="all, delete, delete-orphan",
                             order_by="ItemComment.date_created")
@@ -276,7 +296,8 @@ class Item(db.Model):
                                       order_by="CloudTrailEntry.event_time")
     issues = relationship("ItemAudit", secondary=issue_item_association, back_populates="sub_items",
                           single_parent=True, cascade="all, delete, delete-orphan")
-    exceptions = relationship("ExceptionLogs", backref="item", cascade="all, delete, delete-orphan")
+    exceptions = relationship(
+        "ExceptionLogs", backref="item", cascade="all, delete, delete-orphan")
 
     @hybrid_property
     def score(self):
@@ -343,9 +364,12 @@ class ItemComment(db.Model):
     """
     __tablename__ = "itemcomment"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
-    item_id = Column(Integer, ForeignKey('item.id'), nullable=False, index=True)
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'),
+                     nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey('item.id'),
+                     nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False)
     text = Column(Unicode(1024))
 
     def __str__(self):
@@ -367,9 +391,11 @@ class ItemRevision(db.Model):
     id = Column(Integer, primary_key=True)
     active = Column(Boolean())
     config = deferred(Column(JSON))
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
     date_last_ephemeral_change = Column(DateTime(), nullable=True, index=True)
-    item_id = Column(Integer, ForeignKey("item.id"), nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey("item.id"),
+                     nullable=False, index=True)
     comments = relationship("ItemRevisionComment", backref="revision", cascade="all, delete, delete-orphan",
                             order_by="ItemRevisionComment.date_created")
     cloudtrail_entries = relationship("CloudTrailEntry", backref="revision", cascade="all, delete, delete-orphan",
@@ -387,7 +413,8 @@ class CloudTrailEntry(db.Model):
     request_id = Column(String(36), index=True)
     event_source = Column(String(64), nullable=False)
     event_name = Column(String(64), nullable=False)
-    event_time = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
+    event_time = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
     request_parameters = deferred(Column(JSON))
     responseElements = deferred(Column(JSON))
     source_ip = Column(String(45))
@@ -395,8 +422,10 @@ class CloudTrailEntry(db.Model):
     full_entry = deferred(Column(JSON))
     user_identity = deferred(Column(JSON))
     user_identity_arn = Column(String(300), index=True)
-    revision_id = Column(Integer, ForeignKey('itemrevision.id'), nullable=False, index=True)
-    item_id = Column(Integer, ForeignKey('item.id'), nullable=False, index=True)
+    revision_id = Column(Integer, ForeignKey(
+        'itemrevision.id'), nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey('item.id'),
+                     nullable=False, index=True)
 
 
 class ItemRevisionComment(db.Model):
@@ -405,9 +434,12 @@ class ItemRevisionComment(db.Model):
     """
     __tablename__ = "itemrevisioncomment"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
-    revision_id = Column(Integer, ForeignKey('itemrevision.id'), nullable=False, index=True)
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'),
+                     nullable=False, index=True)
+    revision_id = Column(Integer, ForeignKey(
+        'itemrevision.id'), nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False)
     text = Column(Unicode(1024))
 
 
@@ -432,7 +464,8 @@ class IgnoreListEntry(db.Model):
     id = Column(Integer, primary_key=True)
     prefix = Column(String(512))
     notes = Column(String(512))
-    tech_id = Column(Integer, ForeignKey("technology.id"), nullable=False, index=True)
+    tech_id = Column(Integer, ForeignKey("technology.id"),
+                     nullable=False, index=True)
 
 
 class ExceptionLogs(db.Model):
@@ -443,16 +476,21 @@ class ExceptionLogs(db.Model):
     __tablename__ = "exceptions"
     id = Column(BigInteger, primary_key=True)
     source = Column(String(256), nullable=False, index=True)
-    occurred = Column(DateTime, default=datetime.datetime.utcnow(), nullable=False)
-    ttl = Column(DateTime, default=(datetime.datetime.utcnow() + datetime.timedelta(days=10)), nullable=False)
+    occurred = Column(
+        DateTime, default=datetime.datetime.utcnow(), nullable=False)
+    ttl = Column(DateTime, default=(datetime.datetime.utcnow() +
+                                    datetime.timedelta(days=10)), nullable=False)
     type = Column(String(256), nullable=False, index=True)
     message = Column(String(512))
     stacktrace = Column(Text)
     region = Column(String(32), nullable=True, index=True)
 
-    tech_id = Column(Integer, ForeignKey("technology.id", ondelete="CASCADE"), index=True)
-    item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), index=True)
-    account_id = Column(Integer, ForeignKey("account.id", ondelete="CASCADE"), index=True)
+    tech_id = Column(Integer, ForeignKey(
+        "technology.id", ondelete="CASCADE"), index=True)
+    item_id = Column(Integer, ForeignKey(
+        "item.id", ondelete="CASCADE"), index=True)
+    account_id = Column(Integer, ForeignKey(
+        "account.id", ondelete="CASCADE"), index=True)
 
 
 class ItemAuditScore(db.Model):
@@ -467,11 +505,11 @@ class ItemAuditScore(db.Model):
     disabled = Column(Boolean, default=False)
     account_pattern_scores = relationship("AccountPatternAuditScore", backref="itemauditscores",
                                           cascade="all, delete, delete-orphan")
-    __table_args__ = (UniqueConstraint('technology', 'method'), )
-
+    __table_args__ = (UniqueConstraint('technology', 'method'),)
 
     def add_or_update_pattern_score(self, account_type, field, pattern, score):
-        db_pattern_score = self.get_account_pattern_audit_score(account_type, field, pattern)
+        db_pattern_score = self.get_account_pattern_audit_score(
+            account_type, field, pattern)
         if db_pattern_score is not None:
             db_pattern_score.score = score
         else:
@@ -500,7 +538,8 @@ class AccountPatternAuditScore(db.Model):
     account_field = Column(String(128), nullable=False)
     account_pattern = Column(String(128), nullable=False)
     score = Column(Integer, nullable=False)
-    itemauditscores_id = Column(Integer, ForeignKey("itemauditscores.id"), nullable=False)
+    itemauditscores_id = Column(Integer, ForeignKey(
+        "itemauditscores.id"), nullable=False)
 
 
 class WatcherConfig(db.Model):
@@ -544,7 +583,7 @@ class Datastore(object):
         """
         item = sub_dict(config)
         item_str = json.dumps(item, sort_keys=True)
-        item_hash = hashlib.md5(item_str) # nosec: not used for security
+        item_hash = hashlib.md5(item_str)  # nosec: not used for security
         return item_hash.hexdigest()
 
     def get_all_ctype_filtered(self, tech=None, account=None, region=None, name=None, include_inactive=False):
@@ -555,9 +594,11 @@ class Datastore(object):
         item_map = {}
         query = Item.query
         if tech:
-            query = query.join((Technology, Item.tech_id == Technology.id)).filter(Technology.name == tech)
+            query = query.join((Technology, Item.tech_id == Technology.id)).filter(
+                Technology.name == tech)
         if account:
-            query = query.join((Account, Item.account_id == Account.id)).filter(Account.name == account)
+            query = query.join((Account, Item.account_id == Account.id)).filter(
+                Account.name == account)
 
         filter_by = {'region': region, 'name': name}
         for k, v in filter_by.items():
@@ -579,11 +620,13 @@ class Datastore(object):
                 time.sleep(5)
                 attempt = attempt + 1
                 if attempt > 5:
-                    raise Exception("Too many retries for database connections.")
+                    raise Exception(
+                        "Too many retries for database connections.")
 
         for item in items:
             if not item.latest_revision_id:
-                app.logger.debug("There are no itemrevisions for this item: {}".format(item.id))
+                app.logger.debug(
+                    "There are no itemrevisions for this item: {}".format(item.id))
                 continue
             most_recent = ItemRevision.query.get(item.latest_revision_id)
             if not most_recent.active and not include_inactive:
@@ -672,7 +715,7 @@ class Datastore(object):
         item.latest_revision_id = latest_revision.id
         db.session.add(item)
         db.session.commit()
-        #db.session.close()
+        # db.session.close()
 
     def _delete_duplicate_item(self, items):
         """
@@ -700,7 +743,8 @@ class Datastore(object):
         """
         account_result = Account.query.filter(Account.name == account).first()
         if not account_result:
-            raise Exception("Account with name [{}] not found.".format(account))
+            raise Exception(
+                "Account with name [{}] not found.".format(account))
 
         item = Item.query.join((Technology, Item.tech_id == Technology.id)) \
             .join((Account, Item.account_id == Account.id)) \
@@ -722,14 +766,16 @@ class Datastore(object):
             item = None
 
         if not item:
-            technology_result = Technology.query.filter(Technology.name == technology).first()
+            technology_result = Technology.query.filter(
+                Technology.name == technology).first()
             if not technology_result:
                 technology_result = Technology(name=technology)
                 db.session.add(technology_result)
                 db.session.commit()
                 app.logger.info("Creating a new Technology: {} - ID: {}"
                                 .format(technology, technology_result.id))
-            item = Item(tech_id=technology_result.id, region=region, account_id=account_result.id, name=name)
+            item = Item(tech_id=technology_result.id, region=region,
+                        account_id=account_result.id, name=name)
             db.session.add(item)
             db.session.commit()
             db.session.refresh(item)
@@ -746,7 +792,8 @@ def store_exception(source, location, exception, ttl=None):
     :return:
     """
     try:
-        app.logger.debug("Logging exception from {} with location: {} to the database.".format(source, location))
+        app.logger.debug(
+            "Logging exception from {} with location: {} to the database.".format(source, location))
         message = str(exception)[:512]
 
         exception_entry = ExceptionLogs(source=source, ttl=ttl, type=type(exception).__name__,
@@ -761,18 +808,21 @@ def store_exception(source, location, exception, ttl=None):
                 exception_entry.region = location[2]
 
             if len(location) >= 2:
-                account = Account.query.filter(Account.name == location[1]).one()
+                account = Account.query.filter(
+                    Account.name == location[1]).one()
                 if account:
                     exception_entry.account_id = account.id
 
             if len(location) >= 1:
-                technology = Technology.query.filter(Technology.name == location[0]).first()
+                technology = Technology.query.filter(
+                    Technology.name == location[0]).first()
                 if not technology:
                     technology = Technology(name=location[0])
                     db.session.add(technology)
                     db.session.commit()
                     db.session.refresh(technology)
-                    app.logger.info("Creating a new Technology: {} - ID: {}".format(technology.name, technology.id))
+                    app.logger.info(
+                        "Creating a new Technology: {} - ID: {}".format(technology.name, technology.id))
                 exception_entry.tech_id = technology.id
 
         db.session.add(exception_entry)
@@ -780,12 +830,14 @@ def store_exception(source, location, exception, ttl=None):
         app.logger.debug("Completed logging exception to database.")
 
     except Exception as e:
-        app.logger.error("Encountered exception while logging exception to database:")
+        app.logger.error(
+            "Encountered exception while logging exception to database:")
         app.logger.exception(e)
 
 
 def clear_old_exceptions():
-    exc_list = ExceptionLogs.query.filter(ExceptionLogs.ttl <= datetime.datetime.utcnow()).all()
+    exc_list = ExceptionLogs.query.filter(
+        ExceptionLogs.ttl <= datetime.datetime.utcnow()).all()
 
     for exc in exc_list:
         db.session.delete(exc)

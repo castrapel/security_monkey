@@ -27,7 +27,6 @@ from security_monkey import db
 from mock import patch
 from collections import defaultdict
 
-
 watcher_configs = [
     {'index': 'index1', 'interval': 15},
     {'index': 'index2', 'interval': 15},
@@ -68,7 +67,8 @@ class BackupTestCase(SecurityMonkeyTestCase):
     def test_backup_with_all_watchers(self):
         from security_monkey.backup import backup_config_to_json
 
-        backup_config_to_json(['TEST_ACCOUNT'], ['index1', 'index2', 'index3'], 'none')
+        backup_config_to_json(
+            ['TEST_ACCOUNT'], ['index1', 'index2', 'index3'], 'none')
 
         self.assertTrue('TEST_ACCOUNT' in mock_file_system.keys(),
                         msg="Did not backup TEST_ACCOUNT")

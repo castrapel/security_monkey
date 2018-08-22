@@ -24,7 +24,6 @@ from security_monkey.auditors.iam.managed_policy import ManagedPolicyAuditor
 from security_monkey.watchers.iam.managed_policy import ManagedPolicyItem
 from security_monkey import ARN_PREFIX
 
-
 FULL_ADMIN_POLICY_BARE = """
 {
     "Statement":    {
@@ -49,7 +48,8 @@ class ManagedPolicyAuditorTestCase(SecurityMonkeyTestCase):
         }
 
         auditor = ManagedPolicyAuditor(accounts=['unittest'])
-        policyobj = ManagedPolicyItem(account="TEST_ACCOUNT", name="policy_test", config=config)
+        policyobj = ManagedPolicyItem(
+            account="TEST_ACCOUNT", name="policy_test", config=config)
 
         self.assertIs(len(policyobj.audit_issues), 0,
                       "Managed Policy should have 0 alert but has {}".format(len(policyobj.audit_issues)))
@@ -70,7 +70,8 @@ class ManagedPolicyAuditorTestCase(SecurityMonkeyTestCase):
         }
 
         auditor = ManagedPolicyAuditor(accounts=['unittest'])
-        policyobj = ManagedPolicyItem(account="TEST_ACCOUNT", name="policy_test", config=config)
+        policyobj = ManagedPolicyItem(
+            account="TEST_ACCOUNT", name="policy_test", config=config)
 
         self.assertIs(len(policyobj.audit_issues), 0,
                       "Managed Policy should have 0 alert but has {}".format(len(policyobj.audit_issues)))
@@ -91,7 +92,8 @@ class ManagedPolicyAuditorTestCase(SecurityMonkeyTestCase):
         }
 
         auditor = ManagedPolicyAuditor(accounts=['unittest'])
-        policyobj = ManagedPolicyItem(account="TEST_ACCOUNT", name="policy_test", config=config)
+        policyobj = ManagedPolicyItem(
+            account="TEST_ACCOUNT", name="policy_test", config=config)
 
         self.assertIs(len(policyobj.audit_issues), 0,
                       "Managed Policy should have 0 alert but has {}".format(len(policyobj.audit_issues)))

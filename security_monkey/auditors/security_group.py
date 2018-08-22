@@ -39,7 +39,8 @@ class SecurityGroupAuditor(Auditor):
     i_am_plural = SecurityGroup.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(SecurityGroupAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(SecurityGroupAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     def _port_for_rule(self, rule):
         """
@@ -112,10 +113,12 @@ class SecurityGroupAuditor(Auditor):
 
             ports = self._port_for_rule(rule)
             if rule.get('owner_id'):
-                entity_value = '{account}/{sg}'.format(account=rule.get('owner_id'), sg=rule.get('group_id'))
+                entity_value = '{account}/{sg}'.format(
+                    account=rule.get('owner_id'), sg=rule.get('group_id'))
                 entity = Entity(category='security_group', value=entity_value)
                 if key in self.inspect_entity(entity, item):
-                    recorder(item, entity, ports, score=score, source='security_group')
+                    recorder(item, entity, ports, score=score,
+                             source='security_group')
 
             if rule.get('cidr_ip'):
                 if '/0' in rule.get('cidr_ip'):
@@ -123,25 +126,32 @@ class SecurityGroupAuditor(Auditor):
 
                 entity = Entity(category='cidr', value=rule.get('cidr_ip'))
                 if key in self.inspect_entity(entity, item):
-                    recorder(item, entity, ports, score=score, source='security_group')
+                    recorder(item, entity, ports, score=score,
+                             source='security_group')
 
     def check_friendly_cross_account_ingress(self, item):
-        self._check_cross_account(item, 'FRIENDLY', self.record_friendly_access, severity=0)
+        self._check_cross_account(
+            item, 'FRIENDLY', self.record_friendly_access, severity=0)
 
     def check_friendly_cross_account_egress(self, item):
-        self._check_cross_account(item, 'FRIENDLY', self.record_friendly_access, direction='egress', severity=0)
+        self._check_cross_account(
+            item, 'FRIENDLY', self.record_friendly_access, direction='egress', severity=0)
 
     def check_thirdparty_cross_account_ingress(self, item):
-        self._check_cross_account(item, 'THIRDPARTY', self.record_thirdparty_access, severity=0)
+        self._check_cross_account(
+            item, 'THIRDPARTY', self.record_thirdparty_access, severity=0)
 
     def check_thirdparty_cross_account_egress(self, item):
-        self._check_cross_account(item, 'THIRDPARTY', self.record_thirdparty_access, direction='egress', severity=0)
+        self._check_cross_account(
+            item, 'THIRDPARTY', self.record_thirdparty_access, direction='egress', severity=0)
 
     def check_unknown_cross_account_ingress(self, item):
-        self._check_cross_account(item, 'UNKNOWN', self.record_unknown_access, severity=10)
+        self._check_cross_account(
+            item, 'UNKNOWN', self.record_unknown_access, severity=10)
 
     def check_unknown_cross_account_egress(self, item):
-        self._check_cross_account(item, 'UNKNOWN', self.record_unknown_access, direction='egress', severity=10)
+        self._check_cross_account(
+            item, 'UNKNOWN', self.record_unknown_access, direction='egress', severity=10)
 
     def _check_internet_cidr(self, cidr):
         return str(cidr).endswith('/0')
@@ -170,7 +180,8 @@ class SecurityGroupAuditor(Auditor):
 
             actions = self._port_for_rule(rule)
             entity = Entity(category='cidr', value=cidr)
-            self.record_internet_access(item, entity, actions, score=score, source='security_group')
+            self.record_internet_access(
+                item, entity, actions, score=score, source='security_group')
 
     def check_internet_accessible_ingress(self, item):
         self._check_internet_accessible(item, direction='ingress')

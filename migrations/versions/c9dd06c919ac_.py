@@ -23,11 +23,15 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.add_column('itemaudit', sa.Column('action_instructions', sa.Text(), nullable=True))
-    op.add_column('itemaudit', sa.Column('background_info', sa.Text(), nullable=True))
+    op.add_column('itemaudit', sa.Column(
+        'action_instructions', sa.Text(), nullable=True))
+    op.add_column('itemaudit', sa.Column(
+        'background_info', sa.Text(), nullable=True))
     op.add_column('itemaudit', sa.Column('origin', sa.Text(), nullable=True))
-    op.add_column('itemaudit', sa.Column('origin_summary', sa.Text(), nullable=True))
-    op.add_column('itemaudit', sa.Column('class_uuid', sa.VARCHAR(length=32), nullable=True))
+    op.add_column('itemaudit', sa.Column(
+        'origin_summary', sa.Text(), nullable=True))
+    op.add_column('itemaudit', sa.Column(
+        'class_uuid', sa.VARCHAR(length=32), nullable=True))
 
 
 def downgrade():

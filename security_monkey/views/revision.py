@@ -102,7 +102,8 @@ class RevisionGet(AuthenticatedService):
             {'cloudtrail': cloudtrail_entries}.items()
         )
 
-        self.reqparse.add_argument('compare', type=int, default=None, location='args')
+        self.reqparse.add_argument(
+            'compare', type=int, default=None, location='args')
         args = self.reqparse.parse_args()
         compare_id = args.pop('compare', None)
         if compare_id:
@@ -172,16 +173,26 @@ class RevisionList(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('active', type=str, default=None, location='args')
-        self.reqparse.add_argument('regions', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounts', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounttypes', type=str, default=None, location='args')
-        self.reqparse.add_argument('names', type=str, default=None, location='args')
-        self.reqparse.add_argument('arns', type=str, default=None, location='args')
-        self.reqparse.add_argument('technologies', type=str, default=None, location='args')
-        self.reqparse.add_argument('searchconfig', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'active', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'regions', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounts', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounttypes', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'names', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'arns', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'technologies', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'searchconfig', type=str, default=None, location='args')
         args = self.reqparse.parse_args()
 
         page = args.pop('page', None)
@@ -201,7 +212,8 @@ class RevisionList(AuthenticatedService):
         if 'accounttypes' in args:
             accounttypes = args['accounttypes'].split(',')
             query = query.join((Account, Account.id == Item.account_id))
-            query = query.join((AccountType, AccountType.id == Account.account_type_id))
+            query = query.join(
+                (AccountType, AccountType.id == Account.account_type_id))
             query = query.filter(AccountType.name.in_(accounttypes))
         if 'technologies' in args:
             technologies = args['technologies'].split(',')
@@ -218,7 +230,8 @@ class RevisionList(AuthenticatedService):
             query = query.filter(ItemRevision.active == active)
         if 'searchconfig' in args:
             searchconfig = args['searchconfig']
-            query = query.filter(cast(ItemRevision.config, String).ilike('%{}%'.format(searchconfig)))
+            query = query.filter(cast(ItemRevision.config, String).ilike(
+                '%{}%'.format(searchconfig)))
         query = query.order_by(ItemRevision.date_created.desc())
         revisions = query.paginate(page, count)
 
@@ -233,8 +246,10 @@ class RevisionList(AuthenticatedService):
             item_marshaled = marshal(revision.item.__dict__, ITEM_FIELDS)
             revision_marshaled = marshal(revision.__dict__, REVISION_FIELDS)
             account_marshaled = {'account': revision.item.account.name}
-            accounttype_marshaled = {'account_type': revision.item.account.account_type.name}
-            technology_marshaled = {'technology': revision.item.technology.name}
+            accounttype_marshaled = {
+                'account_type': revision.item.account.account_type.name}
+            technology_marshaled = {
+                'technology': revision.item.technology.name}
             merged_marshaled = dict(
                 item_marshaled.items() +
                 revision_marshaled.items() +

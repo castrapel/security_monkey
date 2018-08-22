@@ -72,7 +72,8 @@ class IAMRoleTestCase(SecurityMonkeyTestCase):
 
         for x in range(0, self.total_roles):
             # Create the IAM Role via Moto:
-            aspd["Statement"][0]["Resource"] = ARN_PREFIX + ":iam:012345678910:role/roleNumber{}".format(x)
+            aspd["Statement"][0]["Resource"] = ARN_PREFIX + \
+                ":iam:012345678910:role/roleNumber{}".format(x)
             client.create_role(Path="/", RoleName="roleNumber{}".format(x),
                                AssumeRolePolicyDocument=json.dumps(aspd, indent=4))
             client.put_role_policy(RoleName="roleNumber{}".format(x), PolicyName="testpolicy",
@@ -208,7 +209,8 @@ class IAMRoleSkipTestCase(SecurityMonkeyTestCase):
 
         for x in range(0, self.total_roles):
             # Create the IAM Role via Moto:
-            aspd["Statement"][0]["Resource"] = ARN_PREFIX + ":iam:012345678910:role/roleNumber{}".format(x)
+            aspd["Statement"][0]["Resource"] = ARN_PREFIX + \
+                ":iam:012345678910:role/roleNumber{}".format(x)
             client.create_role(Path="/", RoleName="roleNumber{}".format(x),
                                AssumeRolePolicyDocument=json.dumps(aspd, indent=4))
             client.put_role_policy(RoleName="roleNumber{}".format(x), PolicyName="testpolicy",
@@ -233,9 +235,10 @@ class IAMRoleSkipTestCase(SecurityMonkeyTestCase):
         assert len(exceptions) == 0
         assert watcher.batch_counter == 1
 
-        batch_lookup = {}   # Ensure we aren't processing duplicates
+        batch_lookup = {}  # Ensure we aren't processing duplicates
         for r in first_batch:
-            assert r.name not in watcher.ignore_list    # Ensure we properly ignore the things
+            # Ensure we properly ignore the things
+            assert r.name not in watcher.ignore_list
             batch_lookup[r.name] = True
 
         # Slurp again:
@@ -250,6 +253,7 @@ class IAMRoleSkipTestCase(SecurityMonkeyTestCase):
             batch_lookup[r.name] = True
 
         # Sum of items should be total items - length of the ignored items:
-        assert self.total_roles - len(watcher.ignore_list) == item_sum == len(batch_lookup)
+        assert self.total_roles - \
+            len(watcher.ignore_list) == item_sum == len(batch_lookup)
 
         mock_sts().stop()

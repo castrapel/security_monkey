@@ -38,7 +38,7 @@ RUN apt-get update && \
     pip install cloudaux\[openstack\] && \
     pip install python-saml && \
     pip install -r requirements.txt
-    
+
 COPY . /usr/local/src/security_monkey
 RUN pip install ."[onelogin]" && \
     /bin/mkdir -p /var/log/security_monkey/ && \

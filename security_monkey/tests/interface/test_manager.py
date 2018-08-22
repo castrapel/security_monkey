@@ -31,7 +31,8 @@ import datetime
 
 class ManageTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)

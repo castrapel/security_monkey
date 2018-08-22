@@ -17,7 +17,8 @@ import string
 
 class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)
@@ -60,7 +61,8 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
         db.session.commit()
 
         assert len(Item.query.filter(Item.name == "testrole").all()) == 1
-        assert len(Technology.query.filter(Technology.name == "iamrole").all()) == 1
+        assert len(Technology.query.filter(
+            Technology.name == "iamrole").all()) == 1
         assert len(Account.query.filter(Account.name == "testing").all()) == 1
 
     def test_child_deletion_cascade_check(self):
@@ -87,7 +89,8 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
         assert len(exc) == 0
 
         assert len(Item.query.filter(Item.name == "testrole").all()) == 1
-        assert len(Technology.query.filter(Technology.name == "iamrole").all()) == 1
+        assert len(Technology.query.filter(
+            Technology.name == "iamrole").all()) == 1
         assert len(Account.query.filter(Account.name == "testing").all()) == 1
 
         assert len(self.item.exceptions) == 0
@@ -115,7 +118,8 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
         assert len(exc) == 0
 
         assert len(Item.query.filter(Item.name == "testrole").all()) == 0
-        assert len(Technology.query.filter(Technology.name == "iamrole").all()) == 1
+        assert len(Technology.query.filter(
+            Technology.name == "iamrole").all()) == 1
         assert len(Account.query.filter(Account.name == "testing").all()) == 1
 
     def test_store_exception(self):
@@ -133,8 +137,10 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
 
         location = ("iamrole", "testing", "us-west-2", "testrole")
 
-        ttl_month = (datetime.datetime.utcnow() + datetime.timedelta(days=10)).month
-        ttl_day = (datetime.datetime.utcnow() + datetime.timedelta(days=10)).day
+        ttl_month = (datetime.datetime.utcnow() +
+                     datetime.timedelta(days=10)).month
+        ttl_day = (datetime.datetime.utcnow() +
+                   datetime.timedelta(days=10)).day
         current_month = datetime.datetime.utcnow().month
         current_day = datetime.datetime.utcnow().day
 
@@ -143,7 +149,8 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
             store_exception("tests", tuple(location[:i]), test_exception)
 
             # Fetch the exception and validate it:
-            exc_log = ExceptionLogs.query.order_by(ExceptionLogs.id.desc()).first()
+            exc_log = ExceptionLogs.query.order_by(
+                ExceptionLogs.id.desc()).first()
 
             assert exc_log.type == type(test_exception).__name__
             assert exc_log.message == str(test_exception)
@@ -165,7 +172,8 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
         assert len(self.item.exceptions) == 1
 
     def test_exception_length(self):
-        some_string = "".join(random.choice(string.ascii_uppercase) for _ in range(1024))
+        some_string = "".join(random.choice(string.ascii_uppercase)
+                              for _ in range(1024))
 
         try:
             raise ValueError(some_string)
@@ -209,8 +217,10 @@ class ExceptionLoggingTestCase(SecurityMonkeyTestCase):
             test_exception = e
 
         location = ['newtech']
-        ttl_month = (datetime.datetime.utcnow() + datetime.timedelta(days=10)).month
-        ttl_day = (datetime.datetime.utcnow() + datetime.timedelta(days=10)).day
+        ttl_month = (datetime.datetime.utcnow() +
+                     datetime.timedelta(days=10)).month
+        ttl_day = (datetime.datetime.utcnow() +
+                   datetime.timedelta(days=10)).day
         current_month = datetime.datetime.utcnow().month
         current_day = datetime.datetime.utcnow().day
 

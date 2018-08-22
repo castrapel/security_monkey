@@ -41,8 +41,10 @@ class WatcherConfigGetList(AuthenticatedService):
         self.reqparse = reqparse.RequestParser()
 
     def get(self):
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
@@ -57,7 +59,8 @@ class WatcherConfigGetList(AuthenticatedService):
 
         for key in keys:
             watcher_class = watcher_registry[key]
-            config = WatcherConfig.query.filter(WatcherConfig.index == watcher_class.index).first()
+            config = WatcherConfig.query.filter(
+                WatcherConfig.index == watcher_class.index).first()
             if config is None:
                 config = WatcherConfig(id=0,
                                        index=watcher_class.index,
@@ -86,10 +89,14 @@ class WatcherConfigPut(AuthenticatedService):
         super(WatcherConfigPut, self).__init__()
 
     def put(self, id):
-        self.reqparse.add_argument('index', required=True, type=text_type, location='json')
-        self.reqparse.add_argument('interval', required=True, type=int, location='json')
-        self.reqparse.add_argument('active', required=True, type=bool, location='json')
-        self.reqparse.add_argument('remove_items', required=False, type=bool, location='json')
+        self.reqparse.add_argument(
+            'index', required=True, type=text_type, location='json')
+        self.reqparse.add_argument(
+            'interval', required=True, type=int, location='json')
+        self.reqparse.add_argument(
+            'active', required=True, type=bool, location='json')
+        self.reqparse.add_argument(
+            'remove_items', required=False, type=bool, location='json')
         args = self.reqparse.parse_args()
         index = args['index']
         interval = args['interval']
@@ -101,14 +108,15 @@ class WatcherConfigPut(AuthenticatedService):
             config.interval = interval
             config.active = active
         else:
-            config = WatcherConfig(index=index, interval=interval, active=active)
+            config = WatcherConfig(
+                index=index, interval=interval, active=active)
 
         db.session.add(config)
         db.session.commit()
 
         if active is False and remove_items is True:
             results = Item.query.join((Technology, Item.tech_id == Technology.id)) \
-                                      .filter(Technology.name == index).all()
+                .filter(Technology.name == index).all()
 
             for item in results:
                 db.session.delete(item)

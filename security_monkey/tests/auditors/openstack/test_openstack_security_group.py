@@ -44,35 +44,36 @@ INTERNET_SG_INGRESS = {
     'id': 'sg-12345679',
     'name': 'INTERNETSG',
     'rules': [
-        {        
+        {
             'cidr_ip': '0.0.0.0/0',
             'rule_type': 'ingress',
             'from_port': 80,
             'to_port': 80,
             'ip_protocol': 'TCP'
-        }        
-    ]        
-}       
+        }
+    ]
+}
 
 INTERNAL_SG = {
     'id': 'sg-87654321',
     'name': 'INTERNALSG',
     'rules': [
-        {       
+        {
             'cidr_ip': '10.0.0.0/8',
             'rule_type': 'ingress',
             'from_port': 80,
             'to_port': 80,
             'ip_protocol': 'TCP'
-        }       
-    ]       
-}  
+        }
+    ]
+}
+
 
 class OpenStackSecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
 
     def pre_test_setup(self):
-
-        OpenStackSecurityGroupAuditor(accounts=['TEST_ACCOUNT']).OBJECT_STORE.clear()
+        OpenStackSecurityGroupAuditor(
+            accounts=['TEST_ACCOUNT']).OBJECT_STORE.clear()
         account_type_result = AccountType(name='AWS')
         db.session.add(account_type_result)
         db.session.commit()
@@ -89,8 +90,8 @@ class OpenStackSecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = OpenStackSecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNAL_SG', 
-                                    config=INTERNAL_SG)
+        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNAL_SG',
+                                   config=INTERNAL_SG)
 
         auditor.check_securitygroup_ec2_rfc1918(item)
         self.assertEquals(len(item.audit_issues), 0)
@@ -99,8 +100,8 @@ class OpenStackSecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = OpenStackSecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_INGRESS', 
-                                    config=INTERNET_SG_INGRESS)
+        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_INGRESS',
+                                   config=INTERNET_SG_INGRESS)
 
         auditor.check_internet_accessible_ingress(item)
         self.assertEquals(len(item.audit_issues), 1)
@@ -110,8 +111,8 @@ class OpenStackSecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = OpenStackSecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_EGRESS', 
-                                    config=INTERNET_SG_EGRESS)
+        item = OpenStackChangeItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_EGRESS',
+                                   config=INTERNET_SG_EGRESS)
 
         auditor.check_internet_accessible_egress(item)
         self.assertEquals(len(item.audit_issues), 1)

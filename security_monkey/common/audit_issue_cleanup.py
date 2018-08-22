@@ -26,7 +26,6 @@ from security_monkey.datastore import AuditorSettings, Account, Technology, Data
 from security_monkey.watcher import ChangeItem
 from security_monkey import app, db
 
-
 existing_auditor_classes = {}
 for key in auditor_registry:
     for auditor in auditor_registry[key]:
@@ -37,19 +36,22 @@ def clean_stale_issues():
     results = AuditorSettings.query.filter().all()
     for settings in results:
         if settings.auditor_class is None or settings.auditor_class not in existing_auditor_classes:
-            app.logger.info("Cleaning up issues for removed auditor %s", settings.auditor_class)
+            app.logger.info(
+                "Cleaning up issues for removed auditor %s", settings.auditor_class)
             _delete_issues(settings)
 
     db.session.commit()
 
 
 def clean_account_issues(account):
-    results = AuditorSettings.query.filter(AuditorSettings.account_id == account.id).all()
+    results = AuditorSettings.query.filter(
+        AuditorSettings.account_id == account.id).all()
     for settings in results:
         auditor_class = existing_auditor_classes.get(settings.auditor_class)
         if auditor_class:
             if not auditor_class([account.name]).applies_to_account(account):
-                app.logger.info("Cleaning up %s issues for %s", settings.auditor_class, account.name)
+                app.logger.info("Cleaning up %s issues for %s",
+                                settings.auditor_class, account.name)
                 _delete_issues(settings)
 
     db.session.commit()
@@ -60,7 +62,8 @@ def _delete_issues(settings):
     tech = Technology.query.filter(Technology.id == settings.tech_id).first()
     if account and tech:
         # Report issues as fixed
-        db_items = Datastore().get_all_ctype_filtered(tech=tech.name, account=account.name, include_inactive=False)
+        db_items = Datastore().get_all_ctype_filtered(
+            tech=tech.name, account=account.name, include_inactive=False)
         items = []
         for item in db_items:
             new_item = ChangeItem(index=tech.name,

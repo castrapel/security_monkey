@@ -80,7 +80,8 @@ class IAMUserAuditor(IAMPolicyAuditor):
                 if akey['Status'] != 'Active':
                     description = 'Inactive Accesskey'
                     specific = ' [{}]'.format(akey['AccessKeyId'])
-                    note = notes.format(description=description, specific=specific)
+                    note = notes.format(
+                        description=description, specific=specific)
                     self.add_issue(0, issue, item, notes=note)
 
     def check_access_key_rotation(self, item):
@@ -99,7 +100,8 @@ class IAMUserAuditor(IAMPolicyAuditor):
                     create_date = parser.parse(create_date)
                     if create_date < self.ninety_days_ago:
                         note = notes.format(
-                            what='Active Accesskey [{key}]'.format(key=akey['AccessKeyId']),
+                            what='Active Accesskey [{key}]'.format(
+                                key=akey['AccessKeyId']),
                             requirement=requirement,
                             date=akey['CreateDate'])
                         self.add_issue(1, issue, item, notes=note)
@@ -116,11 +118,13 @@ class IAMUserAuditor(IAMPolicyAuditor):
         for akey in akeys:
             if 'Status' in akey:
                 if akey['Status'] == 'Active':
-                    last_used_str = akey.get('LastUsedDate') or akey.get('CreateDate')
+                    last_used_str = akey.get(
+                        'LastUsedDate') or akey.get('CreateDate')
                     last_used_date = parser.parse(last_used_str)
                     if last_used_date < self.ninety_days_ago:
                         note = notes.format(
-                            what='Active Accesskey [{key}]'.format(key=akey['AccessKeyId']),
+                            what='Active Accesskey [{key}]'.format(
+                                key=akey['AccessKeyId']),
                             requirement=requirement,
                             date=last_used_str)
                         self.add_issue(1, issue, item, notes=note)
@@ -132,7 +136,8 @@ class IAMUserAuditor(IAMPolicyAuditor):
         """
         issue = Categories.INSECURE_CONFIGURATION
         notes = Categories.INSECURE_CONFIGURATION_NOTES
-        notes = notes.format(description='User with password login and no MFA devices')
+        notes = notes.format(
+            description='User with password login and no MFA devices')
 
         user_mfas = item.config.get('MfaDevices', {})
         login_profile = item.config.get('LoginProfile', {})

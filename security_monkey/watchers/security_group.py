@@ -36,7 +36,8 @@ class SecurityGroup(Watcher):
     def __init__(self, accounts=None, debug=False):
         super(SecurityGroup, self).__init__(accounts=accounts, debug=debug)
         # TODO: grab those from DB
-        self.instance_detail = app.config.get("SECURITYGROUP_INSTANCE_DETAIL", 'FULL')
+        self.instance_detail = app.config.get(
+            "SECURITYGROUP_INSTANCE_DETAIL", 'FULL')
         self.honor_ephemerals = True
         self.ephemeral_paths = ["assigned_to"]
 
@@ -48,8 +49,8 @@ class SecurityGroup(Watcher):
             return 'NONE'
 
     def _build_rule(self, rule, rule_type):
-        rule_list=[]
-        #base rule information
+        rule_list = []
+        # base rule information
         rule_config = {
             "ip_protocol": rule.get('IpProtocol'),
             "rule_type": rule_type,
@@ -60,27 +61,27 @@ class SecurityGroup(Watcher):
             "group_id": None,
             "name": None
         }
-    
+
         for ips in rule.get('IpRanges'):
-            #make a copy of the base rule info.
-            new_rule=rule_config.copy()
+            # make a copy of the base rule info.
+            new_rule = rule_config.copy()
             new_rule['cidr_ip'] = ips.get('CidrIp')
             rule_list.append(new_rule)
 
         for ips in rule.get('Ipv6Ranges'):
-            #make a copy of the base rule info.
-            new_rule=rule_config.copy()
+            # make a copy of the base rule info.
+            new_rule = rule_config.copy()
             new_rule['cidr_ip'] = ips.get('CidrIpv6')
             rule_list.append(new_rule)
 
         for user_id_group_pairs in rule.get('UserIdGroupPairs'):
-            #make a copy of the base rule info.
-            new_rule=rule_config.copy()
+            # make a copy of the base rule info.
+            new_rule = rule_config.copy()
             new_rule['owner_id'] = user_id_group_pairs.get('UserId')
             new_rule['group_id'] = user_id_group_pairs.get('GroupId')
             new_rule['name'] = user_id_group_pairs.get('GroupName')
-            rule_list.append(new_rule)                
-            
+            rule_list.append(new_rule)
+
         return rule_list
 
     def slurp(self):
@@ -105,11 +106,13 @@ class SecurityGroup(Watcher):
             except Exception as e:  # EC2ResponseError
                 # Some Accounts don't subscribe to EC2 and will throw an exception here.
                 exc = BotoConnectionIssue(str(e), self.index, account, None)
-                self.slurp_exception((self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
+                self.slurp_exception(
+                    (self.index, account), exc, exception_map, source="{}-watcher".format(self.index))
                 continue
 
             for region in regions:
-                app.logger.debug("Checking {}/{}/{}".format(self.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(self.index, account, region.name))
 
                 try:
                     rec2 = connect(account, 'boto3.ec2.client', region=region)
@@ -127,15 +130,18 @@ class SecurityGroup(Watcher):
                         instances = self.wrap_aws_rate_limited_call(
                             rec2.describe_instances
                         )
-                        app.logger.info("Number of instances found in region {}: {}".format(region.name, len(instances)))
+                        app.logger.info("Number of instances found in region {}: {}".format(
+                            region.name, len(instances)))
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), self.index, account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), self.index, account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
 
-                app.logger.debug("Found {} {}".format(len(sgs), self.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(sgs), self.i_am_plural))
 
                 if self.get_detail_level() != 'NONE':
                     app.logger.info("Creating mapping of sg_id's to instances")
@@ -147,9 +153,11 @@ class SecurityGroup(Watcher):
                                 if group['GroupId'] not in sg_instances:
                                     sg_instances[group['GroupId']] = [instance]
                                 else:
-                                    sg_instances[group['GroupId']].append(instance)
+                                    sg_instances[group['GroupId']].append(
+                                        instance)
 
-                    app.logger.info("Creating mapping of instance_id's to tags")
+                    app.logger.info(
+                        "Creating mapping of instance_id's to tags")
                     # map instanceid => tags
                     instance_tags = {}
                     for tag in tags['Tags']:
@@ -182,16 +190,19 @@ class SecurityGroup(Watcher):
                     }
 
                     for rule in sg['IpPermissions']:
-                        item_config['rules'] += self._build_rule(rule,"ingress")
-                        
+                        item_config['rules'] += self._build_rule(
+                            rule, "ingress")
+
                     for rule in sg['IpPermissionsEgress']:
-                        item_config['rules'] += self._build_rule(rule,"egress")
+                        item_config['rules'] += self._build_rule(
+                            rule, "egress")
 
                     item_config['rules'] = sorted(item_config['rules'])
 
                     if self.get_detail_level() == 'SUMMARY':
                         if sg['InstanceId'] in sg_instances:
-                            item_config["assigned_to"] = "{} instances".format(len(sg_instances[sg['GroupId']]))
+                            item_config["assigned_to"] = "{} instances".format(
+                                len(sg_instances[sg['GroupId']]))
                         else:
                             item_config["assigned_to"] = "0 instances"
 
@@ -200,19 +211,23 @@ class SecurityGroup(Watcher):
                         if sg['GroupId'] in sg_instances:
                             for instance in sg_instances[sg['GroupId']]:
                                 if instance['InstanceId'] in instance_tags:
-                                    tagdict = {tag['Key']: tag['Value'] for tag in instance_tags[instance['InstanceId']]}
+                                    tagdict = {
+                                        tag['Key']: tag['Value'] for tag in instance_tags[instance['InstanceId']]}
                                     tagdict["instance_id"] = instance['InstanceId']
                                 else:
-                                    tagdict = {"instance_id": instance['InstanceId']}
+                                    tagdict = {
+                                        "instance_id": instance['InstanceId']}
                                 assigned_to.append(tagdict)
                         item_config["assigned_to"] = assigned_to
 
                     # Issue 40: Security Groups can have a name collision between EC2 and
                     # VPC or between different VPCs within a given region.
                     if sg.get('VpcId'):
-                        sg_name = "{0} ({1} in {2})".format(sg['GroupName'], sg['GroupId'], sg['VpcId'])
+                        sg_name = "{0} ({1} in {2})".format(
+                            sg['GroupName'], sg['GroupId'], sg['VpcId'])
                     else:
-                        sg_name = "{0} ({1})".format(sg['GroupName'], sg['GroupId'])
+                        sg_name = "{0} ({1})".format(
+                            sg['GroupName'], sg['GroupId'])
 
                     item = SecurityGroupItem(region=region.name, account=account, name=sg_name, arn=arn,
                                              config=item_config, source_watcher=self)

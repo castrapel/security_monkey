@@ -47,12 +47,14 @@ class GitHubTeam(Watcher):
     def slurp(self):
         @record_exception(source="{index}-watcher".format(index=self.index))
         def fetch_org_teams(**kwargs):
-            account = Account.query.filter(Account.name == kwargs["account_name"]).first()
+            account = Account.query.filter(
+                Account.name == kwargs["account_name"]).first()
 
             item_list = []
 
             # Fetch teams:
-            app.logger.debug("Fetching organization teams for: {}".format(account.identifier))
+            app.logger.debug(
+                "Fetching organization teams for: {}".format(account.identifier))
             teams = strip_url_fields(self.list_org_teams(account.identifier))
 
             for team in teams:
@@ -70,7 +72,8 @@ class GitHubTeam(Watcher):
         def slurp_items(**kwargs):
             # Are we skipping this org?
             if self.check_ignore_list(kwargs["account_name"]):
-                app.logger.debug("Skipping ignored account: {}".format(kwargs["account_name"]))
+                app.logger.debug("Skipping ignored account: {}".format(
+                    kwargs["account_name"]))
                 return [], kwargs["exception_map"]
 
             # Exception handling complexities...
@@ -101,7 +104,8 @@ class GitHubTeam(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubError(org, result.status_code)
+                raise InvalidResponseCodeFromGitHubError(
+                    org, result.status_code)
 
             if not result.links.get("last"):
                 done = True

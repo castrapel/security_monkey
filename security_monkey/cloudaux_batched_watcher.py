@@ -22,7 +22,8 @@ class CloudAuxBatchedWatcher(CloudAuxWatcher):
         @iter_account_region(self.service_name, accounts=self.account_identifiers,
                              regions=self._get_regions(), conn_type='dict')
         def get_item_list(**kwargs):
-            kwargs, exception_map = self._add_exception_fields_to_kwargs(**kwargs)
+            kwargs, exception_map = self._add_exception_fields_to_kwargs(
+                **kwargs)
             items = invoke_list_method(**kwargs)
 
             if not items:
@@ -47,9 +48,10 @@ class CloudAuxBatchedWatcher(CloudAuxWatcher):
         @iter_account_region(self.service_name, accounts=self.account_identifiers, conn_type='dict', regions=["TBD"])
         def slurp_items(**kwargs):
             item_list = list()
-            kwargs, exception_map = self._add_exception_fields_to_kwargs(**kwargs)
+            kwargs, exception_map = self._add_exception_fields_to_kwargs(
+                **kwargs)
             item_counter = self.batch_counter * self.batched_size
-            skip_counter = 0    # Need to track number of items skipped so that the batches don't overlap
+            skip_counter = 0  # Need to track number of items skipped so that the batches don't overlap
 
             while self.batched_size - (len(item_list) + skip_counter) > 0 and not self.done_slurping:
                 cursor = self.total_list[item_counter]
@@ -61,14 +63,16 @@ class CloudAuxBatchedWatcher(CloudAuxWatcher):
                         self.done_slurping = True
                     continue
 
-                kwargs["conn_dict"]["region"] = cursor["Region"]    # Inject the region in.
+                # Inject the region in.
+                kwargs["conn_dict"]["region"] = cursor["Region"]
                 app.logger.debug("Account: {account}, Batched Watcher: {watcher}, Fetching item: "
                                  "{item}/{region}".format(account=kwargs["account_name"],
                                                           watcher=self.index,
                                                           item=item_name,
                                                           region=kwargs["conn_dict"]["region"]))
 
-                item_details = invoke_get_method(cursor, name=item_name, **kwargs)
+                item_details = invoke_get_method(
+                    cursor, name=item_name, **kwargs)
                 if item_details:
                     # Determine which region to record the item into.
                     # Some tech, like IAM, is global and so we record it as 'universal' by setting an override_region
@@ -76,7 +80,8 @@ class CloudAuxBatchedWatcher(CloudAuxWatcher):
                     # region may be different.  Extract the actual region from item_details.
                     # Otherwise, just use the region where the boto connection was made.
                     record_region = self.override_region or \
-                                    item_details.get('Region') or kwargs['conn_dict']['region']
+                        item_details.get(
+                            'Region') or kwargs['conn_dict']['region']
                     item = CloudAuxChangeItem.from_item(
                         name=item_name,
                         item=item_details,

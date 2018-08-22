@@ -134,7 +134,6 @@ CONFIG_ONE = {
     }
 }
 
-
 CONFIG_TWO = {
     "id": 1296269,
     "owner": {
@@ -329,8 +328,10 @@ class GitHubRepoAuditorTestCase(SecurityMonkeyTestCase):
         db.session.commit()
 
         self.gh_items = [
-            GitHubOrgItem(account="octocat", name="Hello-World", arn="octocat/Hello-World", config=CONFIG_ONE),
-            GitHubOrgItem(account="octocat", name="Repo-Private", arn="octocat/Repo-Private", config=CONFIG_TWO),
+            GitHubOrgItem(account="octocat", name="Hello-World",
+                          arn="octocat/Hello-World", config=CONFIG_ONE),
+            GitHubOrgItem(account="octocat", name="Repo-Private",
+                          arn="octocat/Repo-Private", config=CONFIG_TWO),
         ]
 
     def test_public_repo_check(self):

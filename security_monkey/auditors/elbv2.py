@@ -64,21 +64,24 @@ class ELBv2Auditor(Auditor):
         scheme = alb.config.get('Scheme')
         if scheme == 'internet-facing':
             security_group_ids = set(alb.config.get('SecurityGroups', []))
-            sg_auditor_items = self.get_auditor_support_items(SecurityGroup.index, alb.account)
-            security_auditor_groups = [sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
+            sg_auditor_items = self.get_auditor_support_items(
+                SecurityGroup.index, alb.account)
+            security_auditor_groups = [
+                sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
 
             for sg in security_auditor_groups:
                 for issue in sg.db_item.issues:
                     if self._issue_matches_listeners(alb, issue):
                         self.link_to_support_item_issues(alb, sg.db_item,
-                            sub_issue_message=issue.issue, score=issue.score)
+                                                         sub_issue_message=issue.issue, score=issue.score)
 
     def check_logging(self, alb):
         attributes = alb.config.get('Attributes', [])
         for attribute in attributes:
             if attribute.get('Key') == 'access_logs.s3.enabled':
                 if attribute['Value'] == 'false':
-                    self.add_issue(1, Categories.RECOMMENDATION, alb, notes='Enable access logs')
+                    self.add_issue(1, Categories.RECOMMENDATION,
+                                   alb, notes='Enable access logs')
                 return
 
     def check_deletion_protection(self, alb):
@@ -86,7 +89,8 @@ class ELBv2Auditor(Auditor):
         for attribute in attributes:
             if attribute.get('Key') == 'deletion_protection.enabled':
                 if attribute['Value'] == 'false':
-                    self.add_issue(1, Categories.RECOMMENDATION, alb, notes='Enable deletion protection')
+                    self.add_issue(1, Categories.RECOMMENDATION,
+                                   alb, notes='Enable deletion protection')
                 return
 
     def check_ssl_policy(self, alb):
@@ -107,7 +111,7 @@ class ELBv2Auditor(Auditor):
             'ELBSecurityPolicy-TLS-1-0-2015-04'])
 
         for listener in alb.config.get('Listeners', []):
-            port = '['+str(listener.get('Port'))+']'
+            port = '[' + str(listener.get('Port')) + ']'
             ssl_policy = listener.get('SslPolicy')
             if not ssl_policy:
                 continue
@@ -120,5 +124,6 @@ class ELBv2Auditor(Auditor):
                 self.add_issue(5, Categories.INSECURE_TLS, alb, notes=notes)
 
             if ssl_policy not in supported_ssl_policies:
-                notes = Categories.INSECURE_TLS_NOTES.format(policy=ssl_policy, port=port, reason='Unknown reference policy')
+                notes = Categories.INSECURE_TLS_NOTES.format(
+                    policy=ssl_policy, port=port, reason='Unknown reference policy')
                 self.add_issue(10, Categories.INSECURE_TLS, alb, notes=notes)

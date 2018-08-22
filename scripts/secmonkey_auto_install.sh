@@ -25,7 +25,7 @@
 # Improved and Tidied by :: cbarrac
 # Date :: August 2015
 #
-# Version History :: 
+# Version History ::
 #
 #
 #       0.1 :: 2014/09/16        :: First version submitted to Netflix Develop Branch. Few issues.
@@ -39,14 +39,14 @@
 #       0.5.2 :: 2015/09/01      :: Update for v0.3.8. Add dart support. Some cleanup.
 #       0.5.3 :: 2015/10/13      :: Created error and echo_usage functions for simplification.
 #       0.5.4 :: 2015/11/20      :: Pinned dart to dart=1.12.2-1
-#       0.5.5 :: 2016/06/09      :: Removed dart pinning. Modified logging configuration. 
+#       0.5.5 :: 2016/06/09      :: Removed dart pinning. Modified logging configuration.
 #
-# To Do :: 
+# To Do ::
 #         Fix bug with password containing !
 #
 ########################################################################################################
- 
-set -e 
+
+set -e
 
 ### Declaring some variables
 
@@ -54,16 +54,16 @@ USAGE="Usage: ./$(basename $0) [-hv] [-d arg] [-e arg] [-i arg] [-n arg] [-p arg
 
 Ensure that the script is executable, for example, with permissions of 755 (rwxr_xr_x) using 'chmod 755 $(basename $0)'
 
-For example - 
+For example -
 
               ./$(basename $0) -d 10.11.1.11 -e cert_email@secmonkey.com -i 10.10.10.10 -n ec2-10-10-10-10.us-west-1.compute.amazonaws.com -p SuperSecretPasswordYo -r recipient@secmonkey.com -s sender@secmonkey.com -u postgres -w secmonkey.com
-    
-              ./$(basename $0) -h 
+
+              ./$(basename $0) -h
 
               ./$(basename $0) -v
-    
 
-CLI switches - 
+
+CLI switches -
               -d  >> Hostname or IP Address of the Postgres Database
               -e  >> Email Address used for SSL Cert for the Security Monkey Instance
               -i  >> IP Address (what you want the hostname resolve to) of the SecurityMonkey Instance
@@ -109,7 +109,7 @@ check_opt ()
 check_opt_one ()
 {
     if [ $ARGS -gt 2 ]
-    then 
+    then
         error "Please run with only one option! Help is printed with '-h'."
         echo_usage
     fi
@@ -187,7 +187,7 @@ fix_locales ()
 error ()
 {
     >&2 echo -e "\nError": $1
-    ($err_code++) && exit $(expr $err_code - 1) 
+    ($err_code++) && exit $(expr $err_code - 1)
 }
 
 ### Function to echo Usage Example
@@ -223,7 +223,7 @@ create_static_var ()
     else
         sudo mkdir -p $dir_sm
     fi
-    
+
     export SECURITY_MONKEY_SETTINGS="$file_deploy"		# SECURITY_MONKEY_SETTINGS variable should point to the config-deploy.py file
     exec "$@"
 
@@ -276,7 +276,7 @@ create_host ()
 install_post ()
 {
     echo -e "\nInstalling Postgres on the localhost so must NOT be using a RDS, let's hope so.....\n"
-    sudo apt-get install -y postgresql postgresql-contrib 
+    sudo apt-get install -y postgresql postgresql-contrib
 }
 
 install_pre ()
@@ -298,7 +298,7 @@ install_pre ()
 create_db ()
 {
     echo -e "Creating a .pgpass file in the home directory to remove the password prompt for the psql commands....\n"
-	
+
     echo "$db:5432:postgres:$user:$password" > $f_pgpass && chmod 0600 $f_pgpass # Postgres DB on RDS always listens on tcp 5432, I currently don't believe it's necessary to change the listening port to a variable from the cli & connecting to the 'postgres' db
 
     echo -e "We will now create a Postgres DB user as per your CLI options....\n"
@@ -582,7 +582,7 @@ clone_install ()
     cd $dir_sm && sudo python setup.py install
 
     create_config_file
-    
+
     sudo -E python $dir_sm/manage.py db upgrade 			# Need to keep local environment variables when sudo to python because we need to know where SECURITY_HOME_SETTINGS is. Hence, "-E".
     clear_hist
 }
@@ -725,8 +725,8 @@ EOF
     clear_hist
 }
 
-### Function to install Dart and build static website content 
-build_static () 
+### Function to install Dart and build static website content
+build_static ()
 {
     curl https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
     curl https://storage.googleapis.com/download.dartlang.org/linux/debian/dart_stable.list > dart_stable.list

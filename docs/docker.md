@@ -30,7 +30,7 @@ Quick Start:
 3. On a fresh database instance, various initial configuration must be run such as database setup, initial user creation (<admin@example.org> / admin), etc.
 You can make additional Docker configuration changes by modifying `docker-compose.init.yml`. Additionally, before you bring the containers up,
 you need to add an account for the scheduler to monitor. This can all be done one of two ways:
-    1. By modifying the `docker/api-init.sh` script to include the `monkey` commands. **PLEASE NOTE:** If you make changes to this file, 
+    1. By modifying the `docker/api-init.sh` script to include the `monkey` commands. **PLEASE NOTE:** If you make changes to this file,
        please run `docker-compose down && docker-compose build` to prevent errors and potential annoyances.
     1. By manually logging into the data container's shell to execute the commands.
 

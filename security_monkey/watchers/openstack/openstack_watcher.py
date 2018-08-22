@@ -44,13 +44,15 @@ class OpenStackWatcher(CloudAuxWatcher):
 
     def _get_account_regions(self):
         """ Regions are not global but account specific """
+
         def _get_regions(cloud_name, yaml_file):
-            return [ _region.get('name') for _region in  get_regions( cloud_name, yaml_file ) ]
+            return [_region.get('name') for _region in get_regions(cloud_name, yaml_file)]
 
         account_regions = {}
         for account in self.accounts:
             cloud_name, yaml_file = self._get_openstack_creds(account)
-            account_regions[(account, cloud_name, yaml_file)] = _get_regions(cloud_name, yaml_file)
+            account_regions[(account, cloud_name, yaml_file)
+                            ] = _get_regions(cloud_name, yaml_file)
         return account_regions
 
     def get_name_from_list_output(self, item):
@@ -86,7 +88,8 @@ class OpenStackWatcher(CloudAuxWatcher):
 
         @iter_account_region(account_regions=self._get_account_regions())
         def slurp_items(**kwargs):
-            kwargs, exception_map = self._add_exception_fields_to_kwargs(**kwargs)
+            kwargs, exception_map = self._add_exception_fields_to_kwargs(
+                **kwargs)
 
             """ cache some of the kwargs in case they get popped before they are needed """
             region = kwargs['region']
@@ -109,12 +112,14 @@ class OpenStackWatcher(CloudAuxWatcher):
                         region=region,
                         cloud_name=cloud_name,
                         item_type=self.item_type,
-                        item_id=item.id )
+                        item_id=item.id)
 
-                    item = OpenStackChangeItem(index=self.index, account=account_name, region=region, name=item_name, arn=arn,
-                                                      config=item_details)
+                    item = OpenStackChangeItem(index=self.index, account=account_name, region=region, name=item_name,
+                                               arn=arn,
+                                               config=item_details)
                     results.append(item)
             return results, exception_map
+
         return self._flatten_iter_response(slurp_items())
 
 

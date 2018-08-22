@@ -17,7 +17,7 @@ class UsernameService {
         //http://stackoverflow.com/questions/22151427/how-to-communicate-between-angular-dart-controllers
       Stream username_change_stream = scope.on('username-change');
       username_change_stream.listen(usernameChange);
-      
+
       Stream roles_change_stream = scope.on('roles-change');
       roles_change_stream.listen(rolesChange);
 
@@ -49,11 +49,11 @@ class UsernameService {
     }
 
     get signed_in => name.isNotEmpty;
-    
+
     bool isAdmin(){
       return hasRole("admin");
     }
-    
+
     bool hasRole(String name){
       for (Role role in roles){
         if (role.id == name){

@@ -15,7 +15,8 @@ import sqlalchemy as sa
 
 
 def upgrade():
-    op.create_index('ix_itemrevision_date_created', 'itemrevision', ['date_created'], unique=False)
+    op.create_index('ix_itemrevision_date_created',
+                    'itemrevision', ['date_created'], unique=False)
 
 
 def downgrade():

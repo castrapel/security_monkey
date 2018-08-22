@@ -133,7 +133,8 @@ class ChangeFinderTestCase(SecurityMonkeyTestCase):
         from security_monkey.task_scheduler.tasks import manual_run_change_finder, setup
         build_mock_result(watcher_configs, auditor_configs)
         setup()
-        manual_run_change_finder(['TEST_ACCOUNT1', 'TEST_ACCOUNT2'], ['index1', 'index2', 'index3'])
+        manual_run_change_finder(['TEST_ACCOUNT1', 'TEST_ACCOUNT2'], [
+            'index1', 'index2', 'index3'])
 
         watcher_keys = RUNTIME_WATCHERS.keys()
         self.assertEqual(first=3, second=len(watcher_keys),
@@ -183,7 +184,8 @@ class ChangeFinderTestCase(SecurityMonkeyTestCase):
         from security_monkey.task_scheduler.tasks import manual_run_change_finder, setup
         build_mock_result(watcher_configs, auditor_configs)
         setup()
-        manual_run_change_finder(['TEST_ACCOUNT1'], ['index1', 'index2', 'index3'])
+        manual_run_change_finder(
+            ['TEST_ACCOUNT1'], ['index1', 'index2', 'index3'])
 
         watcher_keys = RUNTIME_WATCHERS.keys()
         self.assertEqual(first=3, second=len(watcher_keys),

@@ -129,7 +129,8 @@ class RDSDBCluster(Watcher):
                     }
 
                     item = RDSClusterItem(
-                        region=region.name, account=account, name=name, arn=cluster.get('DBClusterArn'),
+                        region=region.name, account=account, name=name, arn=cluster.get(
+                            'DBClusterArn'),
                         config=item_config, source_watcher=self)
                     item_list.append(item)
 

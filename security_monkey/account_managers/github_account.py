@@ -31,7 +31,8 @@ class GitHubAccountManager(AccountManager):
     identifier_tool_tip = 'Enter the GitHub Organization Name'
     access_token_tool_tip = "Enter the path to the file that contains the GitHub personal access token."
     custom_field_configs = [
-        CustomFieldConfig('access_token_file', "Personal Access Token", True, access_token_tool_tip),
+        CustomFieldConfig('access_token_file',
+                          "Personal Access Token", True, access_token_tool_tip),
     ]
 
     def __init__(self):

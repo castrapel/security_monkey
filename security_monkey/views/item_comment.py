@@ -169,7 +169,8 @@ class ItemCommentPost(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('text', required=False, type=text_type, help='Must provide comment', location='json')
+        self.reqparse.add_argument(
+            'text', required=False, type=text_type, help='Must provide comment', location='json')
         args = self.reqparse.parse_args()
 
         ic = ItemComment()

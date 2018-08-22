@@ -65,19 +65,19 @@ def sub_dict(d):
 
 
 def check_rfc_1918(cidr):
-        """
-        EC2-Classic SG's should never use RFC-1918 CIDRs
-        """
-        if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('10.0.0.0/8'):
-            return True
+    """
+    EC2-Classic SG's should never use RFC-1918 CIDRs
+    """
+    if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('10.0.0.0/8'):
+        return True
 
-        if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('172.16.0.0/12'):
-            return True
+    if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('172.16.0.0/12'):
+        return True
 
-        if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('192.168.0.0/16'):
-            return True
+    if ipaddr.IPNetwork(cidr) in ipaddr.IPNetwork('192.168.0.0/16'):
+        return True
 
-        return False
+    return False
 
 
 def find_modules(folder):
@@ -98,11 +98,14 @@ def find_modules(folder):
             if os.path.splitext(fname)[-1] == '.py':
                 modname = os.path.splitext(fname)[0]
                 try:
-                    module=imp.load_source(modname, os.path.join(root,fname))
+                    module = imp.load_source(
+                        modname, os.path.join(root, fname))
                 except ImportError:
-                    app.logger.debug("Failed to load module %s from %s", modname, os.path.join(root,fname))
+                    app.logger.debug(
+                        "Failed to load module %s from %s", modname, os.path.join(root, fname))
                 else:
-                    app.logger.debug("Loaded module %s from %s", modname, os.path.join(root,fname))
+                    app.logger.debug("Loaded module %s from %s",
+                                     modname, os.path.join(root, fname))
 
 
 def load_plugins(group):
@@ -135,14 +138,16 @@ def send_email(subject=None, recipients=None, html=""):
                 mail.send(msg)
             app.logger.debug("Emailed {} - {} ".format(recipients, subject))
         except Exception as e:
-            m = "Failed to send failure message with subject: {}\n{} {}".format(subject, Exception, e)
+            m = "Failed to send failure message with subject: {}\n{} {}".format(
+                subject, Exception, e)
             app.logger.warn(m)
             app.logger.warn(traceback.format_exc())
 
     else:
         if recipients:
             try:
-                ses = boto3.client("ses", region_name=app.config.get('SES_REGION', AWS_DEFAULT_REGION))
+                ses = boto3.client("ses", region_name=app.config.get(
+                    'SES_REGION', AWS_DEFAULT_REGION))
                 ses.send_email(Source=app.config['MAIL_DEFAULT_SENDER'],
                                Destination={"ToAddresses": recipients},
                                Message={
@@ -152,9 +157,10 @@ def send_email(subject=None, recipients=None, html=""):
                                            "Data": html
                                        }
                                    }
-                               })
+                })
 
             except Exception as e:
-                m = "Failed to send failure message with subject: {}\n{} {}".format(subject, Exception, e)
+                m = "Failed to send failure message with subject: {}\n{} {}".format(
+                    subject, Exception, e)
                 app.logger.warn(m)
                 app.logger.warn(traceback.format_exc())

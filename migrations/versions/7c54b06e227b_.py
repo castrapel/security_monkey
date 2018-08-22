@@ -43,8 +43,10 @@ class Account(Base):
     third_party = Column(Boolean())
     name = Column(String(50), index=True, unique=True)
     notes = Column(String(256))
-    identifier = Column(String(256), unique=True)  # Unique id of the account, the number for AWS.
-    account_type_id = Column(Integer, ForeignKey("account_type.id"), nullable=False)
+    # Unique id of the account, the number for AWS.
+    identifier = Column(String(256), unique=True)
+    account_type_id = Column(Integer, ForeignKey(
+        "account_type.id"), nullable=False)
 
 
 class AccountTypeCustomValues(Base):
@@ -66,22 +68,28 @@ class ExceptionLogs(Base):
     __tablename__ = "exceptions"
     id = Column(BigInteger, primary_key=True)
     source = Column(String(256), nullable=False, index=True)
-    occurred = Column(DateTime, default=datetime.datetime.utcnow(), nullable=False)
-    ttl = Column(DateTime, default=(datetime.datetime.utcnow() + datetime.timedelta(days=10)), nullable=False)
+    occurred = Column(
+        DateTime, default=datetime.datetime.utcnow(), nullable=False)
+    ttl = Column(DateTime, default=(datetime.datetime.utcnow() +
+                                    datetime.timedelta(days=10)), nullable=False)
     type = Column(String(256), nullable=False, index=True)
     message = Column(String(512))
     stacktrace = Column(Text)
     region = Column(String(32), nullable=True, index=True)
 
-    tech_id = Column(Integer, ForeignKey("technology.id", ondelete="CASCADE"), index=True)
-    item_id = Column(Integer, ForeignKey("item.id", ondelete="CASCADE"), index=True)
-    account_id = Column(Integer, ForeignKey("account.id", ondelete="CASCADE"), index=True)
+    tech_id = Column(Integer, ForeignKey(
+        "technology.id", ondelete="CASCADE"), index=True)
+    item_id = Column(Integer, ForeignKey(
+        "item.id", ondelete="CASCADE"), index=True)
+    account_id = Column(Integer, ForeignKey(
+        "account.id", ondelete="CASCADE"), index=True)
 
 
 issue_item_association = Table(
     'issue_item_association',
     Base.metadata,
-    Column('super_issue_id', Integer, ForeignKey('itemaudit.id'), primary_key=True),
+    Column('super_issue_id', Integer, ForeignKey(
+        'itemaudit.id'), primary_key=True),
     Column('sub_item_id', Integer, ForeignKey('item.id'), primary_key=True)
 )
 
@@ -102,12 +110,17 @@ class ItemAudit(Base):
     class_uuid = Column(String(32), nullable=True)
     fixed = Column(Boolean, default=False, nullable=False)
     justified = Column(Boolean)
-    justified_user_id = Column(Integer, ForeignKey("user.id"), nullable=True, index=True)
+    justified_user_id = Column(Integer, ForeignKey(
+        "user.id"), nullable=True, index=True)
     justification = Column(String(512))
-    justified_date = Column(DateTime(), default=datetime.datetime.utcnow, nullable=True)
-    item_id = Column(Integer, ForeignKey("item.id"), nullable=False, index=True)
-    auditor_setting_id = Column(Integer, ForeignKey("auditorsettings.id"), nullable=True, index=True)
-    sub_items = relationship("Item", secondary=issue_item_association, backref="super_issues")
+    justified_date = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=True)
+    item_id = Column(Integer, ForeignKey("item.id"),
+                     nullable=False, index=True)
+    auditor_setting_id = Column(Integer, ForeignKey(
+        "auditorsettings.id"), nullable=True, index=True)
+    sub_items = relationship(
+        "Item", secondary=issue_item_association, backref="super_issues")
 
 
 class Item(Base):
@@ -121,16 +134,23 @@ class Item(Base):
     arn = Column(Text(), nullable=True, index=True, unique=True)
     latest_revision_complete_hash = Column(String(32), index=True)
     latest_revision_durable_hash = Column(String(32), index=True)
-    tech_id = Column(Integer, ForeignKey("technology.id"), nullable=False, index=True)
-    account_id = Column(Integer, ForeignKey("account.id"), nullable=False, index=True)
+    tech_id = Column(Integer, ForeignKey("technology.id"),
+                     nullable=False, index=True)
+    account_id = Column(Integer, ForeignKey(
+        "account.id"), nullable=False, index=True)
     latest_revision_id = Column(Integer, nullable=True)
-    comments = relationship("ItemComment", backref="revision", cascade="all, delete, delete-orphan")
-    revisions = relationship("ItemRevision", backref="item", cascade="all, delete, delete-orphan")
-    issues = relationship("ItemAudit", backref="item", cascade="all, delete, delete-orphan")
-    cloudtrail_entries = relationship("CloudTrailEntry", backref="item", cascade="all, delete, delete-orphan")
+    comments = relationship("ItemComment", backref="revision",
+                            cascade="all, delete, delete-orphan")
+    revisions = relationship(
+        "ItemRevision", backref="item", cascade="all, delete, delete-orphan")
+    issues = relationship("ItemAudit", backref="item",
+                          cascade="all, delete, delete-orphan")
+    cloudtrail_entries = relationship(
+        "CloudTrailEntry", backref="item", cascade="all, delete, delete-orphan")
     issues = relationship("ItemAudit", backref="item", cascade="all, delete, delete-orphan",
                           foreign_keys="ItemAudit.item_id")
-    exceptions = relationship("ExceptionLogs", backref="item", cascade="all, delete, delete-orphan")
+    exceptions = relationship(
+        "ExceptionLogs", backref="item", cascade="all, delete, delete-orphan")
 
 
 class ItemComment(Base):
@@ -139,9 +159,12 @@ class ItemComment(Base):
     """
     __tablename__ = "itemcomment"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
-    item_id = Column(Integer, ForeignKey('item.id'), nullable=False, index=True)
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'),
+                     nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey('item.id'),
+                     nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False)
     text = Column(Unicode(1024))
 
 
@@ -151,9 +174,12 @@ class ItemRevisionComment(Base):
     """
     __tablename__ = "itemrevisioncomment"
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
-    revision_id = Column(Integer, ForeignKey('itemrevision.id'), nullable=False, index=True)
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'),
+                     nullable=False, index=True)
+    revision_id = Column(Integer, ForeignKey(
+        'itemrevision.id'), nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False)
     text = Column(Unicode(1024))
 
 
@@ -165,11 +191,15 @@ class ItemRevision(Base):
     id = Column(Integer, primary_key=True)
     active = Column(Boolean())
     config = deferred(Column(JSON))
-    date_created = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
+    date_created = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
     date_last_ephemeral_change = Column(DateTime(), nullable=True, index=True)
-    item_id = Column(Integer, ForeignKey("item.id"), nullable=False, index=True)
-    comments = relationship("ItemRevisionComment", backref="revision", cascade="all, delete, delete-orphan")
-    cloudtrail_entries = relationship("CloudTrailEntry", backref="revision", cascade="all, delete, delete-orphan")
+    item_id = Column(Integer, ForeignKey("item.id"),
+                     nullable=False, index=True)
+    comments = relationship(
+        "ItemRevisionComment", backref="revision", cascade="all, delete, delete-orphan")
+    cloudtrail_entries = relationship(
+        "CloudTrailEntry", backref="revision", cascade="all, delete, delete-orphan")
 
 
 class CloudTrailEntry(Base):
@@ -183,7 +213,8 @@ class CloudTrailEntry(Base):
     request_id = Column(String(36), index=True)
     event_source = Column(String(64), nullable=False)
     event_name = Column(String(64), nullable=False)
-    event_time = Column(DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
+    event_time = Column(
+        DateTime(), default=datetime.datetime.utcnow, nullable=False, index=True)
     request_parameters = deferred(Column(JSON))
     responseElements = deferred(Column(JSON))
     source_ip = Column(String(45))
@@ -191,8 +222,10 @@ class CloudTrailEntry(Base):
     full_entry = deferred(Column(JSON))
     user_identity = deferred(Column(JSON))
     user_identity_arn = Column(String(300), index=True)
-    revision_id = Column(Integer, ForeignKey('itemrevision.id'), nullable=False, index=True)
-    item_id = Column(Integer, ForeignKey('item.id'), nullable=False, index=True)
+    revision_id = Column(Integer, ForeignKey(
+        'itemrevision.id'), nullable=False, index=True)
+    item_id = Column(Integer, ForeignKey('item.id'),
+                     nullable=False, index=True)
 
 
 class Technology(Base):
@@ -201,7 +234,8 @@ class Technology(Base):
     """
     __tablename__ = 'technology'
     id = Column(Integer, primary_key=True)
-    name = Column(String(32), index=True, unique=True)  # elb, s3, iamuser, iamgroup, etc.
+    # elb, s3, iamuser, iamgroup, etc.
+    name = Column(String(32), index=True, unique=True)
 
 
 def upgrade():
@@ -230,7 +264,8 @@ def upgrade():
                 o.tech_id = i.tech_id) > 1);"""))
 
     for r in result:
-        index = "{region}-{name}-{tech_id}-{account_id}".format(region=r[1], name=r[2], tech_id=r[3], account_id=r[4])
+        index = "{region}-{name}-{tech_id}-{account_id}".format(
+            region=r[1], name=r[2], tech_id=r[3], account_id=r[4])
         if not items_reference.get(index):
             items_reference[index] = r
         else:
@@ -247,7 +282,8 @@ def upgrade():
         print("[!] Duplicate items found... Deleting them...")
         for duplicate in items_to_delete:
             # Get the SQLAlchemy Item to delete (simplifies cascades and things):
-            db_item = session.query(Item).filter(Item.id == duplicate[0]).scalar()
+            db_item = session.query(Item).filter(
+                Item.id == duplicate[0]).scalar()
             session.delete(db_item)
             # session.execute(delete(Item, Item.id == duplicate[0]))
             print("[-] Marked duplicate item for deletion: {}".format(duplicate[2]))

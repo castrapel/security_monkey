@@ -29,6 +29,7 @@ class AccountGetPutDelete(AuthenticatedService):
         rbac.allow(["View"], ["GET"]),
         rbac.allow(["Admin"], ["PUT", "DELETE"])
     ]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         super(AccountGetPutDelete, self).__init__()
@@ -84,9 +85,9 @@ class AccountGetPutDelete(AuthenticatedService):
         custom_fields_marshaled = []
         for field in result.custom_fields:
             field_marshaled = {
-                                  'name': field.name,
-                                  'value': field.value,
-                              }
+                'name': field.name,
+                'value': field.value,
+            }
             custom_fields_marshaled.append(field_marshaled)
         account_marshaled['custom_fields'] = custom_fields_marshaled
 
@@ -265,7 +266,7 @@ class AccountPostList(AuthenticatedService):
         from security_monkey.account_manager import account_registry
         account_manager = account_registry.get(account_type)()
         account = account_manager.create(account_type, name, active, third_party,
-                    notes, identifier, custom_fields=custom_fields)
+                                         notes, identifier, custom_fields=custom_fields)
 
         marshaled_account = marshal(account.__dict__, ACCOUNT_FIELDS)
         marshaled_account['auth'] = self.auth_dict
@@ -319,12 +320,18 @@ class AccountPostList(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('order_by', type=str, default=None, location='args')
-        self.reqparse.add_argument('order_dir', type=str, default='desc', location='args')
-        self.reqparse.add_argument('active', type=str, default=None, location='args')
-        self.reqparse.add_argument('third_party', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'order_by', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'order_dir', type=str, default='desc', location='args')
+        self.reqparse.add_argument(
+            'active', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'third_party', type=str, default=None, location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
@@ -346,12 +353,14 @@ class AccountPostList(AuthenticatedService):
         if order_by and hasattr(Account, order_by):
             if order_dir.lower() == 'asc':
                 if order_by == 'account_type':
-                    query = query.join(Account.account_type).order_by(getattr(AccountType, 'name').asc())
+                    query = query.join(Account.account_type).order_by(
+                        getattr(AccountType, 'name').asc())
                 else:
                     query = query.order_by(getattr(Account, order_by).asc())
             else:
                 if order_by == 'account_type':
-                    query = query.join(Account.account_type).order_by(getattr(AccountType, 'name').desc())
+                    query = query.join(Account.account_type).order_by(
+                        getattr(AccountType, 'name').desc())
                 else:
                     query = query.order_by(getattr(Account, order_by).desc())
         else:

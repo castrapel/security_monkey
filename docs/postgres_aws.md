@@ -14,7 +14,7 @@ Click `Create Security Group`:
 
 ![Create new security group](images/new_security_group.png)
 
-Create a new security group named `securitymonkey-rds`, and add an ingress rule on TCP 5432 to permit the `securitymonkey` 
+Create a new security group named `securitymonkey-rds`, and add an ingress rule on TCP 5432 to permit the `securitymonkey`
 (or whatever you named the security group that Security Monkey is launched with) security group access.
 
 ![Sg details](images/rds_sg.png)
@@ -25,7 +25,7 @@ Launch Postgres RDS Instance
 
 ![Create RDS Instance](images/aws_rds.png "Create RDS Instance")
 
-The AWS supplied defaults should get you going. 
+The AWS supplied defaults should get you going.
 Make sure that you launch the RDS instance with the `securitymonkey-rds` security group that we created above.
 
 You will need to use the hostname, dbname, username, password to create a `SQLALCHEMY_DATABASE_URI` for your config.

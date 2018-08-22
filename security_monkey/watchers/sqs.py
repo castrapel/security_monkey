@@ -51,7 +51,8 @@ class SQS(CloudAuxBatchedWatcher):
 
     def get_name_from_list_output(self, item):
         # SQS returns URLs. Need to deconstruct the URL to pull out the name :/
-        app.logger.debug("[ ] Processing SQS Queue with URL: {}".format(item["Url"]))
+        app.logger.debug(
+            "[ ] Processing SQS Queue with URL: {}".format(item["Url"]))
 
         name = item["Url"].split("{}/".format(self.account_identifiers[0]))[1]
 
@@ -73,10 +74,12 @@ class SQS(CloudAuxBatchedWatcher):
 
         for item_count in range(0, len(queues)):
             if self.corresponding_items.get(queues[item_count]):
-                app.logger.error("[?] Received a duplicate item in the SQS list: {}. Skipping it.".format(queues[item_count]))
+                app.logger.error("[?] Received a duplicate item in the SQS list: {}. Skipping it.".format(
+                    queues[item_count]))
                 continue
             queue_count += 1
-            items.append({"Url": queues[item_count], "Region": kwargs["region"]})
+            items.append({"Url": queues[item_count],
+                          "Region": kwargs["region"]})
             self.corresponding_items[queues[item_count]] = queue_count + offset
 
         return items
@@ -87,11 +90,13 @@ class SQS(CloudAuxBatchedWatcher):
 
             # Update the current position in the total list by replacing the SQS queue URL with
             # the ARN of the queue
-            self.total_list[self.corresponding_items[item["Url"]]] = {"Arn": queue["Arn"]}
+            self.total_list[self.corresponding_items[item["Url"]]] = {
+                "Arn": queue["Arn"]}
         except ClientError as ce:
             # In case the queue was created and then deleted really quickly:
             if "NonExistentQueue" in ce.response["Error"]["Code"]:
-                app.logger.debug("Queue with URL: {} - was listed, but is no longer present".format(item["Url"]))
+                app.logger.debug(
+                    "Queue with URL: {} - was listed, but is no longer present".format(item["Url"]))
                 return
             else:
                 raise ce

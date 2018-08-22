@@ -58,32 +58,41 @@ class GitHubOrg(Watcher):
         @record_exception(source="{index}-watcher".format(index=self.index))
         def fetch_org_details(**kwargs):
             item_list = []
-            account = Account.query.filter(Account.name == kwargs["account_name"]).first()
+            account = Account.query.filter(
+                Account.name == kwargs["account_name"]).first()
 
             # Fetch the initial GitHub organization details:
-            app.logger.debug("Fetching initial org details for: {}".format(account.identifier))
-            org_details = strip_url_fields(self.get_org_details(account.identifier))
+            app.logger.debug(
+                "Fetching initial org details for: {}".format(account.identifier))
+            org_details = strip_url_fields(
+                self.get_org_details(account.identifier))
 
             # Now, fetch details about the users within the organization:
-            app.logger.debug("Fetching members for: {}".format(account.identifier))
+            app.logger.debug(
+                "Fetching members for: {}".format(account.identifier))
             members = self.list_org_members(account.identifier)
             org_details["members"] = sorted(members)
 
-            app.logger.debug("Fetching owners for: {}".format(account.identifier))
+            app.logger.debug(
+                "Fetching owners for: {}".format(account.identifier))
             owners = self.list_org_members(account.identifier, role="admin")
             org_details["owners"] = sorted(owners)
 
-            app.logger.debug("Fetching members without 2FA for: {}".format(account.identifier))
-            no_twofa = self.list_org_members(account.identifier, twofa="2fa_disabled")
+            app.logger.debug(
+                "Fetching members without 2FA for: {}".format(account.identifier))
+            no_twofa = self.list_org_members(
+                account.identifier, twofa="2fa_disabled")
             org_details["no_2fa_members"] = sorted(no_twofa)
 
             # Fetch outside collabs:
-            app.logger.debug("Fetching all outside collaborators for: {}".format(account.identifier))
+            app.logger.debug(
+                "Fetching all outside collaborators for: {}".format(account.identifier))
             outside_collabs = self.list_org_outside_collabs(account.identifier)
             org_details["outside_collaborators"] = sorted(outside_collabs)
 
             # Fetch teams:
-            app.logger.debug("Fetching all teams for: {}".format(account.identifier))
+            app.logger.debug(
+                "Fetching all teams for: {}".format(account.identifier))
             teams = self.list_org_teams(account.identifier)
             org_details["teams"] = sorted(teams)
 
@@ -101,7 +110,8 @@ class GitHubOrg(Watcher):
         def slurp_items(**kwargs):
             # Are we skipping this org?
             if self.check_ignore_list(kwargs["account_name"]):
-                app.logger.debug("Skipping ignored account: {}".format(kwargs["account_name"]))
+                app.logger.debug("Skipping ignored account: {}".format(
+                    kwargs["account_name"]))
                 return [], kwargs["exception_map"]
 
             # Exception handling complexities...
@@ -148,7 +158,8 @@ class GitHubOrg(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubError(org, result.status_code)
+                raise InvalidResponseCodeFromGitHubError(
+                    org, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -178,7 +189,8 @@ class GitHubOrg(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubError(org, result.status_code)
+                raise InvalidResponseCodeFromGitHubError(
+                    org, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -208,7 +220,8 @@ class GitHubOrg(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubError(org, result.status_code)
+                raise InvalidResponseCodeFromGitHubError(
+                    org, result.status_code)
 
             if not result.links.get("last"):
                 done = True

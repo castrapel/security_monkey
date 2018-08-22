@@ -58,12 +58,12 @@ class Route53(Watcher):
 
         config = {
             'zonename': zone.get('Name'),
-            'zoneid':   zone.get('Id'),
+            'zoneid': zone.get('Id'),
             'zoneprivate': zone.get('Config', {}).get('PrivateZone', 'Unknown'),
-            'name':     record_name,
-            'type':     record.get('Type'),
-            'records':  records,
-            'ttl':      record.get('TTL'),
+            'name': record_name,
+            'type': record.get('Type'),
+            'records': records,
+            'ttl': record.get('TTL'),
         }
 
         return Route53Record(account=kwargs['account_name'], name=record_name, config=dict(config), source_watcher=self)
@@ -78,7 +78,8 @@ class Route53(Watcher):
 
         @iter_account_region(index=self.index, accounts=self.accounts, exception_record_region='universal')
         def slurp_items(**kwargs):
-            app.logger.debug("Checking {}/{}".format(self.index, kwargs['account_name']))
+            app.logger.debug(
+                "Checking {}/{}".format(self.index, kwargs['account_name']))
             item_list = []
 
             zones = self.list_hosted_zones(**kwargs)
@@ -91,16 +92,18 @@ class Route53(Watcher):
                 account=kwargs['account_name']))
 
             for zone in zones:
-                record_sets = self.list_resource_record_sets(Id=zone['Id'], **kwargs)
+                record_sets = self.list_resource_record_sets(
+                    Id=zone['Id'], **kwargs)
                 if not record_sets:
                     continue
 
                 app.logger.debug("Slurped %s %s within %s %s (%s) from %s" %
-                    (len(record_sets), self.i_have_plural, self.i_am_singular, zone['Name'], zone['Id'],
-                     kwargs['account_name']))
+                                 (len(record_sets), self.i_have_plural, self.i_am_singular, zone['Name'], zone['Id'],
+                                  kwargs['account_name']))
 
                 for record in record_sets:
-                    item = self.process_item(name=record['Name'], record=record, zone=zone, **kwargs)
+                    item = self.process_item(
+                        name=record['Name'], record=record, zone=zone, **kwargs)
                     item_list.append(item)
 
             return item_list, kwargs['exception_map']

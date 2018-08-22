@@ -34,7 +34,7 @@ class OpenStackPort(OpenStackWatcher):
         self.item_type = 'port'
         self.service = 'network'
         self.generator = 'ports'
-        self.ephemeral_paths = [ "updated_at" ]
+        self.ephemeral_paths = ["updated_at"]
 
     def get_name_from_list_output(self, item):
         return "{} ({})".format(item.mac_address, item.id)

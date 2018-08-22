@@ -46,8 +46,10 @@ class IAMPolicyAuditor(Auditor):
             for statement in policy.statements:
                 if statement.effect == "Allow":
                     if '*' in statement.actions:
-                        resources = json.dumps(sorted(list(statement.resources)))
-                        notes = notes.format(actions='["*"]', resource=resources)
+                        resources = json.dumps(
+                            sorted(list(statement.resources)))
+                        notes = notes.format(
+                            actions='["*"]', resource=resources)
                         self.add_issue(10, issue, item, notes=notes)
 
     def check_iam_star_privileges(self, item):
@@ -62,8 +64,10 @@ class IAMPolicyAuditor(Auditor):
                 if statement.effect == 'Allow':
                     actions = {action.lower() for action in statement.actions}
                     if 'iam:*' in actions:
-                        resources = json.dumps(sorted(list(statement.resources)))
-                        notes = notes.format(actions='["iam:*"]', resource=resources)
+                        resources = json.dumps(
+                            sorted(list(statement.resources)))
+                        notes = notes.format(
+                            actions='["iam:*"]', resource=resources)
                         self.add_issue(10, issue, item, notes=notes)
 
     def check_permissions(self, item):
@@ -136,8 +140,10 @@ class IAMPolicyAuditor(Auditor):
 
                 if statement.effect == 'Allow':
                     if 'iam:passrole' in statement.actions_expanded:
-                        resources = json.dumps(sorted(list(statement.resources)))
-                        notes = notes.format(actions='["iam:passrole"]', resource=resources)
+                        resources = json.dumps(
+                            sorted(list(statement.resources)))
+                        notes = notes.format(
+                            actions='["iam:passrole"]', resource=resources)
                         self.add_issue(10, issue, item, notes=notes)
 
     def check_notaction(self, item):
@@ -179,7 +185,8 @@ class IAMPolicyAuditor(Auditor):
         issue = Categories.SENSITIVE_PERMISSIONS
         notes = Categories.SENSITIVE_PERMISSIONS_NOTES_1
 
-        permissions = {"ec2:authorizesecuritygroupegress", "ec2:authorizesecuritygroupingress"}
+        permissions = {"ec2:authorizesecuritygroupegress",
+                       "ec2:authorizesecuritygroupingress"}
 
         for policy in self.load_iam_policies(item):
             for statement in policy.statements:
@@ -188,19 +195,24 @@ class IAMPolicyAuditor(Auditor):
                     continue
 
                 if statement.effect == 'Allow':
-                    permissions = statement.actions_expanded.intersection(permissions)
+                    permissions = statement.actions_expanded.intersection(
+                        permissions)
                     if permissions:
                         actions = json.dumps(sorted(list(permissions)))
-                        resources = json.dumps(sorted(list(statement.resources)))
-                        note = notes.format(actions=actions, resource=resources)
+                        resources = json.dumps(
+                            sorted(list(statement.resources)))
+                        note = notes.format(
+                            actions=actions, resource=resources)
                         self.add_issue(7, issue, item, notes=note)
 
     def library_check_attached_managed_policies(self, iam_item, iam_type):
         """
         alert when an IAM item (group, user or role) is attached to a managed policy with issues
         """
-        mp_items = self.get_auditor_support_items(ManagedPolicy.index, iam_item.account)
-        managed_policies = iam_item.config.get('managed_policies', iam_item.config.get('ManagedPolicies'))
+        mp_items = self.get_auditor_support_items(
+            ManagedPolicy.index, iam_item.account)
+        managed_policies = iam_item.config.get(
+            'managed_policies', iam_item.config.get('ManagedPolicies'))
         for item_mp in managed_policies or []:
             found = False
             item_mp_arn = item_mp.get('arn', item_mp.get('Arn'))
@@ -210,8 +222,10 @@ class IAMPolicyAuditor(Auditor):
                     found = True
                     for issue in mp_item.db_item.issues:
                         if not issue.justified:
-                            self.link_to_support_item_issues(iam_item, mp_item.db_item, None, "Found issue(s) in attached Managed Policy")
+                            self.link_to_support_item_issues(
+                                iam_item, mp_item.db_item, None, "Found issue(s) in attached Managed Policy")
                             break
 
             if not found:
-                app.logger.error("IAM Managed Policy defined but not found for {}-{}".format(iam_item.index, iam_item.name))
+                app.logger.error(
+                    "IAM Managed Policy defined but not found for {}-{}".format(iam_item.index, iam_item.name))

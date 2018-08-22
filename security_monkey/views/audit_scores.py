@@ -93,7 +93,8 @@ class AuditScoresGet(AuthenticatedService):
         page = args.pop('page', None)
         count = args.pop('count', None)
 
-        result = ItemAuditScore.query.order_by(ItemAuditScore.technology).paginate(page, count, error_out=False)
+        result = ItemAuditScore.query.order_by(
+            ItemAuditScore.technology).paginate(page, count, error_out=False)
 
         items = []
         for entry in result.items:
@@ -166,7 +167,8 @@ class AuditScoresGet(AuthenticatedService):
             score = 0
         disabled = args['disabled']
 
-        query = ItemAuditScore.query.filter(ItemAuditScore.technology == technology)
+        query = ItemAuditScore.query.filter(
+            ItemAuditScore.technology == technology)
         query = query.filter(ItemAuditScore.method == method)
         auditscore = query.first()
 
@@ -245,8 +247,10 @@ class AuditScoreGetPutDelete(AuthenticatedService):
 
         account_pattern_scores_marshaled = []
         for account_pattern_score in result.account_pattern_scores:
-            account_pattern_score_marshaled = marshal(account_pattern_score, ACCOUNT_PATTERN_AUDIT_SCORE_FIELDS)
-            account_pattern_scores_marshaled.append(account_pattern_score_marshaled)
+            account_pattern_score_marshaled = marshal(
+                account_pattern_score, ACCOUNT_PATTERN_AUDIT_SCORE_FIELDS)
+            account_pattern_scores_marshaled.append(
+                account_pattern_score_marshaled)
         auditscore_marshaled['account_pattern_scores'] = account_pattern_scores_marshaled
 
         return auditscore_marshaled, 200

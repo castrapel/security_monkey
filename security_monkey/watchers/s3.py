@@ -30,6 +30,7 @@ class S3(CloudAuxWatcher):
         bucket = get_bucket(item_name, **kwargs)
 
         if bucket and bucket.get("Error"):
-            raise SecurityMonkeyException("S3 Bucket: {} fetching error: {}".format(item_name, bucket["Error"]))
+            raise SecurityMonkeyException(
+                "S3 Bucket: {} fetching error: {}".format(item_name, bucket["Error"]))
 
         return bucket

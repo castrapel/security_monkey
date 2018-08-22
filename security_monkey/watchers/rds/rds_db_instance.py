@@ -134,12 +134,14 @@ class RDSDBInstance(Watcher):
 
                     item = RDSDBInstanceItem(region=kwargs['region'],
                                              account=kwargs['account_name'],
-                                             name=name, arn=config['arn'], config=dict(config),
-                                             source_watcher=self)
+                                             name=name, arn=config['arn'], config=dict(
+                        config),
+                        source_watcher=self)
 
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

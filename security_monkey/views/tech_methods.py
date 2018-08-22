@@ -75,7 +75,8 @@ class TechMethodsGet(AuthenticatedService):
             for auditor_class in auditor_registry[key]:
                 auditor = auditor_class('')
                 for method_name in dir(auditor):
-                    method_name = method_name + ' (' + auditor.__class__.__name__ + ')'
+                    method_name = method_name + \
+                        ' (' + auditor.__class__.__name__ + ')'
                     if (method_name.find("check_")) == 0:
                         methods.append(method_name)
 

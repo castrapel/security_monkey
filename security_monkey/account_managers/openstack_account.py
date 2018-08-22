@@ -32,8 +32,9 @@ class OpenStackAccountManager(AccountManager):
     identifier_tool_tip = 'OpenStack Cloud Name. Cloud configuration to load from clouds.yaml file'
 
     cloudsyaml_tool_tip = ('Path on disk to clouds.yaml file')
-    custom_field_configs = [        
-        CustomFieldConfig('cloudsyaml_file', 'OpenStack clouds.yaml file', True, cloudsyaml_tool_tip)
+    custom_field_configs = [
+        CustomFieldConfig(
+            'cloudsyaml_file', 'OpenStack clouds.yaml file', True, cloudsyaml_tool_tip)
     ]
 
     def __init__(self):

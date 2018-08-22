@@ -194,20 +194,34 @@ class ItemList(AuthenticatedService):
             :statuscode 401: Authenciation Error. Please Login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('regions', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounts', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounttypes', type=str, default=None, location='args')
-        self.reqparse.add_argument('active', type=str, default=None, location='args')
-        self.reqparse.add_argument('names', type=str, default=None, location='args')
-        self.reqparse.add_argument('arns', type=str, default=None, location='args')
-        self.reqparse.add_argument('technologies', type=str, default=None, location='args')
-        self.reqparse.add_argument('searchconfig', type=str, default=None, location='args')
-        self.reqparse.add_argument('ids', type=int, default=None, location='args')
-        self.reqparse.add_argument('summary', type=bool, default=False, location='args')
-        self.reqparse.add_argument('min_score', type=int, default=False, location='args')
-        self.reqparse.add_argument('min_unjustified_score', type=int, default=False, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'regions', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounts', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounttypes', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'active', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'names', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'arns', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'technologies', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'searchconfig', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'ids', type=int, default=None, location='args')
+        self.reqparse.add_argument(
+            'summary', type=bool, default=False, location='args')
+        self.reqparse.add_argument(
+            'min_score', type=int, default=False, location='args')
+        self.reqparse.add_argument(
+            'min_unjustified_score', type=int, default=False, location='args')
         args = self.reqparse.parse_args()
 
         page = args.pop('page', None)
@@ -218,7 +232,8 @@ class ItemList(AuthenticatedService):
 
         # Read more about filtering:
         # https://docs.sqlalchemy.org/en/latest/orm/query.html
-        query = Item.query.join((ItemRevision, Item.latest_revision_id == ItemRevision.id))
+        query = Item.query.join(
+            (ItemRevision, Item.latest_revision_id == ItemRevision.id))
         join_accounts = False
         if 'regions' in args:
             regions = args['regions'].split(',')
@@ -230,7 +245,8 @@ class ItemList(AuthenticatedService):
         if 'accounttypes' in args:
             accounttypes = args['accounttypes'].split(',')
             join_accounts = True
-            query = query.join((AccountType, AccountType.id == Account.account_type_id))
+            query = query.join(
+                (AccountType, AccountType.id == Account.account_type_id))
             query = query.filter(AccountType.name.in_(accounttypes))
         if 'technologies' in args:
             technologies = args['technologies'].split(',')
@@ -252,13 +268,15 @@ class ItemList(AuthenticatedService):
             query = query.filter(Account.active == True)
         if 'searchconfig' in args:
             searchconfig = args['searchconfig']
-            query = query.filter(cast(ItemRevision.config, String).ilike('%{}%'.format(searchconfig)))
+            query = query.filter(cast(ItemRevision.config, String).ilike(
+                '%{}%'.format(searchconfig)))
         if 'min_score' in args:
             min_score = args['min_score']
             query = query.filter(Item.score >= min_score)
         if 'min_unjustified_score' in args:
             min_unjustified_score = args['min_unjustified_score']
-            query = query.filter(Item.unjustified_score >= min_unjustified_score)
+            query = query.filter(Item.unjustified_score >=
+                                 min_unjustified_score)
 
         if join_accounts:
             query = query.join((Account, Account.id == Item.account_id))
@@ -292,8 +310,8 @@ class ItemList(AuthenticatedService):
                                           'issue_score': item.score,
                                           'unjustified_issue_score': item.unjustified_score,
                                           'active': active,
-                                          #'last_rev': item.revisions[0].config,
-                                      }.items())
+                                          # 'last_rev': item.revisions[0].config,
+                }.items())
             else:
                 first_seen_query = ItemRevision.query.filter(
                     ItemRevision.item_id == item.id
@@ -313,7 +331,7 @@ class ItemList(AuthenticatedService):
                                           'first_seen': first_seen,
                                           'last_seen': last_seen
                                           # 'last_rev': item.revisions[0].config,
-                                      }.items())
+                }.items())
 
             marshaled_items.append(item_marshaled)
 

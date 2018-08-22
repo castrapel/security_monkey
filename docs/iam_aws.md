@@ -209,7 +209,7 @@ You will need to create this role in all AWS accounts that you want to monitor.
                     "sns:listtopics",
                     "sqs:getqueueattributes",
                     "sqs:listqueues",
-                    "sqs:listqueuetags", 
+                    "sqs:listqueuetags",
                     "sqs:listdeadlettersourcequeues"
                 ],
                 "Effect": "Allow",
@@ -223,7 +223,7 @@ You will need to create this role in all AWS accounts that you want to monitor.
 
 Allow `SecurityMonkeyInstanceProfile` to "Assume" to the `SecurityMonkey` Role.
 -------------------------------------------------------------------
-For Security Monkey to make use of the `SecurityMonkey` IAM role, it needs to have the ability to 
+For Security Monkey to make use of the `SecurityMonkey` IAM role, it needs to have the ability to
 `Assume` into it. The `SecurityMonkeyInstanceProfile` has `sts:AssumeRole` permissions for all AWS account
 roles named `SecurityMonkey`, however, the destination IAM roles also need to permit the source role access to it.
 This is specified in a role's `AssumeRolePolicyDocument`. You must alter this to permit the Security Monkey instance the ability

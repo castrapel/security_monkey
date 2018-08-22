@@ -72,18 +72,22 @@ class WhitelistListPost(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
         count = args.pop('count', None)
 
-        result = NetworkWhitelistEntry.query.order_by(NetworkWhitelistEntry.id).paginate(page, count, error_out=False)
+        result = NetworkWhitelistEntry.query.order_by(
+            NetworkWhitelistEntry.id).paginate(page, count, error_out=False)
 
         items = []
         for entry in result.items:
-            whitelistentry_marshaled = marshal(entry.__dict__, WHITELIST_FIELDS)
+            whitelistentry_marshaled = marshal(
+                entry.__dict__, WHITELIST_FIELDS)
             items.append(whitelistentry_marshaled)
 
         marshaled_dict = {
@@ -135,9 +139,12 @@ class WhitelistListPost(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('name', required=True, type=text_type, help='Must provide account name', location='json')
-        self.reqparse.add_argument('cidr', required=True, type=text_type, help='Network CIDR required.', location='json')
-        self.reqparse.add_argument('notes', required=False, type=text_type, help='Add context.', location='json')
+        self.reqparse.add_argument(
+            'name', required=True, type=text_type, help='Must provide account name', location='json')
+        self.reqparse.add_argument(
+            'cidr', required=True, type=text_type, help='Network CIDR required.', location='json')
+        self.reqparse.add_argument(
+            'notes', required=False, type=text_type, help='Add context.', location='json')
         args = self.reqparse.parse_args()
 
         name = args['name']
@@ -154,7 +161,8 @@ class WhitelistListPost(AuthenticatedService):
         db.session.commit()
         db.session.refresh(whitelist_entry)
 
-        whitelistentry_marshaled = marshal(whitelist_entry.__dict__, WHITELIST_FIELDS)
+        whitelistentry_marshaled = marshal(
+            whitelist_entry.__dict__, WHITELIST_FIELDS)
         whitelistentry_marshaled['auth'] = self.auth_dict
         return whitelistentry_marshaled, 201
 
@@ -206,7 +214,8 @@ class WhitelistGetPutDelete(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        result = NetworkWhitelistEntry.query.filter(NetworkWhitelistEntry.id == item_id).first()
+        result = NetworkWhitelistEntry.query.filter(
+            NetworkWhitelistEntry.id == item_id).first()
 
         if not result:
             return {"status": "Whitelist entry with the given ID not found."}, 404
@@ -261,16 +270,20 @@ class WhitelistGetPutDelete(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('name', required=True, type=text_type, help='Must provide account name', location='json')
-        self.reqparse.add_argument('cidr', required=True, type=text_type, help='Network CIDR required.', location='json')
-        self.reqparse.add_argument('notes', required=False, type=text_type, help='Add context.', location='json')
+        self.reqparse.add_argument(
+            'name', required=True, type=text_type, help='Must provide account name', location='json')
+        self.reqparse.add_argument(
+            'cidr', required=True, type=text_type, help='Network CIDR required.', location='json')
+        self.reqparse.add_argument(
+            'notes', required=False, type=text_type, help='Add context.', location='json')
         args = self.reqparse.parse_args()
 
         name = args['name']
         cidr = args.get('cidr', True)
         notes = args.get('notes', None)
 
-        result = NetworkWhitelistEntry.query.filter(NetworkWhitelistEntry.id == item_id).first()
+        result = NetworkWhitelistEntry.query.filter(
+            NetworkWhitelistEntry.id == item_id).first()
 
         if not result:
             return {"status": "Whitelist entry with the given ID not found."}, 404
@@ -317,7 +330,8 @@ class WhitelistGetPutDelete(AuthenticatedService):
             :statuscode 202: accepted
             :statuscode 401: Authentication Error. Please Login.
         """
-        NetworkWhitelistEntry.query.filter(NetworkWhitelistEntry.id == item_id).delete()
+        NetworkWhitelistEntry.query.filter(
+            NetworkWhitelistEntry.id == item_id).delete()
         db.session.commit()
 
         return {'status': 'deleted'}, 202

@@ -23,53 +23,53 @@ from security_monkey.tests import SecurityMonkeyTestCase
 
 ALLOWED_LIST_WITH_PORTRANGE = [
     {
-     "IPProtocol": "tcp",
-     "ports": [
-      "0-65535"
-     ]
+        "IPProtocol": "tcp",
+        "ports": [
+            "0-65535"
+        ]
     },
     {
-     "IPProtocol": "udp",
-     "ports": [
-      "0-65535"
-     ]
+        "IPProtocol": "udp",
+        "ports": [
+            "0-65535"
+        ]
     },
     {
-     "IPProtocol": "icmp"
+        "IPProtocol": "icmp"
     }
-   ]
+]
 
 ALLOWED_LIST_NO_PORTRANGE = [
     {
-     "IPProtocol": "tcp",
-     "ports": [
-      "80"
-     ]
+        "IPProtocol": "tcp",
+        "ports": [
+            "80"
+        ]
     },
     {
-     "IPProtocol": "icmp"
+        "IPProtocol": "icmp"
     }
-   ]
+]
 
 SOURCERANGES_PRESENT = [
     '0.0.0.0/0',
     '192.168.1.0/24'
-    ]
+]
 
 SOURCERANGES_ABSENT = [
     '10.0.0.0/0',
     '192.168.1.0/24'
-    ]
+]
 
 TARGETTAGS_PRESENT = [
     'http-server',
     'https-server'
-    ]
+]
 
 TARGETTAGS_ABSENT = [
     'http-server',
     'https-server'
-    ]
+]
 
 
 class FirewallTestCase(SecurityMonkeyTestCase):
@@ -95,7 +95,7 @@ class FirewallTestCase(SecurityMonkeyTestCase):
     def test__source_ranges_open(self):
         from security_monkey.auditors.gcp.gce.firewall import GCEFirewallRuleAuditor
         auditor = GCEFirewallRuleAuditor(accounts=['unittest'])
-        
+
         actual = auditor._source_ranges_open(SOURCERANGES_PRESENT)
         self.assertTrue(isinstance(actual, list))
 

@@ -18,6 +18,7 @@ from flask_security.utils import login_user
 try:
     from onelogin.saml2.auth import OneLogin_Saml2_Auth
     from onelogin.saml2.utils import OneLogin_Saml2_Utils
+
     onelogin_import_success = True
 except ImportError:
     onelogin_import_success = False
@@ -45,6 +46,7 @@ class Ping(Resource):
     this example we use a OpenIDConnect authentication flow, that is essentially OAuth2 underneath.
     """
     decorators = [rbac.allow(["anonymous"], ["GET", "POST"])]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         super(Ping, self).__init__()
@@ -62,7 +64,8 @@ class Ping(Resource):
             return_to=current_app.config.get('WEB_PATH')
         )
         self.reqparse.add_argument('code', type=str, required=True)
-        self.reqparse.add_argument('state', type=str, required=False, default=default_state)
+        self.reqparse.add_argument(
+            'state', type=str, required=False, default=default_state)
 
         args = self.reqparse.parse_args()
         client_id = args['state'].split(',')[1]
@@ -86,7 +89,8 @@ class Ping(Resource):
         user_api_url = current_app.config.get('PING_USER_API_URL')
 
         # the secret and cliendId will be given to you when you signup for the provider
-        basic = base64.b64encode(bytes('{0}:{1}'.format(client_id, current_app.config.get("PING_SECRET"))))
+        basic = base64.b64encode(bytes('{0}:{1}'.format(
+            client_id, current_app.config.get("PING_SECRET"))))
         headers = {'Authorization': 'Basic {0}'.format(basic.decode('utf-8'))}
 
         # exchange authorization code for access token.
@@ -110,7 +114,8 @@ class Ping(Resource):
 
         # validate your token based on the key it was signed with
         try:
-            jwt.decode(id_token, secret.decode('utf-8'), algorithms=[algo], audience=client_id)
+            jwt.decode(id_token, secret.decode('utf-8'),
+                       algorithms=[algo], audience=client_id)
         except jwt.DecodeError:
             return dict(message='Token is invalid'), 403
         except jwt.ExpiredSignatureError:
@@ -130,7 +135,8 @@ class Ping(Resource):
             current_app.config.get('PING_DEFAULT_ROLE', 'View'))
 
         # Tell Flask-Principal the identity changed
-        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+        identity_changed.send(
+            current_app._get_current_object(), identity=Identity(user.id))
         login_user(user)
         db.session.commit()
         db.session.refresh(user)
@@ -144,6 +150,7 @@ class AzureAD(Resource):
     this example we use a OpenIDConnect authentication flow, that is essentially OAuth2 underneath.
     """
     decorators = [rbac.allow(["anonymous"], ["GET", "POST"])]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         super(AzureAD, self).__init__()
@@ -167,7 +174,8 @@ class AzureAD(Resource):
         # validate your token based on the key it was signed with
         try:
             (secret, algo) = self.get_idp_cert(id_token, jwks_url)
-            token = jwt.decode(id_token, secret.decode('utf-8'), algorithms=[algo], audience=client_id)
+            token = jwt.decode(id_token, secret.decode(
+                'utf-8'), algorithms=[algo], audience=client_id)
             if 'upn' in token:
                 return token['upn']
             elif 'email' in token:
@@ -192,7 +200,8 @@ class AzureAD(Resource):
         )
         self.reqparse.add_argument('code', type=str, required=True)
         self.reqparse.add_argument('id_token', type=str, required=True)
-        self.reqparse.add_argument('state', type=str, required=False, default=default_state)
+        self.reqparse.add_argument(
+            'state', type=str, required=False, default=default_state)
 
         args = self.reqparse.parse_args()
         client_id = args['state'].split(',')[1]
@@ -209,10 +218,12 @@ class AzureAD(Resource):
         # Validate id_token and extract username (email)
         username = self.validate_id_token(id_token, client_id, jwks_url)
 
-        user = setup_user(username, '', current_app.config.get('AAD_DEFAULT_ROLE', 'View'))
+        user = setup_user(username, '', current_app.config.get(
+            'AAD_DEFAULT_ROLE', 'View'))
 
         # Tell Flask-Principal the identity changed
-        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+        identity_changed.send(
+            current_app._get_current_object(), identity=Identity(user.id))
         login_user(user)
         db.session.commit()
         db.session.refresh(user)
@@ -222,6 +233,7 @@ class AzureAD(Resource):
 
 class Google(Resource):
     decorators = [rbac.allow(["anonymous"], ["GET", "POST"])]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         super(Google, self).__init__()
@@ -239,7 +251,8 @@ class Google(Resource):
             return_to=current_app.config.get('WEB_PATH')
         )
         self.reqparse.add_argument('code', type=str, required=True)
-        self.reqparse.add_argument('state', type=str, required=False, default=default_state)
+        self.reqparse.add_argument(
+            'state', type=str, required=False, default=default_state)
 
         args = self.reqparse.parse_args()
         client_id = args['state'].split(',')[1]
@@ -272,7 +285,8 @@ class Google(Resource):
         # Step 1bis. Validate (some information of) the id token (if necessary)
         google_hosted_domain = current_app.config.get("GOOGLE_HOSTED_DOMAIN")
         if google_hosted_domain is not None:
-            current_app.logger.debug('We need to verify that the token was issued for this hosted domain: %s ' % (google_hosted_domain))
+            current_app.logger.debug(
+                'We need to verify that the token was issued for this hosted domain: %s ' % (google_hosted_domain))
 
             # Get the JSON Web Token
             id_token = token['id_token']
@@ -280,12 +294,15 @@ class Google(Resource):
 
             # Extract the payload
             (header_data, payload_data) = fetch_token_header_payload(id_token)
-            current_app.logger.debug('id_token.header_data: %s' % (header_data))
-            current_app.logger.debug('id_token.payload_data: %s' % (payload_data))
+            current_app.logger.debug(
+                'id_token.header_data: %s' % (header_data))
+            current_app.logger.debug(
+                'id_token.payload_data: %s' % (payload_data))
 
             token_hd = payload_data.get('hd')
             if token_hd != google_hosted_domain:
-                current_app.logger.debug('Verification failed: %s != %s' % (token_hd, google_hosted_domain))
+                current_app.logger.debug('Verification failed: %s != %s' % (
+                    token_hd, google_hosted_domain))
                 return dict(message='Token is invalid %s' % token), 403
             current_app.logger.debug('Verification passed')
 
@@ -299,10 +316,12 @@ class Google(Resource):
         if 'email' not in profile:
             raise UnableToAccessGoogleEmail()
 
-        user = setup_user(profile.get('email'), profile.get('groups', []), current_app.config.get('GOOGLE_DEFAULT_ROLE', 'View'))
+        user = setup_user(profile.get('email'), profile.get(
+            'groups', []), current_app.config.get('GOOGLE_DEFAULT_ROLE', 'View'))
 
         # Tell Flask-Principal the identity changed
-        identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+        identity_changed.send(
+            current_app._get_current_object(), identity=Identity(user.id))
         login_user(user)
         db.session.commit()
         db.session.refresh(user)
@@ -312,6 +331,7 @@ class Google(Resource):
 
 class OneLogin(Resource):
     decorators = [rbac.allow(["anonymous"], ["GET", "POST"])]
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.req = OneLogin.prepare_from_flask_request(request)
@@ -327,7 +347,7 @@ class OneLogin(Resource):
             'get_data': req.args.copy(),
             'post_data': req.form.copy(),
             'https': ("on" if current_app.config.get("ONELOGIN_HTTPS") else "off")
-    }
+        }
 
     def get(self):
         return self.post()
@@ -343,7 +363,8 @@ class OneLogin(Resource):
                 return False
         else:
             last_error_reason = auth.get_last_error_reason()
-            current_app.logger.error('Error processing %s. Error reason: %s' % (', '.join(errors), last_error_reason))
+            current_app.logger.error('Error processing %s. Error reason: %s' % (
+                ', '.join(errors), last_error_reason))
 
             if current_app.config.get('ONELOGIN_LOG_SAML_RESPONSE'):
                 auth_response = auth.get_last_response_xml()
@@ -354,9 +375,11 @@ class OneLogin(Resource):
     def post(self):
         if "onelogin" not in current_app.config.get("ACTIVE_PROVIDERS"):
             return "Onelogin is not enabled in the config.  See the ACTIVE_PROVIDERS section.", 404
-        auth = OneLogin_Saml2_Auth(self.req, current_app.config.get("ONELOGIN_SETTINGS"))
+        auth = OneLogin_Saml2_Auth(
+            self.req, current_app.config.get("ONELOGIN_SETTINGS"))
 
-        self.reqparse.add_argument('return_to', required=False, default=current_app.config.get('WEB_PATH'))
+        self.reqparse.add_argument(
+            'return_to', required=False, default=current_app.config.get('WEB_PATH'))
         self.reqparse.add_argument('acs', required=False)
         self.reqparse.add_argument('sls', required=False)
 
@@ -367,7 +390,8 @@ class OneLogin(Resource):
         if args['acs'] != None:
             # valids the SAML response and checks if successfully authenticated
             if self._consumer(auth):
-                email = auth.get_attribute(current_app.config.get("ONELOGIN_EMAIL_FIELD"))[0]
+                email = auth.get_attribute(
+                    current_app.config.get("ONELOGIN_EMAIL_FIELD"))[0]
                 user = User.query.filter(User.email == email).first()
 
                 # if we get an sso user create them an account
@@ -383,7 +407,8 @@ class OneLogin(Resource):
                     db.session.refresh(user)
 
                 # Tell Flask-Principal the identity changed
-                identity_changed.send(current_app._get_current_object(), identity=Identity(user.id))
+                identity_changed.send(
+                    current_app._get_current_object(), identity=Identity(user.id))
                 login_user(user)
                 db.session.commit()
                 db.session.refresh(user)
@@ -403,6 +428,7 @@ class OneLogin(Resource):
 
 class Providers(Resource):
     decorators = [rbac.allow(["anonymous"], ["GET"])]
+
     def __init__(self):
         super(Providers, self).__init__()
 
@@ -428,17 +454,17 @@ class Providers(Resource):
                     'type': '2.0'
                 })
             elif provider == "aad":
-                    active_providers.append({
-                        'name': current_app.config.get("AAD_NAME"),
-                        'url': current_app.config.get('AAD_REDIRECT_URI'),
-                        'redirectUri': current_app.config.get("AAD_REDIRECT_URI"),
-                        'clientId': current_app.config.get("AAD_CLIENT_ID"),
-                        'nonce': nonce,
-                        'responseType': 'id_token+code',
-                        'response_mode': 'form_post',
-                        'scope': ['email'],
-                        'authorizationEndpoint': current_app.config.get("AAD_AUTH_ENDPOINT"),
-                    })
+                active_providers.append({
+                    'name': current_app.config.get("AAD_NAME"),
+                    'url': current_app.config.get('AAD_REDIRECT_URI'),
+                    'redirectUri': current_app.config.get("AAD_REDIRECT_URI"),
+                    'clientId': current_app.config.get("AAD_CLIENT_ID"),
+                    'nonce': nonce,
+                    'responseType': 'id_token+code',
+                    'response_mode': 'form_post',
+                    'scope': ['email'],
+                    'authorizationEndpoint': current_app.config.get("AAD_AUTH_ENDPOINT"),
+                })
             elif provider == "google":
                 google_provider = {
                     'name': 'google',
@@ -449,7 +475,8 @@ class Providers(Resource):
                     'scope': ['openid email'],
                     'responseType': 'code'
                 }
-                google_hosted_domain = current_app.config.get("GOOGLE_HOSTED_DOMAIN")
+                google_hosted_domain = current_app.config.get(
+                    "GOOGLE_HOSTED_DOMAIN")
                 if google_hosted_domain is not None:
                     google_provider['hd'] = google_hosted_domain
                 active_providers.append(google_provider)
@@ -459,9 +486,11 @@ class Providers(Resource):
                     'authorizationEndpoint': api.url_for(OneLogin)
                 })
             else:
-                raise Exception("Unknown authentication provider: {0}".format(provider))
+                raise Exception(
+                    "Unknown authentication provider: {0}".format(provider))
 
         return active_providers
+
 
 api.add_resource(AzureAD, '/auth/aad', endpoint='aad')
 api.add_resource(Ping, '/auth/ping', endpoint='ping')

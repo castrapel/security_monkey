@@ -28,6 +28,7 @@ from security_monkey.datastore import AccountTypeCustomValues
 from security_monkey.decorators import record_exception
 from security_monkey import AWS_DEFAULT_REGION
 
+
 def get_canonical_ids(accounts, override=False):
     """
     Given a list of AWS Account IDs, reach out to AWS to fetch the Canonical IDs
@@ -46,14 +47,17 @@ def get_canonical_ids(accounts, override=False):
             .filter(AccountTypeCustomValues.name == "canonical_id",
                     AccountTypeCustomValues.account_id == account.id).first()
         if not override and current_canonical:
-            app.logger.info("[/] Account {} already has a canonical ID associated... Skipping...".format(account.name))
+            app.logger.info(
+                "[/] Account {} already has a canonical ID associated... Skipping...".format(account.name))
             continue
 
         @iter_account_region("s3", accounts=[account.identifier], regions=[AWS_DEFAULT_REGION],
-                             assume_role=account.getCustom("role_name") or "SecurityMonkey",
+                             assume_role=account.getCustom(
+                                 "role_name") or "SecurityMonkey",
                              session_name="SecurityMonkey", conn_type="dict")
         def loop_over_accounts(**kwargs):
-            app.logger.info("[-->] Fetching canonical ID for account: {}".format(account.name))
+            app.logger.info(
+                "[-->] Fetching canonical ID for account: {}".format(account.name))
 
             return fetch_id(index="s3", exception_record_region=AWS_DEFAULT_REGION, account_name=account.name,
                             exception_map={}, **kwargs)
@@ -61,7 +65,8 @@ def get_canonical_ids(accounts, override=False):
         result = loop_over_accounts()
 
         if not result:
-            app.logger.error("[x] Did not receive a proper response back. Check the exception log for details.")
+            app.logger.error(
+                "[x] Did not receive a proper response back. Check the exception log for details.")
             continue
 
         # Fetch out the owner:
@@ -69,7 +74,8 @@ def get_canonical_ids(accounts, override=False):
                                                                                    account.name))
 
         if not current_canonical:
-            current_canonical = AccountTypeCustomValues(account_id=account.id, name="canonical_id")
+            current_canonical = AccountTypeCustomValues(
+                account_id=account.id, name="canonical_id")
 
         current_canonical.value = result[0]["Owner"]["ID"]
 

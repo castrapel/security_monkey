@@ -66,8 +66,10 @@ class GitHubRepo(Watcher):
 
         @record_exception(source="{index}-list-watcher".format(index=self.index))
         def fetch_repo_list(**kwargs):
-            account = Account.query.filter(Account.name == kwargs["account_name"]).first()
-            app.logger.debug("Fetching repo list for org: {}".format(account.identifier))
+            account = Account.query.filter(
+                Account.name == kwargs["account_name"]).first()
+            app.logger.debug(
+                "Fetching repo list for org: {}".format(account.identifier))
 
             repos = self.list_org_repos(account.identifier)
             return repos, kwargs["exception_map"]
@@ -76,7 +78,8 @@ class GitHubRepo(Watcher):
         def list_all_repos(**kwargs):
             # Are we skipping this org?
             if self.check_ignore_list(kwargs["account_name"]):
-                app.logger.debug("Skipping ignored account: {}".format(kwargs["account_name"]))
+                app.logger.debug("Skipping ignored account: {}".format(
+                    kwargs["account_name"]))
                 return [], kwargs["exception_map"]
 
             # Exception handling complexities...
@@ -91,7 +94,8 @@ class GitHubRepo(Watcher):
         return self.total_list, exc
 
     def slurp(self):
-        app.logger.debug("Now processing batch #{}".format(self.batch_counter + 1))
+        app.logger.debug("Now processing batch #{}".format(
+            self.batch_counter + 1))
         exception_map = {}
         account_dict = {}
         for account in self.accounts:
@@ -100,23 +104,35 @@ class GitHubRepo(Watcher):
 
         @record_exception(source="{index}-fetcher".format(index=self.index))
         def fetch_additional_repo_details(**kwargs):
-            app.logger.debug("Fetching deploy keys for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["deploy_keys"] = self.list_repo_deploy_keys(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching deploy keys for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["deploy_keys"] = self.list_repo_deploy_keys(
+                kwargs["org"], kwargs["repo"]["name"])
 
-            app.logger.debug("Fetching outside collaborators for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["outside_collaborators"] = self.list_repo_outside_collaborators(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching outside collaborators for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["outside_collaborators"] = self.list_repo_outside_collaborators(
+                kwargs["org"], kwargs["repo"]["name"])
 
-            app.logger.debug("Fetching protected branches for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["protected_branches"] = self.list_repo_protected_branches(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching protected branches for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["protected_branches"] = self.list_repo_protected_branches(
+                kwargs["org"], kwargs["repo"]["name"])
 
-            app.logger.debug("Fetching releases for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["releases"] = self.list_repo_releases(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching releases for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["releases"] = self.list_repo_releases(
+                kwargs["org"], kwargs["repo"]["name"])
 
-            app.logger.debug("Fetching webhooks for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["webhooks"] = self.list_repo_webhooks(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching webhooks for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["webhooks"] = self.list_repo_webhooks(
+                kwargs["org"], kwargs["repo"]["name"])
 
-            app.logger.debug("Fetching team permissions for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
-            kwargs["repo"]["team_permissions"] = self.list_repo_team_permissions(kwargs["org"], kwargs["repo"]["name"])
+            app.logger.debug(
+                "Fetching team permissions for repo: {}/{}".format(kwargs["org"], kwargs["repo"]["name"]))
+            kwargs["repo"]["team_permissions"] = self.list_repo_team_permissions(
+                kwargs["org"], kwargs["repo"]["name"])
 
             return True
 
@@ -129,7 +145,8 @@ class GitHubRepo(Watcher):
                 cursor = self.total_list[item_counter]
                 org_name = cursor["owner"]["login"]
 
-                app.logger.debug("Fetching details for repo: {}/{}".format(org_name, cursor["name"]))
+                app.logger.debug(
+                    "Fetching details for repo: {}/{}".format(org_name, cursor["name"]))
                 additional_details = fetch_additional_repo_details(index=self.index,
                                                                    account_name=account_dict[org_name],
                                                                    name=cursor["name"],
@@ -154,7 +171,8 @@ class GitHubRepo(Watcher):
 
             return item_list, kwargs["exception_map"]
 
-        result = fetch_each_repo_details(index=self.index, exception_map=exception_map)
+        result = fetch_each_repo_details(
+            index=self.index, exception_map=exception_map)
         if not result:
             return [], exception_map
 
@@ -178,7 +196,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubError(org, result.status_code)
+                raise InvalidResponseCodeFromGitHubError(
+                    org, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -209,7 +228,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -242,7 +262,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -251,7 +272,6 @@ class GitHubRepo(Watcher):
 
             result_json = result.json()
             for b in result_json:
-
                 # I don't care so much about the commit itself.
                 del b["commit"]
                 branches.append(b)
@@ -278,7 +298,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -309,7 +330,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -354,7 +376,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True
@@ -385,7 +408,8 @@ class GitHubRepo(Watcher):
             result = requests.get(url, headers=headers, params=params)
 
             if result.status_code != 200:
-                raise InvalidResponseCodeFromGitHubRepoError(org, repo, result.status_code)
+                raise InvalidResponseCodeFromGitHubRepoError(
+                    org, repo, result.status_code)
 
             if not result.links.get("last"):
                 done = True

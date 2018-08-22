@@ -111,11 +111,13 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         # Set up the monitor:
         batched_monitor = Monitor(IAMRole, test_account)
         batched_monitor.watcher = watcher
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [batched_monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            batched_monitor]
 
         # Moto screws up the IAM Role ARN -- so we need to fix it:
         original_slurp_list = watcher.slurp_list
@@ -125,7 +127,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
             items, exception_map = original_slurp_list()
 
             for item in watcher.total_list:
-                item["Arn"] = ARN_PREFIX + ":iam::012345678910:role/{}".format(item["RoleName"])
+                item["Arn"] = ARN_PREFIX + \
+                    ":iam::012345678910:role/{}".format(item["RoleName"])
 
             return items, exception_map
 
@@ -133,7 +136,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
             batched_items, exception_map = original_slurp()
 
             for item in batched_items:
-                item.arn = ARN_PREFIX + ":iam::012345678910:role/{}".format(item.name)
+                item.arn = ARN_PREFIX + \
+                    ":iam::012345678910:role/{}".format(item.name)
                 item.config["Arn"] = item.arn
                 item.config["RoleId"] = item.name  # Need this to stay the same
 
@@ -211,9 +215,11 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         from security_monkey.auditors.iam.iam_role import IAMRoleAuditor
 
         # Set up the monitor:
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
         batched_monitor = Monitor(IAMRole, test_account)
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
 
         technology = Technology(name="iamrole")
         db.session.add(technology)
@@ -227,7 +233,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         items = []
         for x in range(0, 3):
             role_policy = dict(ROLE_CONF)
-            role_policy["Arn"] = ARN_PREFIX + ":iam::012345678910:role/roleNumber{}".format(x)
+            role_policy["Arn"] = ARN_PREFIX + \
+                ":iam::012345678910:role/roleNumber{}".format(x)
             role_policy["RoleName"] = "roleNumber{}".format(x)
             role = CloudAuxChangeItem.from_item(name=role_policy['RoleName'], item=role_policy,
                                                 record_region='universal', account_name=test_account.name,
@@ -267,7 +274,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
 
         for x in range(0, last):
             # Create the IAM Role via Moto:
-            aspd["Statement"][0]["Resource"] = ARN_PREFIX + ":iam:012345678910:role/roleNumber{}".format(x)
+            aspd["Statement"][0]["Resource"] = ARN_PREFIX + \
+                ":iam:012345678910:role/roleNumber{}".format(x)
             client.create_role(Path="/", RoleName="roleNumber{}".format(x),
                                AssumeRolePolicyDocument=json.dumps(aspd, indent=4))
             client.put_role_policy(RoleName="roleNumber{}".format(x), PolicyName="testpolicy",
@@ -281,7 +289,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         from security_monkey.watchers.iam.iam_role import IAMRole
         from security_monkey.auditors.iam.iam_role import IAMRoleAuditor
 
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
 
         watcher = IAMRole(accounts=[test_account.name])
 
@@ -292,7 +301,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         # Set up the monitor:
         batched_monitor = Monitor(IAMRole, test_account)
         batched_monitor.watcher = watcher
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
 
         # Set up the Reporter:
         import security_monkey.reporter
@@ -301,7 +311,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [batched_monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            batched_monitor]
 
         # Moto screws up the IAM Role ARN -- so we need to fix it:
         original_slurp_list = watcher.slurp_list
@@ -311,7 +322,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
             items, exception_map = original_slurp_list()
 
             for item in watcher.total_list:
-                item["Arn"] = ARN_PREFIX + ":iam::012345678910:role/{}".format(item["RoleName"])
+                item["Arn"] = ARN_PREFIX + \
+                    ":iam::012345678910:role/{}".format(item["RoleName"])
 
             return items, exception_map
 
@@ -319,7 +331,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
             batched_items, exception_map = original_slurp()
 
             for item in batched_items:
-                item.arn = ARN_PREFIX + ":iam::012345678910:role/{}".format(item.name)
+                item.arn = ARN_PREFIX + \
+                    ":iam::012345678910:role/{}".format(item.name)
                 item.config["Arn"] = item.arn
                 item.config["RoleId"] = item.name  # Need this to stay the same
 
@@ -355,7 +368,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
 
     def test_get_sm_celery_config_value(self):
         import security_monkey.celeryconfig
-        setattr(security_monkey.celeryconfig, "test_value", {"some", "set", "of", "things"})
+        setattr(security_monkey.celeryconfig, "test_value",
+                {"some", "set", "of", "things"})
         # We should get the proper thing back out:
         from security_monkey.task_scheduler.util import get_sm_celery_config_value, get_celery_config_file
         c = get_celery_config_file()
@@ -389,13 +403,15 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         assert hasattr(get_celery_config_file(), "broker_url")
 
     def test_fix_orphaned_deletions(self):
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
         technology = Technology(name="orphaned")
 
         db.session.add(technology)
         db.session.commit()
 
-        orphaned_item = Item(name="orphaned", region="us-east-1", tech_id=technology.id, account_id=test_account.id)
+        orphaned_item = Item(name="orphaned", region="us-east-1",
+                             tech_id=technology.id, account_id=test_account.id)
         db.session.add(orphaned_item)
         db.session.commit()
 
@@ -429,19 +445,23 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         # Stop the watcher registry from stepping on everyone's toes:
         import security_monkey.watcher
         import security_monkey.monitors
-        security_monkey.watcher.watcher_registry = {IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
+        security_monkey.watcher.watcher_registry = {
+            IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
         security_monkey.monitors.watcher_registry = security_monkey.watcher.watcher_registry
 
         # Set up the monitor:
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
         watcher = IAMRole(accounts=[test_account.name])
         batched_monitor = Monitor(IAMRole, test_account)
         batched_monitor.watcher = watcher
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [batched_monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            batched_monitor]
 
         setup_the_tasks(mock.Mock())
 
@@ -503,8 +523,10 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         db.session.commit()
 
         # Disable the other accounts:
-        disable_account_1 = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
-        disable_account_2 = Account.query.filter(Account.name == "TEST_ACCOUNT2").one()
+        disable_account_1 = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
+        disable_account_2 = Account.query.filter(
+            Account.name == "TEST_ACCOUNT2").one()
         disable_account_1.active = False
         disable_account_2.active = False
         db.session.add(disable_account_1)
@@ -518,12 +540,14 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         monitor.auditors = [GitHubOrgAuditor(accounts=[test_account.name])]
 
         # This is externally executed (as in not with Celery):
-        db.session.add(WatcherConfig(index=GitHubOrg.index, active=True, interval=0))
+        db.session.add(WatcherConfig(
+            index=GitHubOrg.index, active=True, interval=0))
         db.session.commit()
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            monitor]
 
         get_interval = mock.Mock()
         monitor.watcher.get_interval = get_interval
@@ -538,7 +562,7 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         assert not mock_account_tech.apply_async.called
 
         # The ".s" are the scheduled tasks. Too lazy to grab the intervals out.
-        assert not mock_account_tech.s.called   # Will not be called
+        assert not mock_account_tech.s.called  # Will not be called
         assert mock_expired_exceptions.s.called
         assert mock_expired_exceptions.apply_async.called
 
@@ -558,7 +582,7 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
     @patch("security_monkey.task_scheduler.beat.clear_expired_exceptions")
     @patch("security_monkey.task_scheduler.beat.store_exception")
     def test_celery_only_tech(self, mock_store_exception, mock_expired_exceptions, mock_account_tech, mock_purge,
-                         mock_setup):
+                              mock_setup):
         import security_monkey.celeryconfig
         security_monkey.celeryconfig.security_monkey_only_watch = {"iamrole"}
 
@@ -571,23 +595,28 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         # Stop the watcher registry from stepping on everyone's toes:
         import security_monkey.watcher
         import security_monkey.monitors
-        security_monkey.watcher.watcher_registry = {IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
+        security_monkey.watcher.watcher_registry = {
+            IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
         security_monkey.monitors.watcher_registry = security_monkey.watcher.watcher_registry
 
         # Set up the monitors:
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
         role_watcher = IAMRole(accounts=[test_account.name])
         mp_watcher = ManagedPolicy(accounts=[test_account.name])
         batched_monitor = Monitor(IAMRole, test_account)
         batched_monitor.watcher = role_watcher
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
         normal_monitor = Monitor(ManagedPolicy, test_account)
         normal_monitor.watcher = mp_watcher
-        normal_monitor.auditors = [IAMPolicyAuditor(accounts=[test_account.name])]
+        normal_monitor.auditors = [
+            IAMPolicyAuditor(accounts=[test_account.name])]
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [batched_monitor, normal_monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            batched_monitor, normal_monitor]
 
         setup_the_tasks(mock.Mock())
 
@@ -620,7 +649,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
     def test_celery_ignore_tech(self, mock_store_exception, mock_expired_exceptions, mock_account_tech, mock_purge,
                                 mock_setup):
         import security_monkey.celeryconfig
-        security_monkey.celeryconfig.security_monkey_watcher_ignore = {"policy"}
+        security_monkey.celeryconfig.security_monkey_watcher_ignore = {
+            "policy"}
 
         from security_monkey.task_scheduler.beat import setup_the_tasks
         from security_monkey.watchers.iam.iam_role import IAMRole
@@ -631,23 +661,28 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         # Stop the watcher registry from stepping on everyone's toes:
         import security_monkey.watcher
         import security_monkey.monitors
-        security_monkey.watcher.watcher_registry = {IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
+        security_monkey.watcher.watcher_registry = {
+            IAMRole.index: IAMRole, ManagedPolicy.index: ManagedPolicy}
         security_monkey.monitors.watcher_registry = security_monkey.watcher.watcher_registry
 
         # Set up the monitors:
-        test_account = Account.query.filter(Account.name == "TEST_ACCOUNT1").one()
+        test_account = Account.query.filter(
+            Account.name == "TEST_ACCOUNT1").one()
         role_watcher = IAMRole(accounts=[test_account.name])
         mp_watcher = ManagedPolicy(accounts=[test_account.name])
         batched_monitor = Monitor(IAMRole, test_account)
         batched_monitor.watcher = role_watcher
-        batched_monitor.auditors = [IAMRoleAuditor(accounts=[test_account.name])]
+        batched_monitor.auditors = [
+            IAMRoleAuditor(accounts=[test_account.name])]
         normal_monitor = Monitor(ManagedPolicy, test_account)
         normal_monitor.watcher = mp_watcher
-        normal_monitor.auditors = [IAMPolicyAuditor(accounts=[test_account.name])]
+        normal_monitor.auditors = [
+            IAMPolicyAuditor(accounts=[test_account.name])]
 
         import security_monkey.task_scheduler.tasks
         old_get_monitors = security_monkey.task_scheduler.tasks.get_monitors
-        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [batched_monitor, normal_monitor]
+        security_monkey.task_scheduler.tasks.get_monitors = lambda x, y, z: [
+            batched_monitor, normal_monitor]
 
         setup_the_tasks(mock.Mock())
 
@@ -688,7 +723,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         technology_name = "iamrole"
 
         task_audit(account_name, technology_name)  # noqa
-        mock_audit_changes.assert_called_with([account_name], [technology_name], True)
+        mock_audit_changes.assert_called_with(
+            [account_name], [technology_name], True)
 
         assert mock_setup.called
 
@@ -697,7 +733,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         with raises(Exception):
             task_audit(account_name, technology_name)  # noqa
 
-        mock_store_exception.assert_called_with("scheduler-exception-on-audit", None, exception)
+        mock_store_exception.assert_called_with(
+            "scheduler-exception-on-audit", None, exception)
 
     @patch("security_monkey.task_scheduler.tasks.setup")
     @patch("security_monkey.task_scheduler.tasks.reporter_logic")
@@ -718,7 +755,8 @@ class CelerySchedulerTestCase(SecurityMonkeyTestCase):
         with raises(Exception):
             task_account_tech(account_name, technology_name)  # noqa
 
-        mock_store_exception.assert_called_with("scheduler-exception-on-watch", None, exception)
+        mock_store_exception.assert_called_with(
+            "scheduler-exception-on-watch", None, exception)
 
     @patch("security_monkey.task_scheduler.tasks.setup")
     @patch("security_monkey.task_scheduler.tasks.reporter_logic")

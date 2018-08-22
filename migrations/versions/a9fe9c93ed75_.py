@@ -55,7 +55,8 @@ def remove_duplicate_issue_items():
             session.delete(result)
 
         else:
-            seen["{}-{}".format(result.sub_item_id, result.super_issue_id)] = True
+            seen["{}-{}".format(result.sub_item_id,
+                                result.super_issue_id)] = True
 
     print("[-->] Deleting duplicate item associations...")
     session.commit()
@@ -123,23 +124,27 @@ def upgrade():
     # Alter the table so that there are unique constraints:
     print("[ ] Setting primary key values for the 'issue_item_association' table...")
     op.drop_column("issue_item_association", "id")
-    op.create_primary_key("pk_issue_item_association", "issue_item_association", ["super_issue_id", "sub_item_id"])
+    op.create_primary_key("pk_issue_item_association", "issue_item_association", [
+                          "super_issue_id", "sub_item_id"])
     print("[+] Completed setting primary key values for 'issue_item_association'")
 
     print("[ ] Setting primary key values for the 'association' table...")
     op.drop_column("association", "id")
-    op.create_primary_key("pk_association", "association", ["user_id", "account_id"])
+    op.create_primary_key("pk_association", "association", [
+                          "user_id", "account_id"])
     print("[+] Completed setting primary key values for 'association'")
 
     print("[ ] Setting primary key values for the 'roles_users' table...")
     op.drop_column("roles_users", "id")
-    op.create_primary_key("pk_roles_users", "roles_users", ["user_id", "role_id"])
+    op.create_primary_key("pk_roles_users", "roles_users", [
+                          "user_id", "role_id"])
     print("[+] Completed setting primary key values for 'roles_users'")
 
     print("[+] Done!")
 
 
 def downgrade():
-    op.drop_constraint("pk_issue_item_association", "issue_item_association", type_="primary")
+    op.drop_constraint("pk_issue_item_association",
+                       "issue_item_association", type_="primary")
     op.drop_constraint("pk_association", "association", type_="primary")
     op.drop_constraint("pk_roles_users", "roles_users", type_="primary")

@@ -7,13 +7,13 @@ If you don't use AWS, you can skip this section.
 
 Security Monkey has the ability to check which accounts are accessing your resources. This is helpful to
 detect if there is unknown cross-account access. In some cases, your items will be configured to permit
-Amazon owned accounts that provide specific AWS services, such as ELB access logging. Security Monkey is 
+Amazon owned accounts that provide specific AWS services, such as ELB access logging. Security Monkey is
 equipped with a command to automatically add these accounts to the database, which will prevent Security Monkey
 from raising an "unknown cross-account access" issue on a given item.
 
 To add the "friendly" Amazon service accounts to Security Monkey, please run the command:
 
-    monkey amazon_accounts    
+    monkey amazon_accounts  
 
 ### Add Your AWS/GCP Accounts
 
@@ -41,7 +41,7 @@ For clarity: the `-n NAME` refers to the name that you want Security Monkey to u
 A common example would be "test" for your testing AWS account or "prod" for your main production AWS account. These names are unique.
 Note that `--role_name` defaults to "SecurityMonkey", if you are using a different role, this value is just the role name, not the ARN.
 
-The `--id IDENTIFIER` is the back-end cloud service identifier for a given provider. For AWS, it's the 12 digit account number, 
+The `--id IDENTIFIER` is the back-end cloud service identifier for a given provider. For AWS, it's the 12 digit account number,
 and for GCP, it's the project ID. For OpenStack, it's the cloud configuration to load from the clouds.yaml file.
 
 ### Syncing With SWAG
@@ -56,12 +56,12 @@ If you're using [SWAG](https://github.com/Netflix-Skunkworks/swag-client). You c
 If you are not using AWS, you can skip this section. If you are using AWS, you should run the command (this command should
 be run on the Security Monkey instance or otherwise in a place with AWS credentials. For more details, please review the
 [AWS IAM instructions](../iam_aws.md)):
-    
+
     monkey fetch_aws_canonical_ids
     usage: monkey fetch_aws_canonical_ids [-h] [--override OVERRIDE]
 
     Adds S3 canonical IDs in for all AWS accounts in SM.
-    
+
     optional arguments:
       -h, --help           show this help message and exit
       --override OVERRIDE

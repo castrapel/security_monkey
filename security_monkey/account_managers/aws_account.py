@@ -42,12 +42,15 @@ class AWSAccountManager(AccountManager):
                        'requires a \'list_buckets\' API call against AWS to obtain.')
     role_name_label = ("Optional custom role name, otherwise the default 'SecurityMonkey' is used. "
                        "When deploying roles via CloudFormation, this is the Physical ID of the generated IAM::ROLE.")
-    external_id_label = ("Optional custom external id. See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html")
+    external_id_label = (
+        "Optional custom external id. See https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html")
     custom_field_configs = [
-        CustomFieldConfig('canonical_id', "Canonical ID", True, s3_canonical_id),
+        CustomFieldConfig('canonical_id', "Canonical ID",
+                          True, s3_canonical_id),
         CustomFieldConfig('s3_name', 'S3 Name', True, s3_name_label),
         CustomFieldConfig('role_name', 'Role Name', True, role_name_label),
-        CustomFieldConfig('external_id', 'External Id', True, external_id_label)
+        CustomFieldConfig('external_id', 'External Id',
+                          True, external_id_label)
     ]
 
     def __init__(self):

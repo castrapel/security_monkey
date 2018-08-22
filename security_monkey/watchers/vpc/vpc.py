@@ -50,6 +50,7 @@ class VPC(CloudAuxWatcher):
     def get_method(self, item, **kwargs):
         vpc = get_vpc(item["VpcId"], **kwargs)
         # Need to provide the friendly name:
-        vpc["DEFERRED_ITEM_NAME"] = "{name} ({id})".format(name=vpc.get("Name"), id=vpc["Id"])
+        vpc["DEFERRED_ITEM_NAME"] = "{name} ({id})".format(
+            name=vpc.get("Name"), id=vpc["Id"])
 
         return vpc

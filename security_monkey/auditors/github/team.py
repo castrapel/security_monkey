@@ -42,4 +42,5 @@ class GitHubTeamAuditor(Auditor):
         tag = "This team is no secret... to people in the org."
 
         if team_item.config["privacy"] == "closed":
-            self.add_issue(1, tag, team_item, notes="Team is visible to all org members")
+            self.add_issue(1, tag, team_item,
+                           notes="Team is visible to all org members")

@@ -28,81 +28,80 @@ from security_monkey.watchers.kms import KMSMasterKey
 from security_monkey import AWS_DEFAULT_REGION, ARN_PREFIX
 from copy import deepcopy
 
-
 # Internet Accessible
 # No Condition
 # rotation Enabled
 key0 = {
-  "Origin": "AWS_KMS",
-  "KeyId": "key_id",
-  "Description": "Description",
-  "Enabled": True,
-  "KeyUsage": "ENCRYPT_DECRYPT",
-  "Grants": [],
-  "Policies": [
-    {
-      "Version": "2012-10-17",
-      "Id": "key-consolepolicy-2",
-      "Statement": [
+    "Origin": "AWS_KMS",
+    "KeyId": "key_id",
+    "Description": "Description",
+    "Enabled": True,
+    "KeyUsage": "ENCRYPT_DECRYPT",
+    "Grants": [],
+    "Policies": [
         {
-          "Action": "kms:*",
-          "Sid": "Enable IAM User Permissions",
-          "Resource": "*",
-          "Effect": "Allow",
-          "Principal": {
-            "AWS": "*"
-          }
+            "Version": "2012-10-17",
+            "Id": "key-consolepolicy-2",
+            "Statement": [
+                {
+                    "Action": "kms:*",
+                    "Sid": "Enable IAM User Permissions",
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Principal": {
+                        "AWS": "*"
+                    }
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "KeyState": "Enabled",
-  "KeyRotationEnabled": True,
-  "CreationDate": "2017-01-05T20:39:18.960000+00:00",
-  "Arn": ARN_PREFIX + ":kms:" + AWS_DEFAULT_REGION + ":123456789123:key/key_id",
-  "AWSAccountId": "123456789123"
+    ],
+    "KeyState": "Enabled",
+    "KeyRotationEnabled": True,
+    "CreationDate": "2017-01-05T20:39:18.960000+00:00",
+    "Arn": ARN_PREFIX + ":kms:" + AWS_DEFAULT_REGION + ":123456789123:key/key_id",
+    "AWSAccountId": "123456789123"
 }
 
 # Access provided to role in same account
 # Rotation Not Enabled
 key1 = {
-  "Origin": "AWS_KMS",
-  "KeyId": "key_id",
-  "Description": "Description",
-  "Enabled": True,
-  "KeyUsage": "ENCRYPT_DECRYPT",
-  "Grants": [],
-  "Policies": [
-    {
-      "Version": "2012-10-17",
-      "Id": "key-consolepolicy-2",
-      "Statement": [
+    "Origin": "AWS_KMS",
+    "KeyId": "key_id",
+    "Description": "Description",
+    "Enabled": True,
+    "KeyUsage": "ENCRYPT_DECRYPT",
+    "Grants": [],
+    "Policies": [
         {
-          "Resource": "*",
-          "Effect": "Allow",
-          "Sid": "Allow attachment of persistent resources",
-          "Action": [
-            "kms:CreateGrant",
-            "kms:ListGrants",
-            "kms:RevokeGrant"
-          ],
-          "Condition": {
-            "Bool": {
-              "kms:GrantIsForAWSResource": "true"
-            }
-          },
-          "Principal": {
-            "AWS": "arn:aws:iam::123456789123:role/SuperRole"
-          }
+            "Version": "2012-10-17",
+            "Id": "key-consolepolicy-2",
+            "Statement": [
+                {
+                    "Resource": "*",
+                    "Effect": "Allow",
+                    "Sid": "Allow attachment of persistent resources",
+                    "Action": [
+                        "kms:CreateGrant",
+                        "kms:ListGrants",
+                        "kms:RevokeGrant"
+                    ],
+                    "Condition": {
+                        "Bool": {
+                            "kms:GrantIsForAWSResource": "true"
+                        }
+                    },
+                    "Principal": {
+                        "AWS": "arn:aws:iam::123456789123:role/SuperRole"
+                    }
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "KeyState": "Enabled",
-  "KeyRotationEnabled": False,
-  "CreationDate": "2017-01-05T20:39:18.960000+00:00",
-  "Arn": ARN_PREFIX + ":kms:" + AWS_DEFAULT_REGION + ":123456789123:key/key_id",
-  "AWSAccountId": "123456789123"
+    ],
+    "KeyState": "Enabled",
+    "KeyRotationEnabled": False,
+    "CreationDate": "2017-01-05T20:39:18.960000+00:00",
+    "Arn": ARN_PREFIX + ":kms:" + AWS_DEFAULT_REGION + ":123456789123:key/key_id",
+    "AWSAccountId": "123456789123"
 }
 
 
@@ -120,12 +119,12 @@ class KMSTestCase(SecurityMonkeyTestCase):
                           third_party=False, active=True)
         # friendly
         account2 = Account(identifier="222222222222", name="TEST_ACCOUNT_TWO",
-                          account_type_id=account_type_result.id, notes="TEST_ACCOUNT_TWO",
-                          third_party=False, active=True)
+                           account_type_id=account_type_result.id, notes="TEST_ACCOUNT_TWO",
+                           third_party=False, active=True)
         # third party
         account3 = Account(identifier="333333333333", name="TEST_ACCOUNT_THREE",
-                          account_type_id=account_type_result.id, notes="TEST_ACCOUNT_THREE",
-                          third_party=True, active=True)
+                           account_type_id=account_type_result.id, notes="TEST_ACCOUNT_THREE",
+                           third_party=True, active=True)
 
         db.session.add(account)
         db.session.add(account2)

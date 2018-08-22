@@ -15,13 +15,11 @@
 from flask_login import current_user, logout_user
 from flask_restful import Resource
 
-
 # End the Flask-Logins session
 from security_monkey import rbac
 
 
 class Logout(Resource):
-
     decorators = [rbac.exempt]
 
     def get(self):

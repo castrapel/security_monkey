@@ -6,7 +6,6 @@ from security_monkey import rbac
 from security_monkey.datastore import Item, ItemRevision, Account, Technology, ItemAudit, AuditorSettings
 from sqlalchemy.orm import joinedload
 
-
 export_blueprint = Blueprint("export", __name__)
 
 
@@ -26,7 +25,8 @@ def export_items():
         if not v:
             del args[k]
 
-    query = Item.query.join((ItemRevision, Item.latest_revision_id == ItemRevision.id))
+    query = Item.query.join(
+        (ItemRevision, Item.latest_revision_id == ItemRevision.id))
     if 'regions' in args:
         regions = args['regions'].split(',')
         query = query.filter(Item.region.in_(regions))
@@ -49,12 +49,13 @@ def export_items():
         query = query.filter(ItemRevision.active == active)
     if 'searchconfig' in args:
         searchconfig = args['searchconfig']
-        query = query.filter(cast(ItemRevision.config, String).ilike('%{}%'.format(searchconfig)))
+        query = query.filter(cast(ItemRevision.config, String).ilike(
+            '%{}%'.format(searchconfig)))
 
     # Eager load the joins and leave the config column out of this.
     query = query.options(joinedload('issues'))
     # Now loaded by the join on line 29 I think...
-    #query = query.options(joinedload('revisions').defer('config'))
+    # query = query.options(joinedload('revisions').defer('config'))
     query = query.options(joinedload('account'))
     query = query.options(joinedload('technology'))
 
@@ -121,7 +122,8 @@ def export_issues():
         query = query.filter(Item.name.in_(names))
     if 'active' in args:
         active = args['active'].lower() == "true"
-        query = query.join((ItemRevision, Item.latest_revision_id == ItemRevision.id))
+        query = query.join(
+            (ItemRevision, Item.latest_revision_id == ItemRevision.id))
         query = query.filter(ItemRevision.active == active)
     if 'searchconfig' in args:
         search = args['searchconfig'].split(',')
@@ -129,11 +131,13 @@ def export_issues():
         for searchterm in search:
             conditions.append(ItemAudit.issue.ilike('%{}%'.format(searchterm)))
             conditions.append(ItemAudit.notes.ilike('%{}%'.format(searchterm)))
-            conditions.append(ItemAudit.justification.ilike('%{}%'.format(searchterm)))
+            conditions.append(ItemAudit.justification.ilike(
+                '%{}%'.format(searchterm)))
             conditions.append(Item.name.ilike('%{}%'.format(searchterm)))
         query = query.filter(or_(*conditions))
     if 'enabledonly' in args:
-        query = query.join((AuditorSettings, AuditorSettings.id == ItemAudit.auditor_setting_id))
+        query = query.join(
+            (AuditorSettings, AuditorSettings.id == ItemAudit.auditor_setting_id))
         query = query.filter(AuditorSettings.disabled == False)
 
     query = query.order_by(ItemAudit.justified, ItemAudit.score.desc())

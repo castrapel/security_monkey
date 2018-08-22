@@ -1,4 +1,4 @@
-## Please make sure that you have checked the boxes: 
+## Please make sure that you have checked the boxes:
 
 - [ ] [Pease review the Troubleshooting doc for additional details regarding your issue.](https://github.com/Netflix/security_monkey/blob/develop/docs/troubleshooting.md)
 - [ ] Review the [Quickstart guide](https://github.com/Netflix/security_monkey/blob/develop/docs/quickstart.md)

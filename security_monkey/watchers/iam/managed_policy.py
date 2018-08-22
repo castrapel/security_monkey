@@ -80,12 +80,17 @@ class ManagedPolicy(Watcher):
                 attached_roles = []
                 attached_groups = []
                 if policy.attachment_count > 0:
-                    app.logger.debug("Finding attachments for policy %s" % policy.policy_name)
-                    attached_users = [a.arn for a in policy.attached_users.all()]
-                    attached_roles = [a.arn for a in policy.attached_roles.all()]
-                    attached_groups = [a.arn for a in policy.attached_groups.all()]
+                    app.logger.debug(
+                        "Finding attachments for policy %s" % policy.policy_name)
+                    attached_users = [
+                        a.arn for a in policy.attached_users.all()]
+                    attached_roles = [
+                        a.arn for a in policy.attached_roles.all()]
+                    attached_groups = [
+                        a.arn for a in policy.attached_groups.all()]
                 else:
-                    app.logger.debug("Skipping policy attachment retrieval for policy %s because it has no attachments" % policy.policy_name)
+                    app.logger.debug(
+                        "Skipping policy attachment retrieval for policy %s because it has no attachments" % policy.policy_name)
 
                 item_config = {
                     'name': policy.policy_name,
@@ -100,7 +105,8 @@ class ManagedPolicy(Watcher):
                     'policy': policy.default_version.document
                 }
 
-                app.logger.debug("Slurping %s (%s) from %s" % (self.i_am_singular, policy.policy_name, account))
+                app.logger.debug("Slurping %s (%s) from %s" % (
+                    self.i_am_singular, policy.policy_name, account))
 
                 arn = item_config.get('arn')
                 # Don't set the ARN field on Amazon owned managed policies as this would violate the

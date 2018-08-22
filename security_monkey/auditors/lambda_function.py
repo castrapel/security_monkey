@@ -33,5 +33,7 @@ class LambdaFunctionAuditor(ResourcePolicyAuditor):
     i_am_plural = LambdaFunction.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(LambdaFunctionAuditor, self).__init__(accounts=accounts, debug=debug)
-        self.policy_keys = ['Policy$DEFAULT', 'Policy$Aliases', 'Policy$Versions']
+        super(LambdaFunctionAuditor, self).__init__(
+            accounts=accounts, debug=debug)
+        self.policy_keys = ['Policy$DEFAULT',
+                            'Policy$Aliases', 'Policy$Versions']

@@ -90,7 +90,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
     def test_is_active(self):
         from security_monkey.datastore_utils import is_active
 
-        not_active = {"Arn": ARN_PREFIX + ":iam::012345678910:role/someDeletedRole"}
+        not_active = {"Arn": ARN_PREFIX +
+                      ":iam::012345678910:role/someDeletedRole"}
         assert not is_active(not_active)
 
         still_not_active = {
@@ -129,7 +130,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
 
         self.setup_db()
 
-        sti = SomeTestItem.from_slurp(ACTIVE_CONF, account_name=self.account.name)
+        sti = SomeTestItem.from_slurp(
+            ACTIVE_CONF, account_name=self.account.name)
 
         item = create_item_aws(sti, self.technology, self.account)
         assert item.region == "universal"
@@ -160,15 +162,18 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         original_complete_hash = "85b8874a7ca98d7f5f4587d80d310bc5"
         durable_hash = "1d1d718ea820b14f620f5262ae6d06fb"
 
-        assert hash_item(test_config, ephemeral_paths) == (original_complete_hash, durable_hash)
+        assert hash_item(test_config, ephemeral_paths) == (
+            original_complete_hash, durable_hash)
 
         # Change a durable value:
         test_config["SomeDurableProp"] = "is some OTHER value"
-        assert hash_item(test_config, ephemeral_paths) != (original_complete_hash, durable_hash)
+        assert hash_item(test_config, ephemeral_paths) != (
+            original_complete_hash, durable_hash)
 
         # Go back:
         test_config["SomeDurableProp"] = "is some value"
-        assert hash_item(test_config, ephemeral_paths) == (original_complete_hash, durable_hash)
+        assert hash_item(test_config, ephemeral_paths) == (
+            original_complete_hash, durable_hash)
 
         # Change ephemeral values:
         test_config["ephemeralPath"] = "askldjfpwojf0239f32"
@@ -197,7 +202,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         db.session.add(item)
         db.session.commit()
 
-        assert result_from_item(sti, self.account, self.technology).id == item.id
+        assert result_from_item(
+            sti, self.account, self.technology).id == item.id
 
     def test_detect_change(self):
         from security_monkey.datastore_utils import detect_change, hash_item
@@ -219,7 +225,7 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
 
         # Item does not exist in the DB yet:
         assert (True, 'durable', None, 'created') == detect_change(sti, self.account, self.technology, complete_hash,
-                                                        durable_hash)
+                                                                   durable_hash)
 
         # Add the item to the DB:
         db.session.add(item)
@@ -227,7 +233,7 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
 
         # Durable change (nothing hashed in DB yet)
         assert (True, 'durable', item, 'changed') == detect_change(sti, self.account, self.technology, complete_hash,
-                                                        durable_hash)
+                                                                   durable_hash)
 
         # No change:
         item.latest_revision_complete_hash = complete_hash
@@ -236,7 +242,7 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         db.session.commit()
 
         assert (False, None, item, None) == detect_change(sti, self.account, self.technology, complete_hash,
-                                                    durable_hash)
+                                                          durable_hash)
 
         # Ephemeral change:
         mod_conf = dict(ACTIVE_CONF)
@@ -244,7 +250,7 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         complete_hash, durable_hash = hash_item(mod_conf, ["IGNORE_ME"])
 
         assert (True, 'ephemeral', item, None) == detect_change(sti, self.account, self.technology, complete_hash,
-                                                          durable_hash)
+                                                                durable_hash)
 
     def test_persist_item(self):
         from security_monkey.datastore_utils import persist_item, hash_item, result_from_item
@@ -257,7 +263,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         complete_hash, durable_hash = hash_item(sti.config, [])
 
         # Persist a durable change:
-        persist_item(sti, None, self.technology, self.account, complete_hash, durable_hash, True)
+        persist_item(sti, None, self.technology, self.account,
+                     complete_hash, durable_hash, True)
 
         db_item = result_from_item(sti, self.account, self.technology)
         assert db_item
@@ -266,7 +273,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         assert db_item.latest_revision_complete_hash == complete_hash == durable_hash
 
         # No changes:
-        persist_item(sti, db_item, self.technology, self.account, complete_hash, durable_hash, True)
+        persist_item(sti, db_item, self.technology, self.account,
+                     complete_hash, durable_hash, True)
         db_item = result_from_item(sti, self.account, self.technology)
         assert db_item
         assert db_item.revisions.count() == 1
@@ -276,9 +284,11 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         # Ephemeral change:
         mod_conf = dict(ACTIVE_CONF)
         mod_conf["IGNORE_ME"] = "I am ephemeral!"
-        new_complete_hash, new_durable_hash = hash_item(mod_conf, ["IGNORE_ME"])
+        new_complete_hash, new_durable_hash = hash_item(
+            mod_conf, ["IGNORE_ME"])
         sti = SomeTestItem().from_slurp(mod_conf, account_name=self.account.name)
-        persist_item(sti, db_item, self.technology, self.account, new_complete_hash, new_durable_hash, False)
+        persist_item(sti, db_item, self.technology, self.account,
+                     new_complete_hash, new_durable_hash, False)
 
         db_item = result_from_item(sti, self.account, self.technology)
         assert db_item
@@ -296,7 +306,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         for x in range(0, 3):
             modConf = dict(ACTIVE_CONF)
             modConf["name"] = "SomeRole{}".format(x)
-            modConf["Arn"] = ARN_PREFIX + ":iam::012345678910:role/SomeRole{}".format(x)
+            modConf["Arn"] = ARN_PREFIX + \
+                ":iam::012345678910:role/SomeRole{}".format(x)
 
             sti = SomeTestItem().from_slurp(modConf, account_name=self.account.name)
 
@@ -304,7 +315,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
             complete_hash, durable_hash = hash_item(sti.config, [])
 
             # persist:
-            persist_item(sti, None, self.technology, self.account, complete_hash, durable_hash, True)
+            persist_item(sti, None, self.technology, self.account,
+                         complete_hash, durable_hash, True)
 
             db_item = result_from_item(sti, self.account, self.technology)
 
@@ -313,22 +325,26 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
                                      issue="IAM Role has full admin permissions.",
                                      notes=json.dumps(sti.config),
                                      item_id=db_item.id))
-            db.session.add(ItemAudit(score=9001, issue="Some test issue", notes="{}", item_id=db_item.id))
+            db.session.add(
+                ItemAudit(score=9001, issue="Some test issue", notes="{}", item_id=db_item.id))
 
         db.session.commit()
 
         # Now, actually test for deleted revisions:
         arns = [
             ARN_PREFIX + ":iam::012345678910:role/SomeRole",  # <-- Does not exist in the list
-            ARN_PREFIX + ":iam::012345678910:role/SomeRole0",  # <-- Does exist -- should not get deleted
+            # <-- Does exist -- should not get deleted
+            ARN_PREFIX + ":iam::012345678910:role/SomeRole0",
         ]
 
-        inactivate_old_revisions(SomeWatcher(), arns, self.account, self.technology)
+        inactivate_old_revisions(
+            SomeWatcher(), arns, self.account, self.technology)
 
         # Check that SomeRole1 and SomeRole2 are marked as inactive:
         for x in range(1, 3):
             item_revision = ItemRevision.query.join((Item, ItemRevision.id == Item.latest_revision_id)).filter(
-                Item.arn == ARN_PREFIX + ":iam::012345678910:role/SomeRole{}".format(x),
+                Item.arn == ARN_PREFIX +
+                ":iam::012345678910:role/SomeRole{}".format(x),
             ).one()
 
             assert not item_revision.active
@@ -337,7 +353,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         item_revision = ItemRevision.query.join((Item, ItemRevision.id == Item.latest_revision_id)).filter(
             Item.arn == ARN_PREFIX + ":iam::012345678910:role/SomeRole0").one()
 
-        assert len(ItemAudit.query.filter(ItemAudit.item_id == item_revision.item_id).all()) == 2
+        assert len(ItemAudit.query.filter(
+            ItemAudit.item_id == item_revision.item_id).all()) == 2
 
         assert item_revision.active
 
@@ -346,10 +363,12 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         datastore = Datastore()
 
         # Create an item in the DB:
-        sti = SomeTestItem.from_slurp(ACTIVE_CONF, account_name=self.account.name)
+        sti = SomeTestItem.from_slurp(
+            ACTIVE_CONF, account_name=self.account.name)
         sti.save(datastore)
 
-        duplicate = SomeTestItem.from_slurp(ACTIVE_CONF, account_name=self.account.name)
+        duplicate = SomeTestItem.from_slurp(
+            ACTIVE_CONF, account_name=self.account.name)
         # Rename this, and add it back in:
         duplicate.name = "SomeRole2"
         duplicate.save(datastore)
@@ -365,7 +384,8 @@ class DatabaseUtilsTestCase(SecurityMonkeyTestCase):
         assert len(items) == 2
 
         # Try saving the item again -- there should only be 1 now
-        sti = SomeTestItem.from_slurp(ACTIVE_CONF, account_name=self.account.name)
+        sti = SomeTestItem.from_slurp(
+            ACTIVE_CONF, account_name=self.account.name)
         sti.save(datastore)
 
         # There should now only be 1:

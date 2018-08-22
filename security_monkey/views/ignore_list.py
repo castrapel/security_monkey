@@ -71,7 +71,8 @@ class IgnoreListGetPutDelete(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        result = IgnoreListEntry.query.filter(IgnoreListEntry.id == item_id).first()
+        result = IgnoreListEntry.query.filter(
+            IgnoreListEntry.id == item_id).first()
 
         if not result:
             return {"status": "Ignorelist entry with the given ID not found."}, 404
@@ -127,16 +128,21 @@ class IgnoreListGetPutDelete(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('prefix', required=True, type=text_type, help='A prefix must be provided which matches the objects you wish to ignore.', location='json')
-        self.reqparse.add_argument('notes', required=False, type=text_type, help='Add context.', location='json')
-        self.reqparse.add_argument('technology', required=True, type=text_type, help='Technology name required.', location='json')
+        self.reqparse.add_argument('prefix', required=True, type=text_type,
+                                   help='A prefix must be provided which matches the objects you wish to ignore.',
+                                   location='json')
+        self.reqparse.add_argument(
+            'notes', required=False, type=text_type, help='Add context.', location='json')
+        self.reqparse.add_argument('technology', required=True, type=text_type,
+                                   help='Technology name required.', location='json')
         args = self.reqparse.parse_args()
 
         prefix = args['prefix']
         technology = args.get('technology', True)
         notes = args.get('notes', None)
 
-        result = IgnoreListEntry.query.filter(IgnoreListEntry.id == item_id).first()
+        result = IgnoreListEntry.query.filter(
+            IgnoreListEntry.id == item_id).first()
 
         if not result:
             return {"status": "Ignore list entry with the given ID not found."}, 404
@@ -144,7 +150,8 @@ class IgnoreListGetPutDelete(AuthenticatedService):
         result.prefix = prefix
         result.notes = notes
 
-        technology = Technology.query.filter(Technology.name == technology).first()
+        technology = Technology.query.filter(
+            Technology.name == technology).first()
         if not technology:
             return {"status": "Could not find a technology with the given name"}, 500
 
@@ -246,18 +253,22 @@ class IgnorelistListPost(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
 
         args = self.reqparse.parse_args()
         page = args.pop('page', None)
         count = args.pop('count', None)
 
-        result = IgnoreListEntry.query.order_by(IgnoreListEntry.id).paginate(page, count, error_out=False)
+        result = IgnoreListEntry.query.order_by(
+            IgnoreListEntry.id).paginate(page, count, error_out=False)
 
         items = []
         for entry in result.items:
-            ignorelistentry_marshaled = marshal(entry.__dict__, IGNORELIST_FIELDS)
+            ignorelistentry_marshaled = marshal(
+                entry.__dict__, IGNORELIST_FIELDS)
             ignorelistentry_marshaled["technology"] = entry.technology.name
             items.append(ignorelistentry_marshaled)
 
@@ -309,9 +320,13 @@ class IgnorelistListPost(AuthenticatedService):
             :statuscode 401: Authentication Error. Please Login.
         """
 
-        self.reqparse.add_argument('prefix', required=True, type=text_type, help='A prefix must be provided which matches the objects you wish to ignore.', location='json')
-        self.reqparse.add_argument('notes', required=False, type=text_type, help='Add context.', location='json')
-        self.reqparse.add_argument('technology', required=True, type=text_type, help='Technology name required.', location='json')
+        self.reqparse.add_argument('prefix', required=True, type=text_type,
+                                   help='A prefix must be provided which matches the objects you wish to ignore.',
+                                   location='json')
+        self.reqparse.add_argument(
+            'notes', required=False, type=text_type, help='Add context.', location='json')
+        self.reqparse.add_argument('technology', required=True, type=text_type,
+                                   help='Technology name required.', location='json')
         args = self.reqparse.parse_args()
 
         prefix = args['prefix']
@@ -324,7 +339,8 @@ class IgnorelistListPost(AuthenticatedService):
         if notes:
             entry.notes = notes
 
-        technology = Technology.query.filter(Technology.name == technology).first()
+        technology = Technology.query.filter(
+            Technology.name == technology).first()
         if not technology:
             return {"status": "Could not find a technology with the given name"}, 500
 

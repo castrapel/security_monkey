@@ -38,15 +38,21 @@ class S3Auditor(ResourcePolicyAuditor):
 
     def prep_for_audit(self):
         super(S3Auditor, self).prep_for_audit()
-        self.FRIENDLY_S3NAMES = [text_type(account['s3_name']).lower() for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly']
-        self.THIRDPARTY_S3NAMES = [text_type(account['s3_name']).lower() for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'thirdparty']
-        self.FRIENDLY_S3CANONICAL = [text_type(account['s3_canonical_id']).lower() for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly']
-        self.THIRDPARTY_S3CANONICAL = [text_type(account['s3_canonical_id']).lower() for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'thirdparty']
+        self.FRIENDLY_S3NAMES = [text_type(account['s3_name']).lower(
+        ) for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly']
+        self.THIRDPARTY_S3NAMES = [text_type(account['s3_name']).lower(
+        ) for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'thirdparty']
+        self.FRIENDLY_S3CANONICAL = [text_type(account['s3_canonical_id']).lower(
+        ) for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'friendly']
+        self.THIRDPARTY_S3CANONICAL = [text_type(account['s3_canonical_id']).lower(
+        ) for account in self.OBJECT_STORE['ACCOUNTS']['DESCRIPTIONS'] if account['label'] == 'thirdparty']
         self.INTERNET_ACCESSIBLE = [
             'http://acs.amazonaws.com/groups/global/AuthenticatedUsers'.lower(),
             'http://acs.amazonaws.com/groups/global/AllUsers'.lower()]
-        self.LOG_DELIVERY = ['http://acs.amazonaws.com/groups/s3/LogDelivery'.lower()]
-        self.KNOWN_ACLS = self.FRIENDLY_S3NAMES + self.THIRDPARTY_S3NAMES + self.FRIENDLY_S3CANONICAL + self.THIRDPARTY_S3CANONICAL + self.INTERNET_ACCESSIBLE + self.LOG_DELIVERY
+        self.LOG_DELIVERY = [
+            'http://acs.amazonaws.com/groups/s3/LogDelivery'.lower()]
+        self.KNOWN_ACLS = self.FRIENDLY_S3NAMES + self.THIRDPARTY_S3NAMES + self.FRIENDLY_S3CANONICAL + \
+            self.THIRDPARTY_S3CANONICAL + self.INTERNET_ACCESSIBLE + self.LOG_DELIVERY
 
     def _check_acl(self, item, field, keys, recorder):
         acl = item.config.get('Grants', {})
@@ -62,28 +68,34 @@ class S3Auditor(ResourcePolicyAuditor):
             entity = Entity(category='ACL', value=key)
             account = self._get_account(field, key)
             if account:
-                entity.account_name=account['name']
-                entity.account_identifier=account['identifier']
+                entity.account_name = account['name']
+                entity.account_identifier = account['identifier']
             recorder(item, actions=acl[key], entity=entity)
 
     def check_acl_internet_accessible(self, item):
         """ Handles AllUsers and AuthenticatedUsers. """
-        self._check_acl(item, 'aws', self.INTERNET_ACCESSIBLE, self.record_internet_access)
+        self._check_acl(item, 'aws', self.INTERNET_ACCESSIBLE,
+                        self.record_internet_access)
 
     def check_acl_log_delivery(self, item):
-        self._check_acl(item, 'aws', self.LOG_DELIVERY, self.record_thirdparty_access)
+        self._check_acl(item, 'aws', self.LOG_DELIVERY,
+                        self.record_thirdparty_access)
 
     def check_acl_friendly_legacy(self, item):
-        self._check_acl(item, 's3_name', self.FRIENDLY_S3NAMES, self.record_friendly_access)
+        self._check_acl(item, 's3_name', self.FRIENDLY_S3NAMES,
+                        self.record_friendly_access)
 
     def check_acl_thirdparty_legacy(self, item):
-        self._check_acl(item, 's3_name', self.THIRDPARTY_S3NAMES, self.record_thirdparty_access)
+        self._check_acl(item, 's3_name', self.THIRDPARTY_S3NAMES,
+                        self.record_thirdparty_access)
 
     def check_acl_friendly_canonical(self, item):
-        self._check_acl(item, 's3_canonical_id', self.FRIENDLY_S3CANONICAL, self.record_friendly_access)
+        self._check_acl(item, 's3_canonical_id',
+                        self.FRIENDLY_S3CANONICAL, self.record_friendly_access)
 
     def check_acl_thirdparty_canonical(self, item):
-        self._check_acl(item, 's3_canonical_id', self.THIRDPARTY_S3CANONICAL, self.record_thirdparty_access)
+        self._check_acl(item, 's3_canonical_id',
+                        self.THIRDPARTY_S3CANONICAL, self.record_thirdparty_access)
 
     def check_acl_unknown(self, item):
         acl = item.config.get('Grants', {})

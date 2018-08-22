@@ -37,6 +37,7 @@ class VPNAuditor(Auditor):
         if vpn_item.config.get('tunnels'):
             for tunnel in vpn_item.config.get('tunnels'):
                 if tunnel.get('status') != "UP":
-                    notes = "{} - {} - {}".format(tunnel.get('outside_ip_address'), tunnel.get('status'), tunnel.get('status_message'))
-                    self.add_issue(1, "{} tunnel is not UP".format(self.i_am_singular), vpn_item, notes=notes)
-
+                    notes = "{} - {} - {}".format(tunnel.get('outside_ip_address'), tunnel.get(
+                        'status'), tunnel.get('status_message'))
+                    self.add_issue(1, "{} tunnel is not UP".format(
+                        self.i_am_singular), vpn_item, notes=notes)

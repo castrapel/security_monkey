@@ -58,13 +58,14 @@ class RouteTable(Watcher):
             exception_map = {}
             kwargs['exception_map'] = exception_map
             app.logger.debug("Checking {}/{}/{}".format(self.index,
-                             kwargs['account_name'],
-                             kwargs['region']))
+                                                        kwargs['account_name'],
+                                                        kwargs['region']))
 
             all_route_tables = self.describe_route_tables(**kwargs)
 
             if all_route_tables:
-                app.logger.debug("Found {} {}".format(len(all_route_tables), self.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(all_route_tables), self.i_am_plural))
 
                 for route_table in all_route_tables:
                     tags = route_table.get('Tags', {})
@@ -75,7 +76,8 @@ class RouteTable(Watcher):
                     subnet_name = joined_tags.get('Name')
 
                     if subnet_name:
-                        subnet_name = "{0} ({1})".format(subnet_name, route_table.get('RouteTableId'))
+                        subnet_name = "{0} ({1})".format(
+                            subnet_name, route_table.get('RouteTableId'))
                     else:
                         subnet_name = route_table.get('RouteTableId')
 
@@ -124,6 +126,7 @@ class RouteTable(Watcher):
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

@@ -26,9 +26,11 @@ from security_monkey.datastore import Account, Technology, Item, ExceptionLogs, 
 from security_monkey.tests import SecurityMonkeyTestCase, db
 from security_monkey import ARN_PREFIX
 
+
 class S3TestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)

@@ -33,7 +33,8 @@ class CloudAuxWatcher(Watcher):
 
     def _get_assume_role(self, identifier):
         from security_monkey.datastore import Account
-        account = Account.query.filter(Account.identifier == identifier).first()
+        account = Account.query.filter(
+            Account.identifier == identifier).first()
         return account.getCustom("role_name") or 'SecurityMonkey'
 
     def _get_regions(self):
@@ -41,17 +42,20 @@ class CloudAuxWatcher(Watcher):
         from security_monkey.datastore import Account
         # pick an arbitrary account:
         identifier = self.account_identifiers[0]
-        account = Account.query.filter(Account.identifier == identifier).first()
+        account = Account.query.filter(
+            Account.identifier == identifier).first()
         _, regions = get_regions(account, self.service_name)
         return regions
 
     def _add_exception_fields_to_kwargs(self, **kwargs):
         exception_map = dict()
         kwargs['index'] = self.index
-        kwargs['account_name'] = self._get_account_name(kwargs['conn_dict']['account_number'])
+        kwargs['account_name'] = self._get_account_name(
+            kwargs['conn_dict']['account_number'])
         kwargs['exception_record_region'] = self.override_region or kwargs['conn_dict']['region']
         kwargs['exception_map'] = exception_map
-        kwargs['conn_dict']['assume_role'] = self._get_assume_role(kwargs['conn_dict']['account_number'])
+        kwargs['conn_dict']['assume_role'] = self._get_assume_role(
+            kwargs['conn_dict']['account_number'])
         del kwargs['conn_dict']['tech']
         del kwargs['conn_dict']['service_type']
         return kwargs, exception_map
@@ -83,7 +87,8 @@ class CloudAuxWatcher(Watcher):
         @iter_account_region(self.service_name, accounts=self.account_identifiers,
                              regions=self._get_regions(), conn_type='dict')
         def slurp_items(**kwargs):
-            kwargs, exception_map = self._add_exception_fields_to_kwargs(**kwargs)
+            kwargs, exception_map = self._add_exception_fields_to_kwargs(
+                **kwargs)
 
             results = []
             item_list = invoke_list_method(**kwargs)
@@ -95,11 +100,13 @@ class CloudAuxWatcher(Watcher):
                 if item_name and self.check_ignore_list(item_name):
                     continue
 
-                item_details = invoke_get_method(item, name=item_name, **kwargs)
+                item_details = invoke_get_method(
+                    item, name=item_name, **kwargs)
                 if item_details:
                     # Has the item name been updated? (Things like Security Groups and VPCs have friendlier names
                     # than just their ID's:
-                    item_name = item_details.pop("DEFERRED_ITEM_NAME", item_name)
+                    item_name = item_details.pop(
+                        "DEFERRED_ITEM_NAME", item_name)
 
                     # Determine which region to record the item into.
                     # Some tech, like IAM, is global and so we record it as 'universal' by setting an override_region
@@ -107,7 +114,8 @@ class CloudAuxWatcher(Watcher):
                     # region may be different. Extract the actual region from item_details.
                     # Otherwise, just use the region where the boto connection was made.
                     record_region = self.override_region or \
-                        item_details.get('Region') or kwargs['conn_dict']['region']
+                        item_details.get(
+                            'Region') or kwargs['conn_dict']['region']
                     item = CloudAuxChangeItem.from_item(
                         name=item_name,
                         item=item_details,

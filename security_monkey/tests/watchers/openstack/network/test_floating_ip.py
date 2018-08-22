@@ -21,6 +21,7 @@
 """
 from security_monkey.tests.watchers.openstack import OpenStackWatcherTestCase
 
+
 class OpenStackFloatingIPWatcherTestCase(OpenStackWatcherTestCase):
 
     def pre_test_setup(self):

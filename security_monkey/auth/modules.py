@@ -73,6 +73,7 @@ class AccessControlList(object):
 
 class _RBACState(object):
     """Records configuration for Flask-RBAC"""
+
     def __init__(self, rbac, app):
         self.rbac = rbac
         self.app = app
@@ -143,6 +144,7 @@ class RBAC(object):
                 else:
                     self._deny_hook()
             return view_func
+
         return decorator
 
     def allow(self, roles, methods, with_children=True):
@@ -158,11 +160,13 @@ class RBAC(object):
         :param with_children: Whether allow children of roles as well.
                               True by default.
         """
+
         def decorator(view_func):
             _methods = [m.upper() for m in methods]
             for r, m, v in itertools.product(roles, _methods, [view_func.__name__]):
                 self.before_acl.append((r, m, v, with_children))
             return view_func
+
         return decorator
 
     def exempt(self, view_func):
@@ -194,7 +198,8 @@ class RBAC(object):
         assert self._role_model, "Please set role model before authenticate."
         assert self._user_model, "Please set user model before authenticate."
         user = current_user
-        if not isinstance(user._get_current_object(), self._user_model) and not isinstance(user._get_current_object(), AnonymousUser):
+        if not isinstance(user._get_current_object(), self._user_model) and not isinstance(user._get_current_object(),
+                                                                                           AnonymousUser):
             raise TypeError(
                 "%s is not an instance of %s" %
                 (user, self._user_model.__class__))
@@ -244,12 +249,14 @@ class RBAC(object):
             status = 403
         else:
             status = 401
-        #abort(status)
+        # abort(status)
 
         if app.config.get('FRONTED_BY_NGINX'):
-                url = "https://{}:{}{}".format(app.config.get('FQDN'), app.config.get('NGINX_PORT'), '/login')
+            url = "https://{}:{}{}".format(app.config.get('FQDN'),
+                                           app.config.get('NGINX_PORT'), '/login')
         else:
-                url = "http://{}:{}{}".format(app.config.get('FQDN'), app.config.get('API_PORT'), '/login')
+            url = "http://{}:{}{}".format(app.config.get('FQDN'),
+                                          app.config.get('API_PORT'), '/login')
         if current_user.is_authenticated:
             auth_dict = {
                 "authenticated": True,
@@ -264,7 +271,6 @@ class RBAC(object):
             }
 
         return Response(response=json.dumps({"auth": auth_dict}), status=status, mimetype="application/json")
-
 
     def _setup_acl(self):
         for rn, method, resource, with_children in self.before_acl:

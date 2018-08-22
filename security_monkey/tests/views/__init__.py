@@ -39,7 +39,8 @@ class SecurityMonkeyApiTestCase(SecurityMonkeyTestCase):
 
     def create_test_user(self, email, password):
         user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-        user = user_datastore.create_user(email=email, password=encrypt_password(password), confirmed_at=datetime.now())
+        user = user_datastore.create_user(
+            email=email, password=encrypt_password(password), confirmed_at=datetime.now())
         user.role = 'Admin'
         user.active = True
 

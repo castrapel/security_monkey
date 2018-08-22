@@ -148,11 +148,11 @@ class ItemTableComponent extends PaginatedTable implements DetachAware {
         }
         return url;
     }
-    
+
     void export(){
       window.location.assign(getExportLink());
     }
-    
+
     String getExportLink(){
       String link = "/api/1/export/items?";
       List<String> params = new List();

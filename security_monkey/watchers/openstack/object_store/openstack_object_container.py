@@ -38,6 +38,7 @@ class OpenStackObjectContainer(OpenStackWatcher):
 
     """ one of few OpenStack configs that cannot have duplicate names in the tenant (and also doesn't
                 really have an uuid """
+
     def get_name_from_list_output(self, item):
         return item.name
 

@@ -34,7 +34,8 @@ class GlacierVault(CloudAuxWatcher):
     def __init__(self, **kwargs):
         super(GlacierVault, self).__init__(**kwargs)
         self.honor_ephemerals = True
-        self.ephemeral_paths = ['LastInventoryDate', 'NumberOfArchives', 'SizeInBytes']
+        self.ephemeral_paths = ['LastInventoryDate',
+                                'NumberOfArchives', 'SizeInBytes']
 
     def get_name_from_list_output(self, item):
         return item['VaultName']

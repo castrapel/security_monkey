@@ -39,4 +39,3 @@ class LambdaFunction(CloudAuxWatcher):
 
     def get_method(self, item, **kwargs):
         return get_lambda_function(item, **kwargs)
-

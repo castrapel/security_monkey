@@ -60,14 +60,22 @@ class AuditorSettingsGet(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('accounts', type=str, default=None, location='args')
-        self.reqparse.add_argument('technologies', type=str, default=None, location='args')
-        self.reqparse.add_argument('enabled', type=bool, default=None, location='args')
-        self.reqparse.add_argument('issue', type=str, default=None, location='args')
-        self.reqparse.add_argument('order_by', type=str, default=None, location='args')
-        self.reqparse.add_argument('order_dir', type=str, default='Desc', location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'accounts', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'technologies', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'enabled', type=bool, default=None, location='args')
+        self.reqparse.add_argument(
+            'issue', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'order_by', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'order_dir', type=str, default='Desc', location='args')
         args = self.reqparse.parse_args()
 
         page = args.pop('page', None)
@@ -78,7 +86,8 @@ class AuditorSettingsGet(AuthenticatedService):
 
         query = AuditorSettings.query
         query = query.join((Account, Account.id == AuditorSettings.account_id))
-        query = query.join((Technology, Technology.id == AuditorSettings.tech_id))
+        query = query.join(
+            (Technology, Technology.id == AuditorSettings.tech_id))
 
         if 'accounts' in args:
             accounts = args['accounts'].split(',')
@@ -89,7 +98,8 @@ class AuditorSettingsGet(AuthenticatedService):
             query = query.filter(Technology.name.in_(technologies))
 
         if 'enabled' in args:
-            query = query.filter(AuditorSettings.disabled != bool(args['enabled']))
+            query = query.filter(
+                AuditorSettings.disabled != bool(args['enabled']))
 
         if 'issue' in args:
             query = query.filter(AuditorSettings.issue_text == args['issue'])
@@ -141,7 +151,8 @@ class AuditorSettingsGet(AuthenticatedService):
 
         auditor_settings = []
         for auditor_setting in enabled_auditors.items:
-            marshalled = marshal(auditor_setting.__dict__, AUDITORSETTING_FIELDS)
+            marshalled = marshal(auditor_setting.__dict__,
+                                 AUDITORSETTING_FIELDS)
             marshalled = dict(
                 marshalled.items() +
                 {
@@ -171,8 +182,8 @@ class AuditorSettingsPut(AuthenticatedService):
     ]
 
     def __init__(self):
-            self.reqparse = reqparse.RequestParser()
-            super(AuditorSettingsPut, self).__init__()
+        self.reqparse = reqparse.RequestParser()
+        super(AuditorSettingsPut, self).__init__()
 
     def put(self, as_id):
         """
@@ -208,7 +219,8 @@ class AuditorSettingsPut(AuthenticatedService):
             :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('disabled', type=bool, required=True, location='json')
+        self.reqparse.add_argument(
+            'disabled', type=bool, required=True, location='json')
         args = self.reqparse.parse_args()
         disabled = args.pop('disabled', None)
         results = AuditorSettings.query.get(as_id)

@@ -69,7 +69,7 @@ If an account with the same number already exists, this will do nothing, unless 
     An account with id 12345678910 already exists
     $ monkey add_account_aws --number 12345678910 --name account_foo --active false --force
     Successfully added account account_foo
-    
+
 🚨 Important 🚨 - Autostarting and Fetching Data
 ================================================
 At this point Security Monkey is set to manually run. However, we need to ensure that it is always running and automatically
@@ -122,7 +122,7 @@ Each revision to an item can have comments attached. These can explain why a cha
 Receiving notification mails
 -----------------------------
 
-Security Monkey has a built-in mail notification system that can be used with SMTP or AWS SES. By default, SES is enabled but you can change that behaviour with the following variables : 
+Security Monkey has a built-in mail notification system that can be used with SMTP or AWS SES. By default, SES is enabled but you can change that behaviour with the following variables :
 
     # These are only required if using SMTP instead of SES
     EMAILS_USE_SMTP = False     # Otherwise, Use SES
@@ -135,7 +135,7 @@ Security Monkey has a built-in mail notification system that can be used with SM
 
 If you want to use SMTP, change the EMAILS_USE_SMTP variable to True and modify the other MAIL_* Variables.
 
-If you want to use the default settings and use SES, the variable that matters is SES_REGION. SES is one of these services  that aren't available in all the regions but it's ok, it can be in a different region than your instances. Here's how to setup SES. 
+If you want to use the default settings and use SES, the variable that matters is SES_REGION. SES is one of these services  that aren't available in all the regions but it's ok, it can be in a different region than your instances. Here's how to setup SES.
 
 [See the list of the available regions for SES](http://docs.aws.amazon.com/ses/latest/DeveloperGuide/regions.html)
 
@@ -183,7 +183,7 @@ Save, make sure you are in the venv then restart the superviser to apply the cha
 The elements to activate the mails are under the settings -> Accounts section :
 
 - The **Notification Settings** panel
-- The notify box ticked for the accounts you want these settings to be applied on the **Accounts** panel 
+- The notify box ticked for the accounts you want these settings to be applied on the **Accounts** panel
 
 You should now see your settings in the **Settings -> Users** section
 

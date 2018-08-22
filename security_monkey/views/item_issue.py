@@ -89,19 +89,32 @@ class ItemAuditList(AuthenticatedService):
              :statuscode 401: Authentication failure. Please login.
         """
 
-        self.reqparse.add_argument('count', type=int, default=30, location='args')
-        self.reqparse.add_argument('page', type=int, default=1, location='args')
-        self.reqparse.add_argument('regions', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounts', type=str, default=None, location='args')
-        self.reqparse.add_argument('accounttypes', type=str, default=None, location='args')
-        self.reqparse.add_argument('technologies', type=str, default=None, location='args')
-        self.reqparse.add_argument('names', type=str, default=None, location='args')
-        self.reqparse.add_argument('arns', type=str, default=None, location='args')
-        self.reqparse.add_argument('active', type=str, default=None, location='args')
-        self.reqparse.add_argument('searchconfig', type=str, default=None, location='args')
-        self.reqparse.add_argument('enabledonly', type=bool, default=None, location='args')
-        self.reqparse.add_argument('justified', type=str, default=None, location='args')
-        self.reqparse.add_argument('summary', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'count', type=int, default=30, location='args')
+        self.reqparse.add_argument(
+            'page', type=int, default=1, location='args')
+        self.reqparse.add_argument(
+            'regions', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounts', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'accounttypes', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'technologies', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'names', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'arns', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'active', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'searchconfig', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'enabledonly', type=bool, default=None, location='args')
+        self.reqparse.add_argument(
+            'justified', type=str, default=None, location='args')
+        self.reqparse.add_argument(
+            'summary', type=str, default=None, location='args')
         args = self.reqparse.parse_args()
 
         page = args.pop('page', None)
@@ -122,7 +135,8 @@ class ItemAuditList(AuthenticatedService):
         if 'accounttypes' in args:
             accounttypes = args['accounttypes'].split(',')
             query = query.join((Account, Account.id == Item.account_id))
-            query = query.join((AccountType, AccountType.id == Account.account_type_id))
+            query = query.join(
+                (AccountType, AccountType.id == Account.account_type_id))
             query = query.filter(AccountType.name.in_(accounttypes))
         if 'technologies' in args:
             technologies = args['technologies'].split(',')
@@ -136,19 +150,24 @@ class ItemAuditList(AuthenticatedService):
             query = query.filter(Item.arn.in_(arns))
         if 'active' in args:
             active = args['active'].lower() == "true"
-            query = query.join((ItemRevision, Item.latest_revision_id == ItemRevision.id))
+            query = query.join(
+                (ItemRevision, Item.latest_revision_id == ItemRevision.id))
             query = query.filter(ItemRevision.active == active)
         if 'searchconfig' in args:
             search = args['searchconfig'].split(',')
             conditions = []
             for searchterm in search:
-                conditions.append(ItemAudit.issue.ilike('%{}%'.format(searchterm)))
-                conditions.append(ItemAudit.notes.ilike('%{}%'.format(searchterm)))
-                conditions.append(ItemAudit.justification.ilike('%{}%'.format(searchterm)))
-                conditions.append(Item.name.ilike('%{}%'.format(searchterm))) 
+                conditions.append(ItemAudit.issue.ilike(
+                    '%{}%'.format(searchterm)))
+                conditions.append(ItemAudit.notes.ilike(
+                    '%{}%'.format(searchterm)))
+                conditions.append(ItemAudit.justification.ilike(
+                    '%{}%'.format(searchterm)))
+                conditions.append(Item.name.ilike('%{}%'.format(searchterm)))
             query = query.filter(or_(*conditions))
         if 'enabledonly' in args:
-            query = query.join((AuditorSettings, AuditorSettings.id == ItemAudit.auditor_setting_id))
+            query = query.join(
+                (AuditorSettings, AuditorSettings.id == ItemAudit.auditor_setting_id))
             query = query.filter(AuditorSettings.disabled == False)
         if 'justified' in args:
             justified = args['justified'].lower() == "true"
@@ -176,7 +195,8 @@ class ItemAuditList(AuthenticatedService):
             item_marshaled = marshal(issue.item.__dict__, ITEM_FIELDS)
             issue_marshaled = marshal(issue.__dict__, AUDIT_FIELDS)
             account_marshaled = {'account': issue.item.account.name}
-            accounttype_marshaled = {'account_type': issue.item.account.account_type.name}
+            accounttype_marshaled = {
+                'account_type': issue.item.account.account_type.name}
             technology_marshaled = {'technology': issue.item.technology.name}
 
             links = []

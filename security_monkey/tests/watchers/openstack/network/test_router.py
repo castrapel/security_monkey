@@ -21,9 +21,10 @@
 """
 from security_monkey.tests.watchers.openstack import OpenStackWatcherTestCase
 
+
 class OpenStackRouterWatcherTestCase(OpenStackWatcherTestCase):
 
     def pre_test_setup(self):
         super(OpenStackRouterWatcherTestCase, self).pre_test_setup()
-        from security_monkey.watchers.openstack.network.openstack_router import OpenStackRouter 
+        from security_monkey.watchers.openstack.network.openstack_router import OpenStackRouter
         self.watcher = OpenStackRouter(accounts=[self.account.name])

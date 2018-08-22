@@ -30,11 +30,11 @@ Edit `security_monkey/scheduler.py` to change daily check schedule:
 Edit `security_monkey/watcher.py` to change check interval from every 15 minutes:
 
     self.interval = 15
-    
+
 Synchronizing Network Whitelists
 --------------------------------
 
-Network whitelists can be imported from a JSON file in either an S3 bucket or local file. 
+Network whitelists can be imported from a JSON file in either an S3 bucket or local file.
 
 ```sh
 # add and update networks from an S3 bucket

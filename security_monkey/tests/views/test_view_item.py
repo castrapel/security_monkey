@@ -39,7 +39,8 @@ class ItemApiTestCase(SecurityMonkeyApiTestCase):
         assert r_json['items'][0]['last_seen'] == '2016-11-03 00:00:00'
 
     def _setup_one_two_revisions(self):
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)
@@ -55,8 +56,10 @@ class ItemApiTestCase(SecurityMonkeyApiTestCase):
 
         self.now = datetime(2016, 11, 3)
         self.yesterday = self.now - timedelta(days=1)
-        item.revisions.append(ItemRevision(active=True, config={}, date_created=self.now))
-        item.revisions.append(ItemRevision(active=True, config={}, date_created=self.yesterday))
+        item.revisions.append(ItemRevision(
+            active=True, config={}, date_created=self.now))
+        item.revisions.append(ItemRevision(
+            active=True, config={}, date_created=self.yesterday))
 
         db.session.add(account)
         db.session.add(technology)

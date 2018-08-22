@@ -66,7 +66,8 @@ class RevisionCommentGet(AuthenticatedService):
             :statuscode 404: Revision Comment with given ID not found.
             :statuscode 401: Authentication Error. Please Login.
         """
-        query = ItemRevisionComment.query.filter(ItemRevisionComment.id == comment_id)
+        query = ItemRevisionComment.query.filter(
+            ItemRevisionComment.id == comment_id)
         query = query.filter(ItemRevisionComment.revision_id == revision_id)
         irc = query.first()
 
@@ -121,7 +122,8 @@ class RevisionCommentDelete(AuthenticatedService):
             :statuscode 404: Revision Comment with given ID not found.
             :statuscode 401: Authentication Error. Please Login.
         """
-        query = ItemRevisionComment.query.filter(ItemRevisionComment.id == comment_id)
+        query = ItemRevisionComment.query.filter(
+            ItemRevisionComment.id == comment_id)
         query = query.filter(ItemRevisionComment.revision_id == revision_id)
         irc = query.first()
 
@@ -176,7 +178,8 @@ class RevisionCommentPost(AuthenticatedService):
             :statuscode 201: Revision Comment Created
             :statuscode 401: Authentication Error. Please Login.
         """
-        self.reqparse.add_argument('text', required=False, type=text_type, help='Must provide comment', location='json')
+        self.reqparse.add_argument(
+            'text', required=False, type=text_type, help='Must provide comment', location='json')
         args = self.reqparse.parse_args()
 
         irc = ItemRevisionComment()

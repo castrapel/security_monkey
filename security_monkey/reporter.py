@@ -32,7 +32,8 @@ class Reporter(object):
 
     def __init__(self, account=None, debug=False):
         self.all_monitors = all_monitors(account, debug)
-        self.account_alerter = Alerter(watchers_auditors=self.all_monitors, account=account)
+        self.account_alerter = Alerter(
+            watchers_auditors=self.all_monitors, account=account)
 
     def get_monitors_to_run(self, account, interval=None):
         """
@@ -68,14 +69,14 @@ class Reporter(object):
             for support_watcher_index in auditor.support_watcher_indexes:
                 if support_watcher_index in watchers_with_changes:
                     app.logger.debug("Upstream watcher changed {}. reauditing {}".format(
-                                     support_watcher_index, watcher.index))
+                        support_watcher_index, watcher.index))
 
                     watcher.full_audit_list = auditor.read_previous_items()
         if auditor.support_auditor_indexes:
             for support_auditor_index in auditor.support_auditor_indexes:
                 if support_auditor_index in watchers_with_changes:
                     app.logger.debug("Upstream auditor changed {}. reauditing {}".format(
-                                     support_auditor_index, watcher.index))
+                        support_auditor_index, watcher.index))
                     watcher.full_audit_list = auditor.read_previous_items()
 
         if watcher.full_audit_list:

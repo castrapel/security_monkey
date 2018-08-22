@@ -66,9 +66,9 @@ class EBSSnapshot(Watcher):
 
         from security_monkey.common.sts_connect import connect
         self.last_session = connect(kwargs['account_name'],
-            'boto3.ec2.client',
-            region=kwargs['region'],
-            assumed_role=kwargs['assumed_role'])
+                                    'boto3.ec2.client',
+                                    region=kwargs['region'],
+                                    assumed_role=kwargs['assumed_role'])
 
         self.last_session_account = kwargs['account_name']
         self.last_session_region = kwargs['region']
@@ -92,7 +92,8 @@ class EBSSnapshot(Watcher):
             account=kwargs['account_name']))
 
         return {
-            'create_volume_permissions': self.get_attribute('createVolumePermission', 'CreateVolumePermissions', snapshot, **kwargs),
+            'create_volume_permissions': self.get_attribute('createVolumePermission', 'CreateVolumePermissions',
+                                                            snapshot, **kwargs),
             'product_codes': self.get_attribute('productCodes', 'ProductCodes', snapshot, **kwargs),
             'name': snapshot_name(snapshot),
             'snapshot_id': snapshot.get('SnapshotId'),
@@ -114,10 +115,10 @@ class EBSSnapshot(Watcher):
     @record_exception()
     def describe_snapshots(self, **kwargs):
         ec2 = self.get_session(**kwargs)
-        response = self.wrap_aws_rate_limited_call(ec2.describe_snapshots, OwnerIds=['self'])
+        response = self.wrap_aws_rate_limited_call(
+            ec2.describe_snapshots, OwnerIds=['self'])
         snapshots = response.get('Snapshots')
         return [snapshot for snapshot in snapshots if not self.check_ignore_list(snapshot_name(snapshot))]
-
 
     def slurp(self):
         """
@@ -133,11 +134,13 @@ class EBSSnapshot(Watcher):
             item_list = []
             exception_map = {}
             kwargs['exception_map'] = exception_map
-            app.logger.debug("Checking {}/{}/{}".format(self.index, kwargs['account_name'], kwargs['region']))
+            app.logger.debug("Checking {}/{}/{}".format(self.index,
+                                                        kwargs['account_name'], kwargs['region']))
             snapshots = self.describe_snapshots(**kwargs)
 
             if snapshots:
-                app.logger.debug("Found {} {}.".format(len(snapshots), self.i_am_plural))
+                app.logger.debug("Found {} {}.".format(
+                    len(snapshots), self.i_am_plural))
                 for snapshot in snapshots:
                     kwargs['name'] = snapshot_name(snapshot)
                     config = self.process_snapshot(snapshot, **kwargs)
@@ -149,6 +152,7 @@ class EBSSnapshot(Watcher):
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

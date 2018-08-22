@@ -41,7 +41,8 @@ class VPCAuditor(Auditor):
         alert when flow logs are not enabled for VPC
         """
         if not self.account_mapping.get(vpc_item.account):
-            flow_log_items = self.get_watcher_support_items(FlowLog.index, vpc_item.account)
+            flow_log_items = self.get_watcher_support_items(
+                FlowLog.index, vpc_item.account)
 
             self.account_mapping[vpc_item.account] = {fl.config["flow_log_id"]: fl.config["flow_log_status"]
                                                       for fl in flow_log_items}

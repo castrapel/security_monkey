@@ -40,12 +40,12 @@ class SNSAuditorTestCase(SecurityMonkeyTestCase):
                           third_party=False, active=True)
         # friendly
         account2 = Account(identifier="222222222222", name="TEST_ACCOUNT_TWO",
-                          account_type_id=account_type_result.id, notes="TEST_ACCOUNT_TWO",
-                          third_party=False, active=True)
+                           account_type_id=account_type_result.id, notes="TEST_ACCOUNT_TWO",
+                           third_party=False, active=True)
         # third party
         account3 = Account(identifier="333333333333", name="TEST_ACCOUNT_THREE",
-                          account_type_id=account_type_result.id, notes="TEST_ACCOUNT_THREE",
-                          third_party=True, active=True)
+                           account_type_id=account_type_result.id, notes="TEST_ACCOUNT_THREE",
+                           third_party=True, active=True)
 
         db.session.add(account)
         db.session.add(account2)
@@ -67,12 +67,12 @@ class SNSAuditorTestCase(SecurityMonkeyTestCase):
         # Unknown account ID
         item = SNSItem(config=dict(
             subscriptions=[{
-                    "Owner": "020202020202",
-                    "Endpoint": "someemail@example.com",
-                    "Protocol": "email",
-                    "TopicArn": "arn:aws:sns:us-east-1:020202020202:somesnstopic",
-                    "SubscriptionArn": "arn:aws:sns:us-east-1:020202020202:somesnstopic:..."
-                }]))
+                "Owner": "020202020202",
+                "Endpoint": "someemail@example.com",
+                "Protocol": "email",
+                "TopicArn": "arn:aws:sns:us-east-1:020202020202:somesnstopic",
+                "SubscriptionArn": "arn:aws:sns:us-east-1:020202020202:somesnstopic:..."
+            }]))
         auditor.check_subscriptions_crossaccount(item)
         self.assertEquals(len(item.audit_issues), 1)
         self.assertEquals(item.audit_issues[0].score, 10)
@@ -80,12 +80,12 @@ class SNSAuditorTestCase(SecurityMonkeyTestCase):
         # Friendly account ID
         item = SNSItem(config=dict(
             subscriptions=[{
-                    "Owner": "222222222222",
-                    "Endpoint": "someemail@example.com",
-                    "Protocol": "email",
-                    "TopicArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic",
-                    "SubscriptionArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic:..."
-                }]))
+                "Owner": "222222222222",
+                "Endpoint": "someemail@example.com",
+                "Protocol": "email",
+                "TopicArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic",
+                "SubscriptionArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic:..."
+            }]))
         auditor.check_subscriptions_crossaccount(item)
         self.assertEquals(len(item.audit_issues), 1)
         self.assertEquals(item.audit_issues[0].score, 0)
@@ -93,12 +93,12 @@ class SNSAuditorTestCase(SecurityMonkeyTestCase):
         # ThirdParty account ID
         item = SNSItem(config=dict(
             subscriptions=[{
-                    "Owner": "333333333333",
-                    "Endpoint": "someemail@example.com",
-                    "Protocol": "email",
-                    "TopicArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic",
-                    "SubscriptionArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic:..."
-                }]))
+                "Owner": "333333333333",
+                "Endpoint": "someemail@example.com",
+                "Protocol": "email",
+                "TopicArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic",
+                "SubscriptionArn": "arn:aws:sns:us-east-1:012345678910:somesnstopic:..."
+            }]))
         auditor.check_subscriptions_crossaccount(item)
         self.assertEquals(len(item.audit_issues), 1)
         self.assertEquals(item.audit_issues[0].score, 0)

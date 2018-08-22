@@ -34,6 +34,7 @@ class MockWatcher(object):
     def __init__(self, accounts=None, debug=False):
         self.accounts = accounts
 
+
 watcher_configs = [
     {'type': 'MockWatcher1', 'index': 'index1', 'interval': 1440},
     {'type': 'MockWatcher2', 'index': 'index2', 'interval': 1440},
@@ -42,7 +43,8 @@ watcher_configs = [
 
 test_watcher_registry = {}
 for config in watcher_configs:
-    watcher = type(config['type'], (MockWatcher,), {'index': config['index'], 'interval': config['interval']})
+    watcher = type(config['type'], (MockWatcher,), {
+        'index': config['index'], 'interval': config['interval']})
     test_watcher_registry[config['index']] = watcher
 
 
@@ -56,7 +58,8 @@ class WatcherConfigApiTestCase(SecurityMonkeyApiTestCase):
         assert r_json['items'][0]['id'] == 0
 
     def test_get_watcher_configs(self):
-        watcher_config = WatcherConfig(index='index1', interval=1440, active=True)
+        watcher_config = WatcherConfig(
+            index='index1', interval=1440, active=True)
         db.session.add(watcher_config)
         db.session.commit()
         db.session.refresh(watcher_config)
@@ -68,7 +71,8 @@ class WatcherConfigApiTestCase(SecurityMonkeyApiTestCase):
         assert r_json['items'][0]['id'] != 0
 
     def test_put_watcher_config(self):
-        watcher_config = WatcherConfig(index='index1', interval=1440, active=True)
+        watcher_config = WatcherConfig(
+            index='index1', interval=1440, active=True)
         db.session.add(watcher_config)
         db.session.commit()
         db.session.refresh(watcher_config)
@@ -83,17 +87,20 @@ class WatcherConfigApiTestCase(SecurityMonkeyApiTestCase):
 
     # Update the response code when we handle this appropriately (404)
     def test_put_watcher_config_wrong_id(self):
-        watcher_config = WatcherConfig(index='index1', interval=1440, active=True)
+        watcher_config = WatcherConfig(
+            index='index1', interval=1440, active=True)
         db.session.add(watcher_config)
         db.session.commit()
         db.session.refresh(watcher_config)
 
         d = dict(index='account', interval=1440, active=True)
-        r = self.test_app.put("/api/1/watcher_config/{}".format('100'), headers=self.headers, data=json.dumps(d))
+        r = self.test_app.put("/api/1/watcher_config/{}".format('100'),
+                              headers=self.headers, data=json.dumps(d))
         assert r.status_code == 500
 
     def test_put_watcher_config_wrong_data(self):
-        watcher_config = WatcherConfig(index='index1', interval=1440, active=True)
+        watcher_config = WatcherConfig(
+            index='index1', interval=1440, active=True)
         db.session.add(watcher_config)
         db.session.commit()
         db.session.refresh(watcher_config)

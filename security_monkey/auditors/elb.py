@@ -171,17 +171,20 @@ class ELBAuditor(Auditor):
         scheme = elb_item.config.get('Scheme', None)
         vpc = elb_item.config.get('VPCId', None)
         if scheme and scheme == u"internet-facing" and not vpc:
-            self.add_issue(1, Categories.INTERNET_ACCESSIBLE, elb_item, notes='EC2 Classic ELB has internet-facing scheme.')
+            self.add_issue(1, Categories.INTERNET_ACCESSIBLE, elb_item,
+                           notes='EC2 Classic ELB has internet-facing scheme.')
         elif scheme and scheme == u"internet-facing" and vpc:
             security_group_ids = set(elb_item.config.get('SecurityGroups', []))
-            sg_auditor_items = self.get_auditor_support_items(SecurityGroup.index, elb_item.account)
-            security_auditor_groups = [sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
+            sg_auditor_items = self.get_auditor_support_items(
+                SecurityGroup.index, elb_item.account)
+            security_auditor_groups = [
+                sg for sg in sg_auditor_items if sg.config.get('id') in security_group_ids]
 
             for sg in security_auditor_groups:
                 for issue in sg.db_item.issues:
                     if self._issue_matches_listeners(elb_item, issue):
                         self.link_to_support_item_issues(elb_item, sg.db_item,
-                            sub_issue_message=issue.issue, score=issue.score)
+                                                         sub_issue_message=issue.issue, score=issue.score)
 
     def check_listener_reference_policy(self, elb_item):
         """
@@ -197,10 +200,13 @@ class ELBAuditor(Auditor):
         for policy_name, policy in policies.items():
             policy_type = policy.get("type", None)
             if policy_type and policy_type == "SSLNegotiationPolicyType":
-                reference_policy = policy.get('reference_security_policy', None)
-                self._process_reference_policy(reference_policy, policy_name, json.dumps(policy_port_map[policy_name]), elb_item)
+                reference_policy = policy.get(
+                    'reference_security_policy', None)
+                self._process_reference_policy(reference_policy, policy_name, json.dumps(
+                    policy_port_map[policy_name]), elb_item)
                 if not reference_policy:
-                    self._process_custom_listener_policy(policy_name, policy, json.dumps(policy_port_map[policy_name]), elb_item)
+                    self._process_custom_listener_policy(
+                        policy_name, policy, json.dumps(policy_port_map[policy_name]), elb_item)
 
     def check_logging(self, elb_item):
         """
@@ -208,11 +214,13 @@ class ELBAuditor(Auditor):
         """
         logging = elb_item.config.get('Attributes', {}).get('AccessLog', {})
         if not logging:
-            self.add_issue(1, Categories.RECOMMENDATION, elb_item, notes='Enable access logs')
+            self.add_issue(1, Categories.RECOMMENDATION,
+                           elb_item, notes='Enable access logs')
             return
 
         if not logging.get('Enabled'):
-            self.add_issue(1, Categories.RECOMMENDATION, elb_item, notes='Enable access logs')
+            self.add_issue(1, Categories.RECOMMENDATION,
+                           elb_item, notes='Enable access logs')
             return
 
     def _process_reference_policy(self, reference_policy, policy_name, ports, elb_item):
@@ -265,7 +273,7 @@ class ELBAuditor(Auditor):
                 reason="Uses diffie-hellman (DHE-DSS-AES1280SHA)",
                 cve='LOGJAM CVE-2015-4000')
             self.add_issue(5, Categories.INSECURE_TLS, elb_item, notes=notes)
-            
+
             notes = Categories.INSECURE_TLS_NOTES.format(
                 policy=reference_policy, port=ports,
                 reason="Contains RC4 ciphers (ECDHE-RSA-RC4-SHA and RC4-SHA)")
@@ -291,8 +299,8 @@ class ELBAuditor(Auditor):
         if reference_policy == 'ELBSecurityPolicy-2015-02':
             # Yay! Dropped RC4, but broke Windows XP.
             # https://forums.aws.amazon.com/ann.jspa?annID=2877
-            self.add_issue(0, Categories.INFORMATIONAL, elb_item, 
-                notes="ELBSecurityPolicy-2015-02 is not Windows XP compatible")
+            self.add_issue(0, Categories.INFORMATIONAL, elb_item,
+                           notes="ELBSecurityPolicy-2015-02 is not Windows XP compatible")
 
             notes = Categories.INSECURE_TLS_NOTES.format(
                 policy=reference_policy, port=ports,
@@ -308,7 +316,7 @@ class ELBAuditor(Auditor):
                 reason='Weak cipher (DES-CBC3-SHA) for Windows XP support',
                 cve='SWEET32 CVE-2016-2183')
             self.add_issue(5, Categories.INSECURE_TLS, elb_item, notes=notes)
-            
+
             notes = Categories.INSECURE_TLS_NOTES_2.format(
                 policy=reference_policy, port=ports,
                 reason="Uses diffie-hellman (DHE-DSS-AES1280SHA)",
@@ -336,7 +344,8 @@ class ELBAuditor(Auditor):
             # https://forums.aws.amazon.com/ann.jspa?annID=4475
             return
 
-        notes = Categories.INSECURE_TLS_NOTES.format(policy=reference_policy, port=ports, reason='Unknown reference policy')
+        notes = Categories.INSECURE_TLS_NOTES.format(
+            policy=reference_policy, port=ports, reason='Unknown reference policy')
         self.add_issue(10, Categories.INSECURE_TLS, elb_item, notes=notes)
 
     def _process_custom_listener_policy(self, policy_name, policy, ports, elb_item):
@@ -359,7 +368,8 @@ class ELBAuditor(Auditor):
                 reason='SSLv3 is enabled')
             self.add_issue(10, Categories.INSECURE_TLS, elb_item, notes=notes)
 
-        server_defined_cipher_order = policy.get('server_defined_cipher_order', None)
+        server_defined_cipher_order = policy.get(
+            'server_defined_cipher_order', None)
         if server_defined_cipher_order is False:
             notes = Categories.INSECURE_TLS_NOTES.format(
                 policy=policy_name, port=ports,
@@ -372,18 +382,22 @@ class ELBAuditor(Auditor):
                 # https://aws.amazon.com/security/security-bulletins/ssl-issue--freak-attack-/
                 notes = Categories.INSECURE_TLS_NOTES_2.format(
                     policy=policy_name, port=ports,
-                    reason='Export grade cipher ({cipher})'.format(cipher=cipher),
+                    reason='Export grade cipher ({cipher})'.format(
+                        cipher=cipher),
                     cve="FREAK CVE-2015-0204")
-                self.add_issue(10, Categories.INSECURE_TLS, elb_item, notes=notes)
+                self.add_issue(10, Categories.INSECURE_TLS,
+                               elb_item, notes=notes)
 
             if cipher in DEPRECATED_CIPHERS:
                 notes = Categories.INSECURE_TLS_NOTES.format(
                     policy=policy_name, port=ports,
                     reason='Deprecated cipher ({cipher})'.format(cipher=cipher))
-                self.add_issue(10, Categories.INSECURE_TLS, elb_item, notes=notes)
+                self.add_issue(10, Categories.INSECURE_TLS,
+                               elb_item, notes=notes)
 
             if cipher in NOTRECOMMENDED_CIPHERS:
                 notes = Categories.INSECURE_TLS_NOTES.format(
                     policy=policy_name, port=ports,
                     reason='Cipher not recommended ({cipher})'.format(cipher=cipher))
-                self.add_issue(10, Categories.INSECURE_TLS, elb_item, notes=notes)
+                self.add_issue(10, Categories.INSECURE_TLS,
+                               elb_item, notes=notes)

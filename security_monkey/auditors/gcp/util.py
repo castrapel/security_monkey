@@ -23,12 +23,12 @@ from security_monkey.common.gcp.error import AuditIssue
 
 
 def _gen_error_code(cat, subcat, prefix, postfix=None):
-        s = "%s_%s_%s" % (str(cat).upper(),
-                          str(prefix).upper(),
-                          str(subcat).upper())
-        if postfix:
-            s += '_' + str(postfix).upper()
-        return s
+    s = "%s_%s_%s" % (str(cat).upper(),
+                      str(prefix).upper(),
+                      str(subcat).upper())
+    if postfix:
+        s += '_' + str(postfix).upper()
+    return s
 
 
 def make_audit_issue(cat, subcat, prefix, postfix=None, notes=None):
@@ -47,4 +47,3 @@ def process_issues(auditor, ok, issues, item):
                 notes = issue.notes
             auditor.add_issue(sev, msg, item, notes)
     return True
-

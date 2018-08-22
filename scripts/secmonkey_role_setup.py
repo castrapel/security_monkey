@@ -21,7 +21,8 @@ Grab credentials from ~/.boto (or other standard credentials sources).
 Optionally accept "profile_name" as CLI parameter.
 """
 
-import sys, json
+import sys
+import json
 import urllib
 import boto
 
@@ -30,7 +31,7 @@ import boto
 secmonkey_arn = 'arn:aws:iam::<awsaccountnumber>:role/SecurityMonkeyInstanceProfile'
 
 trust_relationship = \
-'''
+    '''
 {
   "Version": "2008-10-17",
   "Statement": [
@@ -51,7 +52,7 @@ role_name = 'SecurityMonkey'
 role_policy_name = 'SecurityMonkeyPolicy'
 
 policy = \
-'''
+    '''
 {
   "Statement": [
     {
@@ -170,7 +171,7 @@ policy = \
            "sns:listtopics",
            "sqs:getqueueattributes",
            "sqs:listqueues",
-           "sqs:listqueuetags", 
+           "sqs:listqueuetags",
            "sqs:listdeadlettersourcequeues"
       ],
       "Effect": "Allow",
@@ -180,48 +181,52 @@ policy = \
 }
 '''
 
-def main(profile = None):
-  # Sanitize JSON
-  assume_policy = json.dumps(json.loads(trust_relationship % secmonkey_arn))
-  security_policy = json.dumps(json.loads(policy))
 
-  # Connect to IAM
-  (role_exist, current_policy) = (False, "")
-  try:
-    iam = boto.connect_iam(profile_name = profile)
-  except boto.exception.NoAuthHandlerFound:
-    sys.exit("Authentication failed, please check your credentials under ~/.boto")
+def main(profile=None):
+    # Sanitize JSON
+    assume_policy = json.dumps(json.loads(trust_relationship % secmonkey_arn))
+    security_policy = json.dumps(json.loads(policy))
 
-  # Check if role already exists
-  rlist = iam.list_roles()
-  for r in rlist['list_roles_response']['list_roles_result']['roles']:
-    if r['role_name'] == role_name:
-      role_exist = True
-      current_policy = json.loads(urllib.unquote(r['assume_role_policy_document']))
-      for p in current_policy['Statement']:
-        if p['Action'] == 'sts:AssumeRole':
-          if secmonkey_arn in p['Principal']['AWS'] :
-            # Already ok
-            sys.exit('Role "%s" already configured, not touching it.' % role_name)
-          else:
-            # Add another monitoring account
-            new_policy = [secmonkey_arn]
-            new_policy.extend(p['Principal']['AWS'])
-            p['Principal']['AWS'] = new_policy
-      assume_policy = json.dumps(current_policy)
+    # Connect to IAM
+    (role_exist, current_policy) = (False, "")
+    try:
+        iam = boto.connect_iam(profile_name=profile)
+    except boto.exception.NoAuthHandlerFound:
+        sys.exit("Authentication failed, please check your credentials under ~/.boto")
 
-  # Add SecurityMonkey monitoring role and link it to supervisor ARN
-  if not role_exist:
-    role = iam.create_role(role_name, assume_policy)
-  else:
-    role = iam.update_assume_role_policy(role_name, assume_policy)
+    # Check if role already exists
+    rlist = iam.list_roles()
+    for r in rlist['list_roles_response']['list_roles_result']['roles']:
+        if r['role_name'] == role_name:
+            role_exist = True
+            current_policy = json.loads(
+                urllib.unquote(r['assume_role_policy_document']))
+            for p in current_policy['Statement']:
+                if p['Action'] == 'sts:AssumeRole':
+                    if secmonkey_arn in p['Principal']['AWS']:
+                        # Already ok
+                        sys.exit(
+                            'Role "%s" already configured, not touching it.' % role_name)
+                    else:
+                        # Add another monitoring account
+                        new_policy = [secmonkey_arn]
+                        new_policy.extend(p['Principal']['AWS'])
+                        p['Principal']['AWS'] = new_policy
+            assume_policy = json.dumps(current_policy)
 
-  # Add our own role policy
-  iam.put_role_policy(role_name, role_policy_name, security_policy)
-  print('Added role "%s", linked to ARN "%s".' % (role_name, secmonkey_arn))
+    # Add SecurityMonkey monitoring role and link it to supervisor ARN
+    if not role_exist:
+        role = iam.create_role(role_name, assume_policy)
+    else:
+        role = iam.update_assume_role_policy(role_name, assume_policy)
+
+    # Add our own role policy
+    iam.put_role_policy(role_name, role_policy_name, security_policy)
+    print('Added role "%s", linked to ARN "%s".' % (role_name, secmonkey_arn))
+
 
 if __name__ == "__main__":
-  profile = None
-  if len(sys.argv) >= 2:
-    profile = sys.argv[1]
-  main(profile)
+    profile = None
+    if len(sys.argv) >= 2:
+        profile = sys.argv[1]
+    main(profile)

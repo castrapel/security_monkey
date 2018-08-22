@@ -21,7 +21,8 @@ from six import text_type
 
 from security_monkey.account_manager import bulk_disable_accounts, bulk_enable_accounts
 from security_monkey.common.s3_canonical import get_canonical_ids
-from security_monkey.datastore import clear_old_exceptions, store_exception, AccountType, ItemAudit, NetworkWhitelistEntry
+from security_monkey.datastore import clear_old_exceptions, store_exception, AccountType, ItemAudit, \
+    NetworkWhitelistEntry
 
 from security_monkey import app, db, jirasync
 from security_monkey.common.route53 import Route53Service
@@ -71,7 +72,8 @@ def run_change_reporter(accounts):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     manual_run_change_reporter(account_names)
@@ -85,7 +87,8 @@ def find_changes(accounts, monitors):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     manual_run_change_finder(account_names, monitor_names)
@@ -101,10 +104,12 @@ def audit_changes(accounts, monitors, send_report, skip_batch):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
-    sm_audit_changes(account_names, monitor_names, send_report, skip_batch=skip_batch)
+    sm_audit_changes(account_names, monitor_names,
+                     send_report, skip_batch=skip_batch)
 
 
 @manager.option('-a', '--accounts', dest='accounts', type=text_type, default=u'all')
@@ -115,7 +120,8 @@ def delete_unjustified_issues(accounts, monitors):
     try:
         _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     issues = ItemAudit.query.filter_by(justified=False).all()
@@ -134,7 +140,8 @@ def backup_config_to_json(accounts, monitors, outputfolder):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     sm_backup_config_to_json(account_names, monitor_names, outputfolder)
@@ -147,7 +154,8 @@ def sync_jira():
         app.logger.info('Syncing issues with Jira')
         jirasync.sync_issues()
     else:
-        app.logger.info('Jira sync not configured. Is SECURITY_MONKEY_JIRA_SYNC set?')
+        app.logger.info(
+            'Jira sync not configured. Is SECURITY_MONKEY_JIRA_SYNC set?')
 
 
 @manager.command
@@ -158,7 +166,8 @@ def clear_expired_exceptions():
     """
     app.logger.info("Clearing out exceptions that have an expired TTL...")
     clear_old_exceptions()
-    app.logger.info("Completed clearing out exceptions that have an expired TTL.")
+    app.logger.info(
+        "Completed clearing out exceptions that have an expired TTL.")
 
 
 @manager.command
@@ -171,7 +180,8 @@ def amazon_accounts():
 
     app.logger.info('Adding / updating Amazon owned accounts')
     try:
-        account_type_result = AccountType.query.filter(AccountType.name == 'AWS').first()
+        account_type_result = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not account_type_result:
             account_type_result = AccountType(name='AWS')
             db.session.add(account_type_result)
@@ -180,13 +190,17 @@ def amazon_accounts():
 
         for group, info in data.items():
             for aws_account in info['accounts']:
-                acct_name = "{group} ({region})".format(group=group, region=aws_account['region'])
-                account = Account.query.filter(Account.identifier == aws_account['account_id']).first()
+                acct_name = "{group} ({region})".format(
+                    group=group, region=aws_account['region'])
+                account = Account.query.filter(
+                    Account.identifier == aws_account['account_id']).first()
                 if not account:
-                    app.logger.debug('    Adding account {0}'.format(acct_name))
+                    app.logger.debug(
+                        '    Adding account {0}'.format(acct_name))
                     account = Account()
                 else:
-                    app.logger.debug('    Updating account {0}'.format(acct_name))
+                    app.logger.debug(
+                        '    Updating account {0}'.format(acct_name))
 
                 account.identifier = aws_account['account_id']
                 account.account_type_id = account_type_result.id
@@ -217,7 +231,8 @@ def create_user(email, role):
 
     ROLES = ['View', 'Comment', 'Justify', 'Admin']
     if role not in ROLES:
-        sys.stderr.write('[!] Role must be one of [{0}].\n'.format(' '.join(ROLES)))
+        sys.stderr.write(
+            '[!] Role must be one of [{0}].\n'.format(' '.join(ROLES)))
         sys.exit(1)
 
     users = User.query.filter(User.email == email)
@@ -258,7 +273,8 @@ def disable_accounts(accounts):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     bulk_disable_accounts(account_names)
@@ -270,7 +286,8 @@ def enable_accounts(accounts):
     try:
         account_names = _parse_accounts(accounts)
     except KeyError as e:
-        app.logger.error("The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
+        app.logger.error(
+            "The passed in account: {} does not exist in Security Monkey's database.".format(e.message))
         return -1
 
     bulk_enable_accounts(account_names)
@@ -341,20 +358,24 @@ def add_override_score(tech_name, method, auditor, score, disabled, pattern_scor
         for score in scores:
             left_right = score.split('=')
             if len(left_right) != 2:
-                sys.stderr.write('pattern_scores (-p) format account_type.account_field.account_value=score\n')
+                sys.stderr.write(
+                    'pattern_scores (-p) format account_type.account_field.account_value=score\n')
                 sys.exit(1)
 
             account_info = left_right[0].split('.')
             if len(account_info) != 3:
-                sys.stderr.write('pattern_scores (-p) format account_type.account_field.account_value=score\n')
+                sys.stderr.write(
+                    'pattern_scores (-p) format account_type.account_field.account_value=score\n')
                 sys.exit(1)
 
             from security_monkey.account_manager import account_registry
             if account_info[0] not in account_registry:
-                sys.stderr.write('Invalid account type {}\n'.format(account_info[0]))
+                sys.stderr.write(
+                    'Invalid account type {}\n'.format(account_info[0]))
                 sys.exit(1)
 
-            entry.add_or_update_pattern_score(account_info[0], account_info[1], account_info[2], int(left_right[1]))
+            entry.add_or_update_pattern_score(
+                account_info[0], account_info[1], account_info[2], int(left_right[1]))
 
     db.session.add(entry)
     db.session.commit()
@@ -413,7 +434,8 @@ def add_override_scores(file_name, field_mappings):
         str_score = row[mappings['score']].decode('ascii', 'ignore').strip('')
         if str_score != '':
             if not str_score.isdigit():
-                errors.append('Score {} line {} is not a positive int.'.format(str_score, line_num))
+                errors.append('Score {} line {} is not a positive int.'.format(
+                    str_score, line_num))
                 continue
             score = int(str_score)
 
@@ -429,7 +451,8 @@ def add_override_scores(file_name, field_mappings):
             score = 0
 
         if tech_name not in auditor_registry:
-            errors.append('Invalid tech name {} line {}.'.format(tech_name, line_num))
+            errors.append('Invalid tech name {} line {}.'.format(
+                tech_name, line_num))
             continue
 
         valid = False
@@ -440,11 +463,13 @@ def add_override_scores(file_name, field_mappings):
                 break
 
         if not valid:
-            errors.append('Invalid auditor {} line {}.'.format(auditor, line_num))
+            errors.append(
+                'Invalid auditor {} line {}.'.format(auditor, line_num))
             continue
 
         if not getattr(auditor_class, method, None):
-            errors.append('Invalid method {} line {}.'.format(method, line_num))
+            errors.append(
+                'Invalid method {} line {}.'.format(method, line_num))
             continue
 
         entry = ItemAuditScore(technology=tech_name, method=method + ' (' + auditor + ')',
@@ -452,20 +477,24 @@ def add_override_scores(file_name, field_mappings):
 
         pattern_mappings = mappings['patterns']
         for mapping in pattern_mappings:
-            str_pattern_score = row[pattern_mappings[mapping]].decode('ascii', 'ignore').strip()
+            str_pattern_score = row[pattern_mappings[mapping]].decode(
+                'ascii', 'ignore').strip()
             if str_pattern_score != '':
                 if not str_pattern_score.isdigit():
-                    errors.append('Pattern score {} line {} is not a positive int.'.format(str_pattern_score, line_num))
+                    errors.append('Pattern score {} line {} is not a positive int.'.format(
+                        str_pattern_score, line_num))
                     continue
 
                 account_info = mapping.split('.')
                 if len(account_info) != 3:
-                    errors.append('Invalid pattern mapping {}.'.format(mapping))
+                    errors.append(
+                        'Invalid pattern mapping {}.'.format(mapping))
                     continue
 
                 from security_monkey.account_manager import account_registry
                 if account_info[0] not in account_registry:
-                    errors.append('Invalid account type {}'.format(account_info[0]))
+                    errors.append(
+                        'Invalid account type {}'.format(account_info[0]))
                     continue
 
                 db_pattern_score = AccountPatternAuditScore(account_type=account_info[0],
@@ -502,14 +531,17 @@ def _parse_tech_names(tech_str):
 def _parse_accounts(account_str, active=True):
     """Parse the account ID or name. This will raise a KeyError if it can't find it."""
     if account_str == 'all':
-        accounts = Account.query.filter(Account.third_party == False).filter(Account.active == active).all()
+        accounts = Account.query.filter(Account.third_party == False).filter(
+            Account.active == active).all()
         accounts = [account.name for account in accounts]
         return accounts
     else:
         names_or_ids = account_str.split(',')
         accounts = Account.query.all()
-        accounts_by_id = {account.identifier: account.name for account in accounts}
-        accounts_by_name = {account.name: account.identifier for account in accounts}
+        accounts_by_id = {
+            account.identifier: account.name for account in accounts}
+        accounts_by_name = {
+            account.name: account.identifier for account in accounts}
 
         # Verify that the account name exists (raise a KeyError if it doesn't):
         names = []
@@ -562,7 +594,8 @@ def fetch_aws_canonical_ids(override):
     """
     Adds S3 canonical IDs in for all AWS accounts in SM.
     """
-    app.logger.info("[ ] Fetching S3 canonical IDs for all AWS accounts being monitored by Security Monkey.")
+    app.logger.info(
+        "[ ] Fetching S3 canonical IDs for all AWS accounts being monitored by Security Monkey.")
 
     # Get all the active AWS accounts:
     accounts = Account.query.filter(Account.active == True) \
@@ -609,7 +642,8 @@ class APIServer(Command):
         address = kwargs['address']
 
         if not GUNICORN:
-            print('GUNICORN not installed. Try `runserver` to use the Flask debug server instead.')
+            print(
+                'GUNICORN not installed. Try `runserver` to use the Flask debug server instead.')
         else:
             class FlaskApplication(Application):
                 def init(self, parser, opts, args):
@@ -673,7 +707,8 @@ def sync_swag(owner, bucket_name, bucket_prefix, bucket_region, account_type, sp
 
         thirdparty = account['owner'] != owner
         if spinnaker:
-            spinnaker_name = swag.get_service_name('spinnaker', "[?id=='{id}']".format(id=account['id']))
+            spinnaker_name = swag.get_service_name(
+                'spinnaker', "[?id=='{id}']".format(id=account['id']))
             if not spinnaker_name:
                 name = account['name']
             else:
@@ -685,7 +720,8 @@ def sync_swag(owner, bucket_name, bucket_prefix, bucket_region, account_type, sp
         identifier = account['id']
 
         custom_fields = {}
-        s3_name = swag.get_service_name('s3', "[?id=='{id}']".format(id=account['id']))
+        s3_name = swag.get_service_name(
+            's3', "[?id=='{id}']".format(id=account['id']))
         if s3_name:
             custom_fields['s3_name'] = s3_name
 
@@ -694,7 +730,8 @@ def sync_swag(owner, bucket_name, bucket_prefix, bucket_region, account_type, sp
             c_id = s3_service['metadata'].get('canonicalId', None)
             if c_id:
                 custom_fields['canonical_id'] = c_id
-        role_name = secmonkey_service.get('metadata', {}).get('role_name', None)
+        role_name = secmonkey_service.get(
+            'metadata', {}).get('role_name', None)
         if role_name is not None:
             custom_fields['role_name'] = role_name
 
@@ -705,9 +742,12 @@ def sync_swag(owner, bucket_name, bucket_prefix, bucket_region, account_type, sp
     app.logger.info('SWAG sync successful.')
 
 
-@manager.option('-b', '--bucket-name', dest='bucket_name', type=text_type, help="S3 bucket where network whitelist data is stored.")
-@manager.option('-i', '--input-filename', dest='input_filename', type=text_type, default='networks.json', help="File path or bucket prefix to fetch account data from. Default: networks.json")
-@manager.option('-a', '--authoritative', dest='authoritative', default=False, action='store_true', help='Remove all networks not named in `input_filename`.')
+@manager.option('-b', '--bucket-name', dest='bucket_name', type=text_type,
+                help="S3 bucket where network whitelist data is stored.")
+@manager.option('-i', '--input-filename', dest='input_filename', type=text_type, default='networks.json',
+                help="File path or bucket prefix to fetch account data from. Default: networks.json")
+@manager.option('-a', '--authoritative', dest='authoritative', default=False, action='store_true',
+                help='Remove all networks not named in `input_filename`.')
 def sync_networks(bucket_name, input_filename, authoritative):
     """Imports a JSON file of networks to the Security Monkey whitelist."""
     if bucket_name:
@@ -793,7 +833,8 @@ def main():
     from security_monkey.account_manager import account_registry
 
     for name, account_manager in account_registry.items():
-        manager.add_command("add_account_%s" % name.lower(), AddAccount(account_manager()))
+        manager.add_command("add_account_%s" %
+                            name.lower(), AddAccount(account_manager()))
     manager.add_command("run_api_server", APIServer())
     manager.run()
 

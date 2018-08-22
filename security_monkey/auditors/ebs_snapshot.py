@@ -1,4 +1,3 @@
-
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
 #     You may obtain a copy of the License at
@@ -28,7 +27,8 @@ class EBSSnapshotAuditor(Auditor):
     i_am_plural = EBSSnapshot.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(EBSSnapshotAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(EBSSnapshotAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     # Example permission set:
     # item = {"create_volume_permissions": [
@@ -49,13 +49,15 @@ class EBSSnapshotAuditor(Auditor):
         for uid in self._get_permissions(item):
             entity = Entity(category='account', value=uid)
             if 'FRIENDLY' in self.inspect_entity(entity, item):
-                self.record_friendly_access(item, entity, actions=['createEBSVolume'])
+                self.record_friendly_access(
+                    item, entity, actions=['createEBSVolume'])
 
     def check_thirdparty_access(self, item):
         for uid in self._get_permissions(item):
             entity = Entity(category='account', value=uid)
             if 'THIRDPARTY' in self.inspect_entity(entity, item):
-                self.record_thirdparty_access(item, entity, actions=['createEBSVolume'])
+                self.record_thirdparty_access(
+                    item, entity, actions=['createEBSVolume'])
 
     def check_unknown_access(self, item):
         for uid in self._get_permissions(item):
@@ -66,14 +68,17 @@ class EBSSnapshotAuditor(Auditor):
 
             entity = Entity(category='account', value=uid)
             if 'UNKNOWN' in self.inspect_entity(entity, item):
-                self.record_unknown_access(item, entity, actions=['createEBSVolume'])
+                self.record_unknown_access(
+                    item, entity, actions=['createEBSVolume'])
 
     def check_marketplace_access(self, item):
         if 'aws-marketplace' in self._get_permissions(item):
             entity = Entity(category='shared_ebs', value='aws-marketplace')
-            self.record_internet_access(item, entity, actions=['createEBSVolume'])
+            self.record_internet_access(
+                item, entity, actions=['createEBSVolume'])
 
     def check_internet_accessible(self, item):
         if 'all' in self._get_permissions(item, key='Group'):
             entity = Entity(category='shared_ebs', value='public')
-            self.record_internet_access(item, entity, actions=['createEBSVolume'])
+            self.record_internet_access(
+                item, entity, actions=['createEBSVolume'])

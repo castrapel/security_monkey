@@ -41,13 +41,15 @@ def setup_the_tasks(sender, **kwargs):
             rep = Reporter(account=account.name)
 
             # Is this a dedicated watcher stack, or is this stack ignoring anything?
-            only_watch = get_sm_celery_config_value(celery_config, "security_monkey_only_watch", set)
+            only_watch = get_sm_celery_config_value(
+                celery_config, "security_monkey_only_watch", set)
             # If only_watch is set, then ignoring is ignored.
             if only_watch:
                 ignoring = set()
             else:
                 # Check if we are ignoring any watchers:
-                ignoring = get_sm_celery_config_value(celery_config, "security_monkey_watcher_ignore", set) or set()
+                ignoring = get_sm_celery_config_value(
+                    celery_config, "security_monkey_watcher_ignore", set) or set()
 
             for monitor in rep.all_monitors:
                 # Is this watcher enabled?
@@ -69,12 +71,15 @@ def setup_the_tasks(sender, **kwargs):
                                                                                  monitor.watcher.index))
 
                     # Start the task immediately:
-                    task_account_tech.apply_async((account.name, monitor.watcher.index))
+                    task_account_tech.apply_async(
+                        (account.name, monitor.watcher.index))
                     app.logger.debug("[-->] Scheduled immediate task")
 
                     # Schedule it based on the schedule:
-                    sender.add_periodic_task(interval, task_account_tech.s(account.name, monitor.watcher.index))
-                    app.logger.debug("[+] Scheduled task to occur every {} minutes".format(interval))
+                    sender.add_periodic_task(interval, task_account_tech.s(
+                        account.name, monitor.watcher.index))
+                    app.logger.debug(
+                        "[+] Scheduled task to occur every {} minutes".format(interval))
 
                     # TODO: Due to a bug with Celery (https://github.com/celery/celery/issues/4041) we temporarily
                     #       disabled this to avoid many duplicate events from getting added.
@@ -88,7 +93,8 @@ def setup_the_tasks(sender, **kwargs):
                     # app.logger.debug("[{}] Completed scheduling for technology: {}".format(account.name,
                     #                                                                        monitor.watcher.index))
 
-            app.logger.debug("[+] Completed scheduling tasks for account: {}".format(account.name))
+            app.logger.debug(
+                "[+] Completed scheduling tasks for account: {}".format(account.name))
 
         # Schedule the task for clearing out old exceptions:
         app.logger.info("Scheduling task to clear out old exceptions.")

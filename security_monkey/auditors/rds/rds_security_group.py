@@ -26,6 +26,7 @@ from security_monkey.common.utils import check_rfc_1918
 
 import ipaddr
 
+
 class RDSSecurityGroupAuditor(Auditor):
     index = RDSSecurityGroup.index
     i_am_singular = RDSSecurityGroup.i_am_singular
@@ -33,7 +34,8 @@ class RDSSecurityGroupAuditor(Auditor):
     network_whitelist = []
 
     def __init__(self, accounts=None, debug=False):
-        super(RDSSecurityGroupAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(RDSSecurityGroupAuditor, self).__init__(
+            accounts=accounts, debug=debug)
 
     def prep_for_audit(self):
         self.network_whitelist = NetworkWhitelistEntry.query.all()

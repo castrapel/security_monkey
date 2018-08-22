@@ -62,7 +62,8 @@ class VPN(CloudAuxWatcher):
         # Cast the datetimes to something JSON serializable (ISO 8601 string):
         for vgw in item.get("VgwTelemetry", []):
             if vgw.get("LastStatusChange"):
-                vgw["LastStatusChange"] = vgw["LastStatusChange"].strftime(DATETIME_FORMAT)
+                vgw["LastStatusChange"] = vgw["LastStatusChange"].strftime(
+                    DATETIME_FORMAT)
 
         return item
 

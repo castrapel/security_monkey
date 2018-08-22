@@ -56,7 +56,8 @@ class SES(Watcher):
                     # TODO: Remove this if-block when boto can handle ses in eu-central-1
                     continue
 
-                app.logger.debug("Checking {}/{}/{}".format(self.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(self.index, account, region.name))
                 try:
                     ses = connect(account, 'ses', region=region.name)
                     response = self.wrap_aws_rate_limited_call(
@@ -88,7 +89,8 @@ class SES(Watcher):
                     verified_identities += verified_domains
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), self.index, account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), self.index, account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
@@ -97,7 +99,7 @@ class SES(Watcher):
                 for identity in identities:
                     if self.check_ignore_list(identity):
                         continue
-                    
+
                     config = {
                         'name': identity,
                         'verified': identity in verified_identities

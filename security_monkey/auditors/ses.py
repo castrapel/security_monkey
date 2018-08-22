@@ -31,7 +31,6 @@ class SESAuditor(Auditor):
     def __init__(self, accounts=None, debug=False):
         super(SESAuditor, self).__init__(accounts=accounts, debug=debug)
 
-
     def check_verified(self, ses_item):
         """
         alert when an SES identity is not verified.

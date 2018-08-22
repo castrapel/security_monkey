@@ -26,7 +26,8 @@ from cloudaux.tests.openstack.mock_object_container import mock_get_container_me
 
 import mock
 
-mock.patch('cloudaux.openstack.object_container.get_container_metadata', mock_get_container_metadata).start()
+mock.patch('cloudaux.openstack.object_container.get_container_metadata',
+           mock_get_container_metadata).start()
 
 
 class OpenStackObjectContainerWatcherTestCase(OpenStackWatcherTestCase):

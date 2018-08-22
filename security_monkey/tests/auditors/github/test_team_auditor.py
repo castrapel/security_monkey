@@ -54,8 +54,10 @@ CONFIG_TWO = {
 class GitHubTeamAuditorTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
         self.gh_items = [
-            GitHubTeamItem(account="Org-one", name="Org-one", arn="Org-one", config=CONFIG_ONE),
-            GitHubTeamItem(account="Org-one", name="Org-one", arn="Org-one", config=CONFIG_TWO),
+            GitHubTeamItem(account="Org-one", name="Org-one",
+                           arn="Org-one", config=CONFIG_ONE),
+            GitHubTeamItem(account="Org-one", name="Org-one",
+                           arn="Org-one", config=CONFIG_TWO),
         ]
 
         self.account_type = AccountType(name="GitHub")

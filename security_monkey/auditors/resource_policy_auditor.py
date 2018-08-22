@@ -34,7 +34,8 @@ import ipaddr
 class ResourcePolicyAuditor(Auditor):
 
     def __init__(self, accounts=None, debug=False):
-        super(ResourcePolicyAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(ResourcePolicyAuditor, self).__init__(
+            accounts=accounts, debug=debug)
         self.policy_keys = ['Policy']
 
     def load_resource_policies(self, item):
@@ -57,7 +58,8 @@ class ResourcePolicyAuditor(Auditor):
                 for who in statement.whos_allowed():
                     entity = Entity.from_tuple(who)
                     if 'FRIENDLY' in self.inspect_entity(entity, item):
-                        self.record_friendly_access(item, entity, list(statement.actions))
+                        self.record_friendly_access(
+                            item, entity, list(statement.actions))
 
     def check_thirdparty_cross_account(self, item):
         policies = self.load_resource_policies(item)
@@ -68,7 +70,8 @@ class ResourcePolicyAuditor(Auditor):
                 for who in statement.whos_allowed():
                     entity = Entity.from_tuple(who)
                     if 'THIRDPARTY' in self.inspect_entity(entity, item):
-                        self.record_thirdparty_access(item, entity, list(statement.actions))
+                        self.record_thirdparty_access(
+                            item, entity, list(statement.actions))
 
     def check_unknown_cross_account(self, item):
         policies = self.load_resource_policies(item)
@@ -90,7 +93,8 @@ class ResourcePolicyAuditor(Auditor):
 
                     entity = Entity.from_tuple(who)
                     if 'UNKNOWN' in self.inspect_entity(entity, item):
-                        self.record_unknown_access(item, entity, list(statement.actions))
+                        self.record_unknown_access(
+                            item, entity, list(statement.actions))
 
     def check_root_cross_account(self, item):
         policies = self.load_resource_policies(item)
@@ -105,5 +109,7 @@ class ResourcePolicyAuditor(Auditor):
                         continue
                     arn = ARN(who.value)
                     entity = Entity.from_tuple(who)
-                    if arn.root and self.inspect_entity(entity, item).intersection(set(['FRIENDLY', 'THIRDPARTY', 'UNKNOWN'])):
-                        self.record_cross_account_root(item, entity, list(statement.actions))
+                    if arn.root and self.inspect_entity(entity, item).intersection(
+                            set(['FRIENDLY', 'THIRDPARTY', 'UNKNOWN'])):
+                        self.record_cross_account_root(
+                            item, entity, list(statement.actions))

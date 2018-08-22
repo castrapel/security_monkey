@@ -74,6 +74,7 @@ def iter_org(orgs):
     :param orgs:
     :return:
     """
+
     def decorator(func):
         @wraps(func)
         def decorated_function(*args, **kwargs):

@@ -774,7 +774,8 @@ class GitHubRepoWatcherTestCase(SecurityMonkeyTestCase):
         from security_monkey.watchers.github.repo import GitHubRepo
         repo_watcher = GitHubRepo(accounts=["Org-one"])
 
-        result = repo_watcher.list_repo_deploy_keys("Org-one", "security_monkey")
+        result = repo_watcher.list_repo_deploy_keys(
+            "Org-one", "security_monkey")
         assert len(result) == 2
         assert result[0]["title"] == "Some Deploy Key That Doesn't Exist"
         assert result[1]["title"] == "Some OTHER Deploy Key That Doesn't Exist"
@@ -787,26 +788,30 @@ class GitHubRepoWatcherTestCase(SecurityMonkeyTestCase):
         from security_monkey.watchers.github.repo import GitHubRepo
         repo_watcher = GitHubRepo(accounts=["Org-one"])
 
-        result = repo_watcher.list_repo_protected_branches("Org-one", "security_monkey")
+        result = repo_watcher.list_repo_protected_branches(
+            "Org-one", "security_monkey")
         assert len(result) == 2
         assert result[0]["name"] == "master"
         assert result[1]["name"] == "develop"
 
         with self.assertRaises(InvalidResponseCodeFromGitHubRepoError) as _:
-            repo_watcher.list_repo_protected_branches("FAILURE", "security_monkey")
+            repo_watcher.list_repo_protected_branches(
+                "FAILURE", "security_monkey")
 
     @mock.patch("requests.get", side_effect=mock_list_repo_outside_collaborators)
     def test_list_repo_outside_collaborators(self, mock_get):
         from security_monkey.watchers.github.repo import GitHubRepo
         repo_watcher = GitHubRepo(accounts=["Org-one"])
 
-        result = repo_watcher.list_repo_outside_collaborators("Org-one", "security_monkey")
+        result = repo_watcher.list_repo_outside_collaborators(
+            "Org-one", "security_monkey")
         assert len(result) == 2
         assert result[0]["login"] == "----notarealuserone----"
         assert result[1]["login"] == "----notarealusertwo----"
 
         with self.assertRaises(InvalidResponseCodeFromGitHubRepoError) as _:
-            repo_watcher.list_repo_outside_collaborators("FAILURE", "security_monkey")
+            repo_watcher.list_repo_outside_collaborators(
+                "FAILURE", "security_monkey")
 
     @mock.patch("requests.get", side_effect=mock_list_repo_releases)
     def test_list_repo_releases(self, mock_get):
@@ -839,13 +844,15 @@ class GitHubRepoWatcherTestCase(SecurityMonkeyTestCase):
         from security_monkey.watchers.github.repo import GitHubRepo
         repo_watcher = GitHubRepo(accounts=["Org-one"])
 
-        result = repo_watcher.list_repo_team_permissions("Org-one", "security_monkey")
+        result = repo_watcher.list_repo_team_permissions(
+            "Org-one", "security_monkey")
         assert len(result) == 2
         assert result["Justice League"] == "admin"
         assert result["Team2"] == "pull"
 
         with self.assertRaises(InvalidResponseCodeFromGitHubRepoError) as _:
-            repo_watcher.list_repo_team_permissions("FAILURE", "security_monkey")
+            repo_watcher.list_repo_team_permissions(
+                "FAILURE", "security_monkey")
 
     @mock.patch("requests.get", side_effect=mock_list_repos)
     def test_slurp_list(self, mock_get):

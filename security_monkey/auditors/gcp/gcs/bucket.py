@@ -25,6 +25,7 @@ from security_monkey.common.gcp.config import AuditorConfig
 from security_monkey.common.gcp.error import AuditIssue
 from security_monkey.watchers.gcp.gcs.bucket import GCSBucket
 
+
 # NOTE: issue scores and messages are defined in
 # security_monkey/common/gcp/config.py
 

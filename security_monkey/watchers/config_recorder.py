@@ -39,7 +39,8 @@ class ConfigRecorder(Watcher):
         from security_monkey.common.sts_connect import connect
         config_service = connect(kwargs['account_name'], 'boto3.config.client',
                                  region=kwargs['region'])
-        response = self.wrap_aws_rate_limited_call(config_service.describe_configuration_recorders)
+        response = self.wrap_aws_rate_limited_call(
+            config_service.describe_configuration_recorders)
         config_recorders = response.get('ConfigurationRecorders', [])
 
         return [recorder for recorder in config_recorders if not self.check_ignore_list(recorder.get('name'))]
@@ -63,7 +64,8 @@ class ConfigRecorder(Watcher):
 
             config_recorders = self.describe_configuration_recorders(**kwargs)
             if config_recorders:
-                app.logger.debug("Found {} {}.".format(len(config_recorders), self.i_am_plural))
+                app.logger.debug("Found {} {}.".format(
+                    len(config_recorders), self.i_am_plural))
 
                 for recorder in config_recorders:
                     name = recorder.get('name')
@@ -80,6 +82,7 @@ class ConfigRecorder(Watcher):
                     item_list.append(item)
 
             return item_list, exception_map
+
         return slurp_items()
 
 

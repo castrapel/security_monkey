@@ -32,13 +32,15 @@ class HeaderAuthTestCase(SecurityMonkeyTestCase):
 
     def test_header_auth_disabled(self):
         with patch.dict(self.app.config, {"USE_HEADER_AUTH": False}):
-            r = self.test_app.get('/login', headers={"Remote-User": "foo@example.com"})
+            r = self.test_app.get(
+                '/login', headers={"Remote-User": "foo@example.com"})
             self.assertFalse(self._get_user("foo@example.com"))
             self.assertEqual(r.status_code, 200)
 
     def test_header_auth_enabled(self):
         with patch.dict(self.app.config, {"USE_HEADER_AUTH": True}):
-            r = self.test_app.get('/login', headers={"Remote-User": "foo@example.com"})
+            r = self.test_app.get(
+                '/login', headers={"Remote-User": "foo@example.com"})
             user = self._get_user("foo@example.com")
             self.assertIsNotNone(user)
             self.assertEqual(user.role, "View")

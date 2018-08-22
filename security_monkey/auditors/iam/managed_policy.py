@@ -45,7 +45,8 @@ class ManagedPolicyAuditor(IAMPolicyAuditor):
     i_am_plural = ManagedPolicy.i_am_plural
 
     def __init__(self, accounts=None, debug=False):
-        super(ManagedPolicyAuditor, self).__init__(accounts=accounts, debug=debug)
+        super(ManagedPolicyAuditor, self).__init__(
+            accounts=accounts, debug=debug)
         self.iam_policy_keys = ['policy']
 
     def check_star_privileges(self, item):
@@ -74,7 +75,8 @@ class ManagedPolicyAuditor(IAMPolicyAuditor):
         Alert when an IAM Object has DataPlaneMutating permissions for sensitive services.
         """
         if not is_aws_managed_policy(item) or (is_aws_managed_policy(item) and has_attached_resources(item)):
-            super(ManagedPolicyAuditor, self).check_mutable_sensitive_services(item)
+            super(ManagedPolicyAuditor,
+                  self).check_mutable_sensitive_services(item)
 
     def check_iam_passrole(self, item):
         """
@@ -107,4 +109,5 @@ class ManagedPolicyAuditor(IAMPolicyAuditor):
         alert when an IAM Object has ec2:AuthorizeSecurityGroupEgress or ec2:AuthorizeSecurityGroupIngress.
         """
         if not is_aws_managed_policy(item) or (is_aws_managed_policy(item) and has_attached_resources(item)):
-            super(ManagedPolicyAuditor, self).check_security_group_permissions(item)
+            super(ManagedPolicyAuditor,
+                  self).check_security_group_permissions(item)

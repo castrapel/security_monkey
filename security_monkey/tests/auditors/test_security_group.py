@@ -68,10 +68,10 @@ INTERNAL_SG = {
     ]
 }
 
+
 class SecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
 
     def pre_test_setup(self):
-
         SecurityGroupAuditor(accounts=['TEST_ACCOUNT']).OBJECT_STORE.clear()
         account_type_result = AccountType(name='AWS')
         db.session.add(account_type_result)
@@ -89,8 +89,8 @@ class SecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = SecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNAL_SG', 
-                                    config=INTERNAL_SG)
+        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNAL_SG',
+                                 config=INTERNAL_SG)
 
         auditor.check_securitygroup_ec2_rfc1918(item)
         self.assertEquals(len(item.audit_issues), 1)
@@ -100,8 +100,8 @@ class SecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = SecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_INGRESS', 
-                                    config=INTERNET_SG_INGRESS)
+        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_INGRESS',
+                                 config=INTERNET_SG_INGRESS)
 
         auditor.check_internet_accessible_ingress(item)
         self.assertEquals(len(item.audit_issues), 1)
@@ -111,8 +111,8 @@ class SecurityGroupAuditorTestCase(SecurityMonkeyTestCase):
         auditor = SecurityGroupAuditor(accounts=['TEST_ACCOUNT'])
         auditor.prep_for_audit()
 
-        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_EGRESS', 
-                                    config=INTERNET_SG_EGRESS)
+        item = SecurityGroupItem(region=AWS_DEFAULT_REGION, account='TEST_ACCOUNT', name='INTERNET_SG_EGRESS',
+                                 config=INTERNET_SG_EGRESS)
 
         auditor.check_internet_accessible_egress(item)
         self.assertEquals(len(item.audit_issues), 1)

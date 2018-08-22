@@ -57,7 +57,8 @@ class GitHubRepoAuditor(Auditor):
         tag = "Repo is a fork of another repo."
 
         if repo_item.config.get("fork"):
-            self.add_issue(3, tag, repo_item, notes="Repo is a fork of another repo")
+            self.add_issue(3, tag, repo_item,
+                           notes="Repo is a fork of another repo")
 
     def check_for_no_protected_branches(self, repo_item):
         """
@@ -97,7 +98,8 @@ class GitHubRepoAuditor(Auditor):
         admin_oc_tag = "Repo has administrative outside collaborators."
 
         if len(repo_item.config["outside_collaborators"]) > 0:
-            self.add_issue(3, oc_tag, repo_item, notes="Repo has outside collaborators")
+            self.add_issue(3, oc_tag, repo_item,
+                           notes="Repo has outside collaborators")
 
             # Check if any of these OC's have administrative privileges:
             for oc in repo_item.config["outside_collaborators"]:
@@ -115,4 +117,5 @@ class GitHubRepoAuditor(Auditor):
 
         for permission in itervalues(repo_item.config["team_permissions"]):
             if permission == "admin":
-                self.add_issue(3, tag, repo_item, notes="Repo has a team with admin permissions to it.")
+                self.add_issue(
+                    3, tag, repo_item, notes="Repo has a team with admin permissions to it.")

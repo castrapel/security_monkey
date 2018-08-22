@@ -19,11 +19,15 @@ from sqlalchemy.orm import sessionmaker, Session as BaseSession, relationship
 
 Session = sessionmaker()
 
-event.remove(BaseSession, 'before_commit', _SessionSignalEvents.session_signal_before_commit)
-event.remove(BaseSession, 'after_commit', _SessionSignalEvents.session_signal_after_commit)
-event.remove(BaseSession, 'after_rollback', _SessionSignalEvents.session_signal_after_rollback)
+event.remove(BaseSession, 'before_commit',
+             _SessionSignalEvents.session_signal_before_commit)
+event.remove(BaseSession, 'after_commit',
+             _SessionSignalEvents.session_signal_after_commit)
+event.remove(BaseSession, 'after_rollback',
+             _SessionSignalEvents.session_signal_after_rollback)
 
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -38,7 +42,8 @@ def upgrade():
 
     bind = op.get_bind()
     session = Session(bind=bind)
-    op.add_column('user', sa.Column('role', sa.String(length=30), nullable=True))
+    op.add_column('user', sa.Column(
+        'role', sa.String(length=30), nullable=True))
     for user in session.query(User):
         if user.active:
             user.role = 'View'

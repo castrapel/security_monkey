@@ -22,7 +22,8 @@ def persist_item(item, db_item, technology, account, complete_hash, durable_hash
             db_item = create_item_aws(item, technology, account)
 
     if db_item.latest_revision_complete_hash == complete_hash:
-        app.logger.debug("Change persister doesn't see any change. Ignoring...")
+        app.logger.debug(
+            "Change persister doesn't see any change. Ignoring...")
 
         # Check if the durable hash is out of date for some reason. This could happen if the
         # ephemeral definitions change. If this is the case, then update it.
@@ -170,7 +171,8 @@ def inactivate_old_revisions(watcher, arns, account, technology):
         revision = create_revision(config, db_item)
         db_item.revisions.append(revision)
 
-        complete_hash, durable_hash = hash_item(config, watcher.ephemeral_paths)
+        complete_hash, durable_hash = hash_item(
+            config, watcher.ephemeral_paths)
 
         db_item.latest_revision_complete_hash = complete_hash
         db_item.latest_revision_durable_hash = durable_hash

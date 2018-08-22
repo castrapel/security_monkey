@@ -32,7 +32,8 @@ class GCPAccountManager(AccountManager):
     identifier_tool_tip = 'Enter the GCP Project ID.'
     creds_file_tool_tip = 'Enter the path on disk to the credentials file.'
     custom_field_configs = [
-        CustomFieldConfig('creds_file', 'Credentials File', True, creds_file_tool_tip),
+        CustomFieldConfig('creds_file', 'Credentials File',
+                          True, creds_file_tool_tip),
     ]
 
     def __init__(self):

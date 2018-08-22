@@ -32,6 +32,7 @@ class Route53Service(object):
     """
         Class provides useful functions of manipulating Route53 records
     """
+
     def __init__(self, **kwargs):
         super(Route53Service, self).__init__(**kwargs)
         self.conn = boto.connect_route53()
@@ -44,7 +45,8 @@ class Route53Service(object):
     def register(self, fqdn, exclusive=False, ttl=60, type='CNAME', regions=None):
         fqdn = fqdn.replace('_', '-')
         fqdn = re.sub(r'[^\w\-\.]', '', fqdn)
-        app.logger.debug('route53: register fqdn: {}, hostname: {}'.format(fqdn, self.hostname))
+        app.logger.debug(
+            'route53: register fqdn: {}, hostname: {}'.format(fqdn, self.hostname))
 
         zone_id = self._get_zone_id(fqdn)
 
@@ -57,8 +59,10 @@ class Route53Service(object):
                     app.logger.debug('found fqdn to delete: {}'.format(rrset))
 
                     for rr in rrset.resource_records:
-                        changes = boto.route53.record.ResourceRecordSets(self.conn, zone_id)
-                        changes.add_change("DELETE", fqdn, type, ttl).add_value(rr)
+                        changes = boto.route53.record.ResourceRecordSets(
+                            self.conn, zone_id)
+                        changes.add_change(
+                            "DELETE", fqdn, type, ttl).add_value(rr)
                         changes.commit()
 
         changes = boto.route53.record.ResourceRecordSets(self.conn, zone_id)
@@ -70,7 +74,8 @@ class Route53Service(object):
         fqdn = fqdn.replace('_', '-')
         fqdn = re.sub(r'[^\w\-\.]', '', fqdn)
 
-        app.logger.debug('route53: unregister fqdn: {}, hostname: {}'.format(fqdn, self.hostname))
+        app.logger.debug(
+            'route53: unregister fqdn: {}, hostname: {}'.format(fqdn, self.hostname))
 
         zone_id = self._get_zone_id(fqdn)
 

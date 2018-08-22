@@ -85,20 +85,21 @@ auditor_configs = [
 
 for config in auditor_configs:
     auditor = type(
-                config['type'], (MockAuditor,),
-                {
-                    'index': config['index'],
-                    'support_auditor_indexes': config['support_auditor_indexes'],
-                    'support_watcher_indexes': config['support_watcher_indexes']
-                }
-            )
+        config['type'], (MockAuditor,),
+        {
+            'index': config['index'],
+            'support_auditor_indexes': config['support_auditor_indexes'],
+            'support_watcher_indexes': config['support_watcher_indexes']
+        }
+    )
 
     test_auditor_registry[config['index']].append(auditor)
 
 
 class MonitorTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        account_result = Account.query.filter(Account.name == 'TEST_ACCOUNT').first()
+        account_result = Account.query.filter(
+            Account.name == 'TEST_ACCOUNT').first()
         if not account_result:
             account_type = AccountType(name='AWS')
             db.session.add(account_type)
@@ -121,7 +122,8 @@ class MonitorTestCase(SecurityMonkeyTestCase):
     @patch.dict(watcher_registry, test_watcher_registry, clear=True)
     @patch.dict(auditor_registry, test_auditor_registry, clear=True)
     def test_get_monitors_and_dependencies_all(self):
-        mons = get_monitors_and_dependencies('TEST_ACCOUNT', test_watcher_registry.keys())
+        mons = get_monitors_and_dependencies(
+            'TEST_ACCOUNT', test_watcher_registry.keys())
         assert len(mons) == 3
 
     @patch.dict(watcher_registry, test_watcher_registry, clear=True)

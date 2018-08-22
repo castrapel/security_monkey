@@ -24,7 +24,8 @@ ORIGINS = [
     'https://{}:{}'.format(app.config.get('FQDN'), app.config.get('WEB_PORT')),
     # Adding this next one so you can also access the dart UI by prepending /static to the path.
     'https://{}:{}'.format(app.config.get('FQDN'), app.config.get('API_PORT')),
-    'https://{}:{}'.format(app.config.get('FQDN'), app.config.get('NGINX_PORT')),
+    'https://{}:{}'.format(app.config.get('FQDN'),
+                           app.config.get('NGINX_PORT')),
     'https://{}:80'.format(app.config.get('FQDN'))
 ]
 
@@ -186,9 +187,11 @@ class AuthenticatedService(Resource):
             }
         else:
             if app.config.get('FRONTED_BY_NGINX'):
-                url = "https://{}:{}{}".format(app.config.get('FQDN'), app.config.get('NGINX_PORT'), '/login')
+                url = "https://{}:{}{}".format(app.config.get('FQDN'),
+                                               app.config.get('NGINX_PORT'), '/login')
             else:
-                url = "http://{}:{}{}".format(app.config.get('FQDN'), app.config.get('API_PORT'), '/login')
+                url = "http://{}:{}{}".format(app.config.get('FQDN'),
+                                              app.config.get('API_PORT'), '/login')
             self.auth_dict = {
                 "authenticated": False,
                 "user": None,

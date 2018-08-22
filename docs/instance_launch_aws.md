@@ -3,7 +3,7 @@ Launch Security Monkey in AWS
 
 Netflix uses a pool of `m3.medium` instances to monitor our AWS accounts, but for this guide we will launch a m1.small.
 
-**Please Note: It is highly recommended that you operate Security Monkey on an instance with at least of 1.7GB of RAM. 
+**Please Note: It is highly recommended that you operate Security Monkey on an instance with at least of 1.7GB of RAM.
 You may encounter installation issues if you have less than 1.7GB of RAM. See [#580](https://github.com/Netflix/security_monkey/issues/580) for details.**
 
 

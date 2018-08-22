@@ -58,12 +58,14 @@ class SNS(Watcher):
                     (sns, topics) = self.get_all_topics_in_region(account, region)
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), 'sns', account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), 'sns', account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
 
-                app.logger.debug("Found {} {}".format(len(topics), SNS.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(topics), SNS.i_am_plural))
                 for topic in topics:
                     arn = topic['TopicArn']
 
@@ -82,7 +84,8 @@ class SNS(Watcher):
     def get_all_topics_in_region(self, account, region):
         from security_monkey.common.sts_connect import connect
         sns = connect(account, 'sns', region=region)
-        app.logger.debug("Checking {}/{}/{}".format(SNS.index, account, region.name))
+        app.logger.debug(
+            "Checking {}/{}/{}".format(SNS.index, account, region.name))
         topics = []
         marker = None
         while True:
@@ -145,8 +148,10 @@ class SNS(Watcher):
             )
 
             config['subscriptions'] = self._get_topic_subscriptions(conn, arn)
-            config['policy'] = self._get_sns_policy(attrs, account, region, arn, exception_map)
-            config['name'] = self._get_sns_name(arn, account, region, exception_map)
+            config['policy'] = self._get_sns_policy(
+                attrs, account, region, arn, exception_map)
+            config['name'] = self._get_sns_name(
+                arn, account, region, exception_map)
         except:
             return None
 

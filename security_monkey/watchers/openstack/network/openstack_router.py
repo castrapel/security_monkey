@@ -34,4 +34,4 @@ class OpenStackRouter(OpenStackWatcher):
         self.item_type = 'router'
         self.service = 'network'
         self.generator = 'routers'
-        self.ephemeral_paths = [ "updated_at" ]
+        self.ephemeral_paths = ["updated_at"]

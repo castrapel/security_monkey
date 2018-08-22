@@ -43,12 +43,14 @@ class AuditorTestObj(Auditor):
 
 class AuditorTestCase(SecurityMonkeyTestCase):
     def pre_test_setup(self):
-        self.account_type = AccountType.query.filter(AccountType.name == 'AWS').first()
+        self.account_type = AccountType.query.filter(
+            AccountType.name == 'AWS').first()
         if not self.account_type:
             self.account_type = AccountType(name='AWS')
             db.session.add(self.account_type)
             db.session.commit()
-        self.test_account = Account(type=self.account_type, name="test_account", identifier="012345678910")
+        self.test_account = Account(
+            type=self.account_type, name="test_account", identifier="012345678910")
         self.technology = Technology(name="testtech")
 
         db.session.add(self.test_account)
@@ -61,7 +63,8 @@ class AuditorTestCase(SecurityMonkeyTestCase):
         super(AuditorTestCase, self).tearDown()
 
     def test_save_issues(self):
-        item = Item(region="us-west-2", name="testitem", technology=self.technology, account=self.test_account)
+        item = Item(region="us-west-2", name="testitem",
+                    technology=self.technology, account=self.test_account)
         revision = ItemRevision(item=item, config={}, active=True)
         item_audit = ItemAudit(item=item, issue="test issue")
         db.session.add(item)
@@ -78,7 +81,8 @@ class AuditorTestCase(SecurityMonkeyTestCase):
         try:
             auditor.save_issues()
         except AttributeError as e:
-            self.fail("Auditor.save_issues() raised AttributeError unexpectedly: {}".format(e.message))
+            self.fail(
+                "Auditor.save_issues() raised AttributeError unexpectedly: {}".format(e.message))
 
     def test_link_to_support_item_issue(self):
         sub_item_id = 2
@@ -107,12 +111,17 @@ class AuditorTestCase(SecurityMonkeyTestCase):
         issue1_score = 10
         issue2_score = 5
 
-        item = ChangeItem(index='test_index', account='test_account', name='item_name')
-        sub_item = Item(id=sub_item_id, tech_id=1, account_id=1, name='sub_item_name')
-        sub_item.issues.append(ItemAudit(score=issue1_score, issue=issue1_text))
-        sub_item.issues.append(ItemAudit(score=issue2_score, issue=issue2_text))
+        item = ChangeItem(index='test_index',
+                          account='test_account', name='item_name')
+        sub_item = Item(id=sub_item_id, tech_id=1,
+                        account_id=1, name='sub_item_name')
+        sub_item.issues.append(
+            ItemAudit(score=issue1_score, issue=issue1_text))
+        sub_item.issues.append(
+            ItemAudit(score=issue2_score, issue=issue2_text))
 
-        auditor.link_to_support_item_issues(item, sub_item, issue_message="TEST")
+        auditor.link_to_support_item_issues(
+            item, sub_item, issue_message="TEST")
         self.assertTrue(len(item.audit_issues) == 1)
         new_issue = item.audit_issues[0]
 

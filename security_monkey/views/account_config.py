@@ -30,6 +30,7 @@ from security_monkey import rbac
 
 from flask_restful import reqparse
 
+
 class AccountConfigGet(AuthenticatedService):
     decorators = [
         rbac.allow(["View"], ["GET"]),
@@ -85,32 +86,32 @@ class AccountConfigGet(AuthenticatedService):
                 fields = []
 
                 if account_fields == 'all':
-                    fields.append({ 'name': 'identifier',
-                                    'label': '',
-                                    'editable': True,
-                                    'tool_tip': '',
-                                    'password': False,
-                                    'allowed_values': None
-                                  }
-                    )
+                    fields.append({'name': 'identifier',
+                                   'label': '',
+                                   'editable': True,
+                                   'tool_tip': '',
+                                   'password': False,
+                                   'allowed_values': None
+                                   }
+                                  )
 
-                    fields.append({ 'name': 'name',
-                                    'label': '',
-                                    'editable': True,
-                                    'tool_tip': '',
-                                    'password': False,
-                                    'allowed_values': None
-                                  }
-                    )
+                    fields.append({'name': 'name',
+                                   'label': '',
+                                   'editable': True,
+                                   'tool_tip': '',
+                                   'password': False,
+                                   'allowed_values': None
+                                   }
+                                  )
 
-                    fields.append({ 'name': 'notes',
-                                    'label': '',
-                                    'editable': True,
-                                    'tool_tip': '',
-                                    'password': False,
-                                    'allowed_values': None
-                                  }
-                    )
+                    fields.append({'name': 'notes',
+                                   'label': '',
+                                   'editable': True,
+                                   'tool_tip': '',
+                                   'password': False,
+                                   'allowed_values': None
+                                   }
+                                  )
 
                 for config in acc_manager.custom_field_configs:
                     if account_fields == 'custom' or not config.password:

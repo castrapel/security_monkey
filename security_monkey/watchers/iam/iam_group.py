@@ -139,7 +139,8 @@ class IAMGroup(Watcher):
                 continue
 
             for group in groups:
-                app.logger.debug("Slurping %s (%s) from %s" % (self.i_am_singular, group.group_name, account))
+                app.logger.debug("Slurping %s (%s) from %s" % (
+                    self.i_am_singular, group.group_name, account))
 
                 if self.check_ignore_list(group.group_name):
                     continue
@@ -151,13 +152,16 @@ class IAMGroup(Watcher):
                 }
 
                 if group.arn in managed_policies:
-                    item_config['managed_policies'] = managed_policies.get(group.arn)
+                    item_config['managed_policies'] = managed_policies.get(
+                        group.arn)
 
                 ### GROUP POLICIES ###
-                group_policies = self.get_all_group_policies(iam, group.group_name)
+                group_policies = self.get_all_group_policies(
+                    iam, group.group_name)
 
                 for policy_name in group_policies:
-                    policy = self.wrap_aws_rate_limited_call(iam.get_group_policy, group.group_name, policy_name)
+                    policy = self.wrap_aws_rate_limited_call(
+                        iam.get_group_policy, group.group_name, policy_name)
                     policy = policy.policy_document
                     policy = urllib.unquote(policy)
                     try:
@@ -167,10 +171,12 @@ class IAMGroup(Watcher):
                         self.slurp_exception((self.index, account, 'universal', group.group_name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
 
-                    item_config['grouppolicies'][policy_name] = dict(policydict)
+                    item_config['grouppolicies'][policy_name] = dict(
+                        policydict)
 
                 ### GROUP USERS ###
-                group_users = self.get_all_group_users(iam, group['group_name'])
+                group_users = self.get_all_group_users(
+                    iam, group['group_name'])
                 for user in group_users:
                     item_config['users'][user.arn] = user.user_name
 

@@ -41,7 +41,7 @@ class GitHubUtilsTestCase(SecurityMonkeyTestCase):
         # can be found!
         for x in ["one", "two", "three"]:
             account = Account(name="Org-{}".format(x), account_type_id=self.account_type.id,
-                                   identifier="Org-{}".format(x), active=True)
+                              identifier="Org-{}".format(x), active=True)
             account.custom_fields.append(AccountTypeCustomValues(name="access_token_file",
                                                                  value="security_monkey/tests/"
                                                                        "utilities/templates/github_creds"))
@@ -79,7 +79,8 @@ class GitHubUtilsTestCase(SecurityMonkeyTestCase):
         assert creds["AnotherOrg"] == "AnotherCred"
 
         # Altogether now:
-        creds = get_github_creds(["Org-one", "Org-two", "Org-three", "AnotherOrg"])
+        creds = get_github_creds(
+            ["Org-one", "Org-two", "Org-three", "AnotherOrg"])
         assert isinstance(creds, dict)
         assert len(creds.keys()) == 4
 
@@ -238,9 +239,12 @@ class GitHubUtilsTestCase(SecurityMonkeyTestCase):
         # Remove the fields:
         new_blob = strip_url_fields(github_blob)
 
-        assert total_outer_fields - len(outer_fields_to_remove) == len(new_blob.keys())
-        assert total_org_fields - len(org_fields_to_remove) == len(new_blob["organization"].keys())
-        assert total_owner_fields - len(owner_fields_to_remove) == len(new_blob["owner"].keys())
+        assert total_outer_fields - \
+            len(outer_fields_to_remove) == len(new_blob.keys())
+        assert total_org_fields - \
+            len(org_fields_to_remove) == len(new_blob["organization"].keys())
+        assert total_owner_fields - \
+            len(owner_fields_to_remove) == len(new_blob["owner"].keys())
 
         # And just for sanity:
         for outer in outer_fields_to_remove:

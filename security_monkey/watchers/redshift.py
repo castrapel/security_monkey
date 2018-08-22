@@ -63,7 +63,8 @@ class Redshift(Watcher):
             account_number = account_db.identifier
 
             for region in regions():
-                app.logger.debug("Checking {}/{}/{}".format(self.index, account, region.name))
+                app.logger.debug(
+                    "Checking {}/{}/{}".format(self.index, account, region.name))
                 try:
                     redshift = connect(account, 'redshift', region=region)
 
@@ -74,7 +75,8 @@ class Redshift(Watcher):
                             redshift.describe_clusters,
                             marker=marker
                         )
-                        all_clusters.extend(response['DescribeClustersResponse']['DescribeClustersResult']['Clusters'])
+                        all_clusters.extend(
+                            response['DescribeClustersResponse']['DescribeClustersResult']['Clusters'])
                         if response['DescribeClustersResponse']['DescribeClustersResult']['Marker'] is not None:
                             marker = response['DescribeClustersResponse']['DescribeClustersResult']['Marker']
                         else:
@@ -82,11 +84,13 @@ class Redshift(Watcher):
 
                 except Exception as e:
                     if region.name not in TROUBLE_REGIONS:
-                        exc = BotoConnectionIssue(str(e), 'redshift', account, region.name)
+                        exc = BotoConnectionIssue(
+                            str(e), 'redshift', account, region.name)
                         self.slurp_exception((self.index, account, region.name), exc, exception_map,
                                              source="{}-watcher".format(self.index))
                     continue
-                app.logger.debug("Found {} {}".format(len(all_clusters), Redshift.i_am_plural))
+                app.logger.debug("Found {} {}".format(
+                    len(all_clusters), Redshift.i_am_plural))
                 for cluster in all_clusters:
                     cluster_id = cluster['ClusterIdentifier']
                     if self.check_ignore_list(cluster_id):

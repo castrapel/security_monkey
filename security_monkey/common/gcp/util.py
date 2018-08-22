@@ -49,7 +49,8 @@ def get_gcp_project_creds(account_names):
     for account in accounts:
         key_file = account.getCustom(creds_field)
         if key_file:
-            project_creds.append({'project': account.identifier, 'key_file': key_file})
+            project_creds.append(
+                {'project': account.identifier, 'key_file': key_file})
         else:
             project_creds.append(account.identifier)
 

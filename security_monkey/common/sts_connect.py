@@ -25,6 +25,7 @@ import boto3
 import boto
 from security_monkey import app, AWS_DEFAULT_REGION, ARN_PREFIX
 
+
 def connect(account_name, connection_type, **args):
     """
 

@@ -21,9 +21,10 @@
 """
 from security_monkey.tests.watchers.openstack import OpenStackWatcherTestCase
 
+
 class OpenStackPortWatcherTestCase(OpenStackWatcherTestCase):
 
     def pre_test_setup(self):
         super(OpenStackPortWatcherTestCase, self).pre_test_setup()
-        from security_monkey.watchers.openstack.network.openstack_port import OpenStackPort 
+        from security_monkey.watchers.openstack.network.openstack_port import OpenStackPort
         self.watcher = OpenStackPort(accounts=[self.account.name])

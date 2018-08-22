@@ -39,4 +39,5 @@ class KMSAuditor(ResourcePolicyAuditor):
         """
         rotation_status = kms_item.config.get('KeyRotationEnabled')
         if not rotation_status:
-            self.add_issue(1, 'KMS key is not configured for rotation.', kms_item)
+            self.add_issue(
+                1, 'KMS key is not configured for rotation.', kms_item)

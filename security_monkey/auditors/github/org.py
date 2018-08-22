@@ -43,7 +43,8 @@ class GitHubOrgAuditor(Auditor):
         tag = "Organization contains public repositories."
 
         if org_item.config["public_repos"] > 0:
-            self.add_issue(0, tag, org_item, notes="Organization contains public repositories")
+            self.add_issue(0, tag, org_item,
+                           notes="Organization contains public repositories")
 
     def check_for_non_twofa_members(self, org_item):
         """
@@ -57,7 +58,8 @@ class GitHubOrgAuditor(Auditor):
         owner_no_twofa = "Organization owner does NOT have 2FA enabled!"
 
         if len(org_item.config["no_2fa_members"]) > 0:
-            self.add_issue(2, tag, org_item, notes="Organization contains users without 2FA enabled")
+            self.add_issue(
+                2, tag, org_item, notes="Organization contains users without 2FA enabled")
 
             for notwofa in org_item.config["no_2fa_members"]:
                 if notwofa in org_item.config["owners"]:

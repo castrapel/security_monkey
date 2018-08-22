@@ -24,16 +24,16 @@ Common Issues
 This is a list of common issues and their resolutions.  
 
 1. **No data is loading**
-   
+
     This is perhaps the number 1 issue users encounter. This can be caused for a number of reasons:
       - Insufficient permissions for the Security Monkey IAM Roles.
         **Solution**: [Follow the IAM instructions](https://github.com/Netflix/security_monkey/blob/develop/docs/quickstart.md#account-types) for the given technology in question and ensure that the proper permissions are in place.
-        
+
       - I'm seeing: `Unable to locate credentials` errors.
         **Solution**: If you are running in AWS, you will need to ensure that you launch all of your Security Monkey instances with
         the `SecurityMonkeyInstanceProfile`. [Please follow the IAM instructions](iam_aws.md)
         and the `Launch a new Instance` section of the [AWS instance launching documentation](instance_launch_aws.md).
-     
+
       - Scheduler and workers are not functioning properly.
         **Solution**: Follow the [autostarting guide](https://github.com/Netflix/security_monkey/blob/develop/docs/autostarting.md), and ensure that the following is true:
           - Remember, there should only ever be exactly one scheduler instance running (only 1 celery scheduler process that should ever be running)
@@ -42,30 +42,30 @@ This is a list of common issues and their resolutions.
             issues that may be relevant.
 
 1. **I'm seeing "Access Denied" errors.**
-    
+
     This is caused by insufficient permissions. **Solution**: [Follow the IAM instructions](https://github.com/Netflix/security_monkey/blob/develop/docs/quickstart.md#account-types) for the given technology in question and ensure that the proper permissions are in place.
 
 1. **Error: Too many open files.** (This is not likely to be as much of a problem in v1.0+ but if you encounter it, then follow the instructions below)
-    
+
     You might see an error along the lines of: `Too many open files' [in /usr/local/src/security_monkey/security_monkey/exceptions.py:68]`
 
     **Solution:** Try increasing the limit for open file handlers
-    
+
     ```bash
     /etc/security/limits.conf
     *    soft nofile 100000
     *    hard nofile 100000
-    
+
     /etc/pam.d/common-session
     session required pam_limits.so
-    
-    /etc/pam.d/common-session-noninteractive 
+
+    /etc/pam.d/common-session-noninteractive
     session required pam_limits.so
-    
+
     /etc/supervisor/supervisord.conf, in the [supervisord] section:
     minfds=100000
     ```
-    
+
     Reference: [Raising the maximum number of file descriptors](https://underyx.me/2015/05/18/raising-the-maximum-number-of-file-descriptors)
 
  1. **Some accounts are getting data but others aren't.**

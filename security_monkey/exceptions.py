@@ -201,4 +201,5 @@ class InvalidCeleryConfigurationType(SecurityMonkeyException):
 
     def __init__(self, variable, required_type, value_type):
         self.error_message = "Incorrect type for Security Monkey celery configuration variable: '{}', required: {}, " \
-                             "actual: {}".format(variable, required_type.__name__, value_type.__name__)
+                             "actual: {}".format(
+                                 variable, required_type.__name__, value_type.__name__)
